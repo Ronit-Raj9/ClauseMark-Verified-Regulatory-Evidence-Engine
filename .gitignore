@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# uv
+.uv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# Runtime data
+data/cache/
+data/outputs/
+data/samples/*
+!data/samples/.gitkeep
+*.db
+*.sqlite
+
+# Env
+.env
+.env.local
+
+# Docker
+.docker/
+
+# Logs
+*.log
+logs/
+
+# Streamlit
+.streamlit/secrets.toml
