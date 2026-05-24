@@ -23,12 +23,13 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import os
 from collections import Counter
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 from typing import Any
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from rie_contracts import (
     Claim,
     ClassifierPort,
@@ -42,9 +43,26 @@ from rie_contracts import (
     SpanRole,
 )
 
+from .config import ClassifierConfig
+from .language import DEFAULT_LANGUAGE, detect_language
 from .llm_client import LlmClient
 from .prompt import build_classification_prompt
 from .schema import ClassificationOutputBase, build_output_model
+
+
+class InternalClassification(BaseModel):
+    """Adapter-internal carrier that pairs the modal LLM output with the detected language.
+
+    Not exposed via the ``ClassifierPort`` contract (which is frozen). Used
+    only within the service to keep the language attached to the modal
+    sample without smuggling it into the LLM JSON schema (which would let
+    the LLM author a language tag — exactly what we forbid).
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    language: str = Field(min_length=2, max_length=8)
+    language_pillar_match: bool
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +86,7 @@ class ClassificationService(ClassifierPort):
         get_element: Callable[[str], Element],
         get_jurisdiction: Callable[[str], str] | None = None,
         now: Callable[[], datetime] | None = None,
+        config: ClassifierConfig | None = None,
     ) -> None:
         self._llm = llm
         self._get_element = get_element
@@ -77,6 +96,7 @@ class ClassificationService(ClassifierPort):
         # remaining deterministic.
         self._get_jurisdiction = get_jurisdiction or (lambda doc_id: doc_id)
         self._now = now or (lambda: datetime.now(UTC))
+        self._config = config or ClassifierConfig()
 
     # ----------------------------------------------------------------- port
     def classify_clause(
@@ -92,11 +112,16 @@ class ClassificationService(ClassifierPort):
         if not indicator_choices:
             raise ValueError("indicator_choices must be non-empty")
 
+        detected_language = self._detect_clause_language(clause_element.text)
+        _pillar_supports_language(
+            indicator_choices=indicator_choices, language=detected_language
+        )
         prompt = build_classification_prompt(
             clause_element=clause_element,
             neighbourhood=neighbourhood,
             pillar=pillar,
             indicator_choices=indicator_choices,
+            detected_language=detected_language,
         )
         output_model = build_output_model(list(indicator_choices))
         schema = output_model.model_json_schema()
@@ -123,6 +148,13 @@ class ClassificationService(ClassifierPort):
         )
 
     # ----------------------------------------------------------------- impl
+    def _detect_clause_language(self, text: str) -> str:
+        if not self._config.multilingual_enabled:
+            return DEFAULT_LANGUAGE
+        if os.getenv("RIE_MULTILINGUAL_ENABLED", "1") == "0":
+            return DEFAULT_LANGUAGE
+        return detect_language(text)
+
     def _draw_samples(
         self,
         *,
@@ -258,6 +290,18 @@ class ClassificationService(ClassifierPort):
     def _claim_id(*, jurisdiction: str, element_id: str, indicator_id: str) -> str:
         key = f"{jurisdiction}|{element_id}|{indicator_id}".encode()
         return hashlib.md5(key, usedforsecurity=False).hexdigest()
+
+
+def _pillar_supports_language(
+    *,
+    indicator_choices: Sequence[IndicatorConfig],
+    language: str,
+) -> bool:
+    """Return True when any indicator exposes keyword lists for ``language``."""
+    for ind in indicator_choices:
+        if language in ind.positive_keywords or language in ind.negative_cues:
+            return True
+    return False
 
 
 __all__ = ["ClassificationService"]

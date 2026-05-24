@@ -86,3 +86,20 @@ def test_prompt_includes_few_shot_examples(
 ) -> None:
     prompt = build_classification_prompt(clause_element, neighbourhood, pillar, indicator_choices)
     assert "few_shot_examples" in prompt
+
+
+def test_prompt_includes_detected_language_block(
+    clause_element: Element,
+    neighbourhood: list[Element],
+    pillar: PillarConfig,
+    indicator_choices: list[IndicatorConfig],
+) -> None:
+    prompt = build_classification_prompt(
+        clause_element,
+        neighbourhood,
+        pillar,
+        indicator_choices,
+        detected_language="fr",
+    )
+    assert "detected_language: fr" in prompt
+    assert "do_not_translate" in prompt
