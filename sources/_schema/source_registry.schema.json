@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rie.un.example/schemas/source-registry.json",
+  "title": "Source registry — per jurisdiction",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["jurisdiction", "sources"],
+  "properties": {
+    "jurisdiction": { "type": "string", "minLength": 2 },
+    "language": { "type": "string", "default": "en" },
+    "sources": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "title", "document_type", "authority_tier"],
+        "properties": {
+          "source_id": { "type": "string" },
+          "title": { "type": "string" },
+          "source_url": { "type": ["string", "null"] },
+          "local_path": { "type": ["string", "null"] },
+          "document_type": {
+            "enum": ["statute", "amendment", "regulation", "guideline", "treaty", "notice", "other"]
+          },
+          "authority_tier": {
+            "enum": ["tier_1_statute", "tier_2_regulation", "tier_3_guideline", "tier_4_informal"]
+          },
+          "effective_date": { "type": ["string", "null"], "format": "date" },
+          "sha256_hash": { "type": ["string", "null"] },
+          "language": { "type": "string" }
+        }
+      }
+    }
+  }
+}

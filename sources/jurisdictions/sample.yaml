@@ -1,0 +1,20 @@
+jurisdiction: "SAMPLE"
+language: "en"
+sources:
+  - source_id: "sample_dpa_2020"
+    title: "Sample Personal Data Protection Act, 2020"
+    source_url: null
+    local_path: "data/samples/sample_dpa.txt"
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "2020-06-01"
+    language: "en"
+
+  - source_id: "sample_ecommerce_2019"
+    title: "Sample Electronic Transactions Act, 2019"
+    source_url: null
+    local_path: "data/samples/sample_eta.txt"
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "2019-04-01"
+    language: "en"

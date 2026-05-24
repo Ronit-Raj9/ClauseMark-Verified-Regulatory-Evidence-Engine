@@ -1,0 +1,12 @@
+jurisdiction: "XX"
+language: "en"
+sources:
+  - source_id: "xx_dpa_2024"
+    title: "Replace me"
+    source_url: null
+    local_path: "data/samples/xx_dpa.pdf"
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: null
+    sha256_hash: null
+    language: "en"
