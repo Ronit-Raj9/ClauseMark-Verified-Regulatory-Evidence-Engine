@@ -1,0 +1,29 @@
+target-version = "py312"
+line-length = 100
+extend-exclude = ["data", ".venv", "build", "dist"]
+
+[lint]
+select = [
+    "E", "F", "W",   # pycodestyle / pyflakes
+    "I",             # isort
+    "B",             # bugbear
+    "UP",            # pyupgrade
+    "C4",            # comprehensions
+    "SIM",           # simplify
+    "RUF",
+    "TID",           # tidy imports
+    "PL",            # pylint subset
+]
+ignore = [
+    "E501",          # line length handled by formatter
+    "PLR0913",       # too many args
+    "PLR2004",       # magic value
+]
+
+[lint.per-file-ignores]
+"tests/**" = ["PLR2004", "B011"]
+"**/migrations/**" = ["I", "E"]
+
+[format]
+quote-style = "double"
+indent-style = "space"

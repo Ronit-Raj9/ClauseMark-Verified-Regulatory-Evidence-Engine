@@ -1,0 +1,14 @@
+{
+  "include": ["packages", "tests", "scripts"],
+  "exclude": ["**/__pycache__", "**/.venv", "data", "build", "dist"],
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "strict",
+  "useLibraryCodeForTypes": true,
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": "none",
+  "reportUnknownMemberType": "none",
+  "reportUnknownVariableType": "none",
+  "reportUnknownArgumentType": "none",
+  "reportPrivateUsage": "warning",
+  "reportUnusedImport": "warning"
+}
