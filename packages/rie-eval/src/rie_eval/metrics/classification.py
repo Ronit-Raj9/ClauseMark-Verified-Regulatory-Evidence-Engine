@@ -31,7 +31,7 @@ def prf(
 ) -> dict[str, tuple[float, float, float]]:
     """Per-label precision/recall/F1.
 
-    Returns a dict keyed by label → (precision, recall, f1). The label set is
+    Returns a dict keyed by label -> (precision, recall, f1). The label set is
     the union of labels seen in either sequence, with ``NO_CLAIM_LABEL`` removed
     (it is a sentinel, not a real class).
     """

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rie.un.example/schemas/out-of-corpus.json",
+  "title": "Sidecar — out-of-corpus gold annotations",
+  "description": "Per-pillar sidecar listing gold_ids whose source documents are NOT in the ingested corpus. Optional metadata for the external_recall metric. The FROZEN GoldItem contract forbids extra fields, so this annotation is kept in a sidecar rather than on the gold item itself.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["items"],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["gold_id", "out_of_corpus"],
+        "properties": {
+          "gold_id": { "type": "string" },
+          "out_of_corpus": { "type": "boolean" },
+          "reason": { "type": "string" }
+        }
+      }
+    }
+  }
+}

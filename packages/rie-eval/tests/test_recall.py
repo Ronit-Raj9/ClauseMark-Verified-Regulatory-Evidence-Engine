@@ -69,6 +69,6 @@ def test_recall_mismatched_length_raises(config: ConfigRepository) -> None:
 
 
 def test_recall_empty_gold_returns_zero(config: ConfigRepository) -> None:
-    # Pillar 8 has no gold items shipped.
+    # Pillar 1 ships without a gold directory (tabular profile — gold optional).
     evaluator = Evaluator(config=config)
-    assert evaluator.measure_retrieval_recall("8", []) == 0.0
+    assert evaluator.measure_retrieval_recall("1", []) == 0.0
