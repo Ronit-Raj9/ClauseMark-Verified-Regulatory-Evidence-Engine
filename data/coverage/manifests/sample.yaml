@@ -1,0 +1,21 @@
+# Corpus manifest for jurisdiction SAMPLE.
+#
+# Declares per-indicator the set of authoritative source types we EXPECT to
+# have ingested before claiming "no evidence in searched corpus" is defensible.
+#
+# Loaded by `rie_coverage.corpus_completeness.load_manifest`. Missing entries
+# for an indicator fall back to the default manifest (statute + regulation).
+jurisdiction: "SAMPLE"
+indicators:
+  "6.4":
+    expected_source_types:
+      - statute
+      - regulation
+      - guideline
+  "7.1":
+    expected_source_types:
+      - statute
+      - regulation
+default_expected_source_types:
+  - statute
+  - regulation

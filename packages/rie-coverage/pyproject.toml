@@ -3,7 +3,7 @@ name = "rie-coverage"
 version = "0.1.0"
 description = "3-state absence reasoning."
 requires-python = ">=3.12,<3.13"
-dependencies = ["rie-contracts", "pydantic>=2.9"]
+dependencies = ["rie-contracts", "pydantic>=2.9", "pyyaml>=6.0.2"]
 
 [build-system]
 requires = ["hatchling"]

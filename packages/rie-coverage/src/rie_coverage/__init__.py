@@ -15,6 +15,18 @@ Public surface:
 * :mod:`rie_coverage.policy` — pure-function helpers documenting the policy.
 """
 
+from rie_coverage.corpus_completeness import (
+    DEFAULT_EXPECTED_SOURCE_TYPES,
+    DOWNGRADE_THRESHOLD,
+    CompletenessReport,
+    CorpusManifest,
+    EnrichedCoverageRow,
+    compute_completeness,
+    default_manifest,
+    enrich_with_completeness,
+    format_corpus_incomplete_reason,
+    load_manifest,
+)
 from rie_coverage.policy import (
     classify,
     format_no_evidence_reason,
@@ -24,9 +36,19 @@ from rie_coverage.policy import (
 from rie_coverage.service import CoverageReasoner
 
 __all__ = [
+    "DEFAULT_EXPECTED_SOURCE_TYPES",
+    "DOWNGRADE_THRESHOLD",
+    "CompletenessReport",
+    "CorpusManifest",
     "CoverageReasoner",
+    "EnrichedCoverageRow",
     "classify",
+    "compute_completeness",
+    "default_manifest",
+    "enrich_with_completeness",
+    "format_corpus_incomplete_reason",
     "format_no_evidence_reason",
+    "load_manifest",
     "miss_pct_from_recall",
     "requires_authoritative_source_check",
 ]
