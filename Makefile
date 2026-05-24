@@ -1,4 +1,4 @@
-.PHONY: sync lock fmt lint type test test-fast test-contract test-arch up down logs migrate api ui demo bootstrap clean
+.PHONY: sync lock fmt lint type test test-fast test-contract test-arch up down logs migrate api ui ui-web demo bootstrap clean
 
 # Auto-source .env for every recipe so DATABASE_URL_SYNC, OLLAMA_*, etc. are
 # available without manual `set -a; source .env`.
@@ -53,6 +53,12 @@ api:
 
 ui:
 	uv run streamlit run packages/rie-ui/src/rie_ui/app.py --server.port 8501
+
+ui-web:
+	cd packages/rie-ui-web && npm install && npm run dev
+
+ui-web-build:
+	cd packages/rie-ui-web && npm install && npm run build
 
 demo:
 	uv run python scripts/run_jurisdiction.py --pillars 6,7 --jurisdiction SAMPLE

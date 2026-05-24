@@ -7,6 +7,7 @@ readme = "README.md"
 
 [tool.uv.workspace]
 members = ["packages/*"]
+exclude = ["packages/rie-ui-web"]
 
 [tool.uv.sources]
 rie-contracts = { workspace = true }

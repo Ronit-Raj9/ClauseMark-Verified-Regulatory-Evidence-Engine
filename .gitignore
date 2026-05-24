@@ -53,3 +53,11 @@ logs/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Node / Vite (packages/rie-ui-web)
+node_modules/
+.pnpm-store/
+.vite/
+*.tsbuildinfo
+packages/rie-ui-web/dist/
+packages/rie-ui-web/.env.local
