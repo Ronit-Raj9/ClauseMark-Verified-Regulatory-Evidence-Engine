@@ -10,3 +10,24 @@ sources:
     effective_date: null
     sha256_hash: null
     language: "en"
+
+# ─── Optional: Phase 2 discovery crawler ────────────────────────────────────
+# Uncomment and tailor to enable `python -m rie_ingest.discovery crawl XX`.
+# IngestService ignores this block entirely; it is read only by rie-discovery.
+#
+# discovery:
+#   seed_urls:
+#     - "https://laws.example.gov/digital-governance/"
+#     - "https://dataprotection.example.gov/regulations/"
+#   crawl_patterns:
+#     # Each regex is matched against the absolute URL. Empty list = no filter.
+#     link_regexes:
+#       - "/(acts|regulations|notices)/"
+#       - "\\.pdf$"
+#     # Filter fetched bodies by Content-Type primary mime.
+#     mime_allow:
+#       - "application/pdf"
+#       - "text/html"
+#   depth_limit: 2              # BFS depth from seeds (0 = seeds only)
+#   crawl_delay_seconds: 1.0    # Per-host minimum gap between fetches
+#   max_pages: 200              # Hard ceiling on URLs fetched per run

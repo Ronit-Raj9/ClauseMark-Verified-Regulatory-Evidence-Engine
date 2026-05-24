@@ -31,6 +31,36 @@
           "language": { "type": "string" }
         }
       }
+    },
+    "discovery": {
+      "type": "object",
+      "description": "Optional discovery-crawler config (Phase 2). Additive — IngestService ignores this block; only `rie-discovery` reads it.",
+      "additionalProperties": false,
+      "required": ["seed_urls"],
+      "properties": {
+        "seed_urls": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "format": "uri" }
+        },
+        "crawl_patterns": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "link_regexes": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "mime_allow": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "depth_limit": { "type": "integer", "minimum": 0, "default": 2 },
+        "crawl_delay_seconds": { "type": "number", "minimum": 0, "default": 1.0 },
+        "max_pages": { "type": "integer", "minimum": 1, "default": 200 }
+      }
     }
   }
 }
