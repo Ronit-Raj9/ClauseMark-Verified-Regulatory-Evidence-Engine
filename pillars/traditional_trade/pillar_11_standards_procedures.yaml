@@ -2,15 +2,84 @@ pillar_id: "11"
 pillar_name: "Standards and conformity assessment"
 cluster: "traditional_trade"
 document_profile: "structured_tabular"
-status: "stub"
-description: "Mandatory technical standards, conformity-assessment procedures, mutual recognition."
+status: "built"
+description: >
+  Frameworks for technical regulations, standards, sanitary and phytosanitary
+  (SPS) measures, and recognition of conformity-assessment results — aligned
+  with WTO TBT and SPS Agreements.
+
 indicators:
   - indicator_id: "11.1"
+    name: "SPS framework consistent with WTO SPS Agreement"
+    definition: >
+      Whether the jurisdiction maintains a sanitary and phytosanitary regime
+      based on science, with risk-assessment procedures and notification
+      obligations consistent with the SPS Agreement.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No SPS framework."
+      "0.5": "Framework exists but lacks risk-assessment or notification mechanisms."
+      "1": "Full SPS framework: risk assessment, science basis, enquiry point, notifications."
+    positive_keywords:
+      en: ["sanitary measure", "phytosanitary", "risk assessment", "scientific evidence",
+           "SPS enquiry point", "Codex Alimentarius", "OIE", "IPPC"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "11.2"
+    name: "TBT national enquiry point and notification"
+    definition: >
+      Whether the jurisdiction has designated a TBT national enquiry point and
+      maintains regular notification of technical regulations under WTO TBT.
+    evaluation_method: "tabular_lookup"
+    scoring_criteria:
+      "0": "No enquiry point or no notifications."
+      "0.5": "Enquiry point exists but irregular notifications."
+      "1": "Enquiry point operational and regular notifications submitted."
+    authority_hints: ["tier_2_regulation", "tier_3_guideline"]
+
+  - indicator_id: "11.3"
     name: "Mutual recognition of conformity assessment"
-    definition: "Whether the jurisdiction recognises foreign conformity-assessment results."
+    definition: >
+      Whether the jurisdiction recognises foreign conformity-assessment results
+      through MRAs or unilateral acceptance.
     evaluation_method: "treaty_lookup"
     scoring_criteria:
-      "0": "No recognition."
-      "0.5": "Recognition with limited partners."
-      "1": "Broad mutual recognition."
+      "0": "No recognition; full domestic re-testing required."
+      "0.5": "Recognition with a limited number of partners or sectors."
+      "1": "Broad mutual recognition across major trading partners and sectors."
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "11.4"
+    name: "Use of international standards"
+    definition: >
+      Whether national technical regulations are based on relevant international
+      standards (ISO, IEC, Codex) where they exist.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Predominantly national standards diverging from international."
+      "0.5": "Mixed use of national and international standards."
+      "1": "International standards used as the basis where they exist."
+    positive_keywords:
+      en: ["international standard", "ISO", "IEC", "Codex", "based on",
+           "in accordance with international standards"]
+    negative_cues:
+      en: ["national standard only", "deviate from international"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation", "tier_3_guideline"]
+
+  - indicator_id: "11.5"
+    name: "Transparency: standards publication and consultation"
+    definition: >
+      Whether draft technical regulations are published for public consultation
+      with reasonable comment periods before adoption.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No publication or consultation."
+      "0.5": "Publication without comment period, or comment period < 60 days."
+      "1": "Publication with comment period of 60 days or more."
+    positive_keywords:
+      en: ["public consultation", "comment period", "draft technical regulation",
+           "notice and comment", "shall be published"]
     authority_hints: ["tier_2_regulation"]

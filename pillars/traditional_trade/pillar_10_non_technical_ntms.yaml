@@ -2,15 +2,74 @@ pillar_id: "10"
 pillar_name: "Non-technical non-tariff measures"
 cluster: "traditional_trade"
 document_profile: "structured_tabular"
-status: "stub"
-description: "Quotas, licensing, price controls and other non-technical NTMs."
+status: "built"
+description: >
+  Non-technical NTMs affecting imports and exports — quantitative restrictions,
+  licensing regimes, price controls, prohibitions and export restrictions.
+
 indicators:
   - indicator_id: "10.1"
-    name: "Import licensing prevalence"
-    definition: "Share of HS6 lines subject to non-automatic import licensing."
+    name: "Import licensing transparency"
+    definition: >
+      Share of HS6 tariff lines subject to non-automatic import licensing, and
+      whether licensing procedures are published in line with WTO ILP Agreement.
     evaluation_method: "tabular_lookup"
     scoring_criteria:
-      "0": ">20% of lines"
-      "0.5": "5–20% of lines"
-      "1": "<5% of lines"
+      "0": "> 20% of lines subject to non-automatic licensing OR procedures unpublished."
+      "0.5": "5–20% of lines subject to non-automatic licensing."
+      "1": "< 5% of lines and full procedural transparency."
     authority_hints: ["tier_2_regulation"]
+
+  - indicator_id: "10.2"
+    name: "Quantitative restrictions and prohibitions"
+    definition: >
+      Share of HS6 lines subject to import or export quotas, bans, or
+      quantitative restrictions inconsistent with GATT Art. XI.
+    evaluation_method: "tabular_lookup"
+    scoring_criteria:
+      "0": "> 10% of lines."
+      "0.5": "2–10% of lines."
+      "1": "< 2% of lines."
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "10.3"
+    name: "Export restrictions"
+    definition: >
+      Share of HS6 lines subject to export bans, quotas, taxes or licensing.
+    evaluation_method: "tabular_lookup"
+    scoring_criteria:
+      "0": "> 10% of lines."
+      "0.5": "2–10% of lines."
+      "1": "< 2% of lines."
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "10.4"
+    name: "Price control measures"
+    definition: >
+      Whether the jurisdiction maintains price controls (minimum / maximum
+      import prices, reference prices) affecting imports.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Broad price-control regime in place."
+      "0.5": "Price controls limited to specific sectors (e.g. pharmaceuticals)."
+      "1": "No import-related price controls."
+    positive_keywords:
+      en: ["minimum import price", "reference price", "price control", "administered price"]
+    authority_hints: ["tier_2_regulation"]
+
+  - indicator_id: "10.5"
+    name: "State-trading enterprise dominance"
+    definition: >
+      Whether state-trading enterprises with exclusive import / export rights
+      operate in significant sectors.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "STEs hold exclusive rights across multiple sectors."
+      "0.5": "STEs hold exclusive rights in narrow sectors only."
+      "1": "No exclusive STE import / export rights."
+    positive_keywords:
+      en: ["state trading enterprise", "exclusive right to import", "sole importer",
+           "monopoly right"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]

@@ -2,15 +2,81 @@ pillar_id: "1"
 pillar_name: "Tariffs and trade defense"
 cluster: "traditional_trade"
 document_profile: "structured_tabular"
-status: "stub"
-description: "MFN tariff levels, tariff dispersion, antidumping & countervailing measures."
+status: "built"
+description: >
+  Most-favoured-nation (MFN) applied tariff levels at HS6, tariff dispersion
+  and peaks, and the legal frameworks for trade-defence remedies (anti-dumping,
+  countervailing duties, safeguards).
+
 indicators:
   - indicator_id: "1.1"
-    name: "Average MFN applied tariff"
-    definition: "Average MFN applied tariff across HS6 lines."
+    name: "Average MFN applied tariff (cap)"
+    definition: >
+      Trade-weighted (or simple) average MFN applied tariff across HS6 tariff
+      lines for the most recent reporting year.
     evaluation_method: "tabular_lookup"
     scoring_criteria:
-      "0": ">15%"
-      "0.5": "5–15%"
-      "1": "<5%"
+      "0": "Average MFN tariff > 15%."
+      "0.5": "Average MFN tariff 5–15%."
+      "1": "Average MFN tariff < 5%."
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "1.2"
+    name: "Tariff dispersion / peaks"
+    definition: >
+      Standard deviation of MFN applied tariffs across HS6 lines, or share of
+      lines with tariff above 15% (international peaks).
+    evaluation_method: "tabular_lookup"
+    scoring_criteria:
+      "0": "High dispersion (std dev > 15) or > 20% of lines above peaks."
+      "0.5": "Moderate dispersion."
+      "1": "Low dispersion; uniform tariff schedule."
+    authority_hints: ["tier_2_regulation"]
+
+  - indicator_id: "1.3"
+    name: "Anti-dumping framework in place"
+    definition: >
+      Whether national legislation establishes an anti-dumping investigation
+      and duty-imposition framework consistent with WTO ADA.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "conditional_regime"
+    scoring_criteria:
+      "0": "No framework."
+      "0.5": "Framework exists but lacks key WTO-consistent elements (e.g. no injury test, no public hearing)."
+      "1": "Full WTO-consistent framework (investigation, injury, lesser-duty option, sunset review)."
+    positive_keywords:
+      en: ["anti-dumping", "dumping margin", "injury determination", "investigating authority",
+           "sunset review", "lesser duty"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "1.4"
+    name: "Countervailing duty framework"
+    definition: >
+      Whether legislation provides for the investigation and imposition of
+      countervailing duties against subsidised imports.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "conditional_regime"
+    scoring_criteria:
+      "0": "No framework."
+      "0.5": "Partial framework."
+      "1": "Full WTO SCM-consistent framework."
+    positive_keywords:
+      en: ["countervailing duty", "subsidy", "subsidised imports", "specificity",
+           "countervailable"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "1.5"
+    name: "Safeguard measures framework"
+    definition: >
+      Whether legislation provides for safeguard investigations and
+      time-limited remedies consistent with the WTO Agreement on Safeguards.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "conditional_regime"
+    scoring_criteria:
+      "0": "No safeguards framework."
+      "0.5": "Framework exists but missing key elements (time-limit, progressive liberalisation)."
+      "1": "Full WTO-consistent safeguards framework."
+    positive_keywords:
+      en: ["safeguard measure", "serious injury", "unforeseen developments",
+           "progressive liberalisation", "time-limited"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
