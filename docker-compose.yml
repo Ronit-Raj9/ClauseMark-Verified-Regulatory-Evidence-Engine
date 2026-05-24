@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: rie-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rie}
+      POSTGRES_USER: ${POSTGRES_USER:-rie}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rie_dev_password}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - rie_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rie}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    container_name: rie-qdrant
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+      - "${QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      - rie_qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rie-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - rie_ollama_data:/root/.ollama
+    restart: unless-stopped
+    profiles: ["llm"]
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    container_name: rie-api
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      QDRANT_HOST: qdrant
+      OLLAMA_BASE_URL: http://ollama:11434
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    ports:
+      - "${API_PORT:-8080}:8080"
+    profiles: ["app"]
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: .
+      dockerfile: docker/ui.Dockerfile
+    container_name: rie-ui
+    env_file: .env
+    environment:
+      RIE_API_URL: http://api:8080
+    depends_on:
+      - api
+    ports:
+      - "${STREAMLIT_PORT:-8501}:8501"
+    profiles: ["app"]
+    restart: unless-stopped
+
+volumes:
+  rie_pg_data:
+  rie_qdrant_data:
+  rie_ollama_data:
