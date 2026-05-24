@@ -21,7 +21,8 @@ def test_registry_has_all_12_pillars(repo: ConfigRepository) -> None:
 def test_registry_status_distribution(repo: ConfigRepository) -> None:
     entries = repo.load_registry()
     built = {e.pillar_id for e in entries if e.status == "built"}
-    assert built == {"6", "7"}, "Day-one built set should be {6,7}"
+    # Phase 2: all 12 pillars ship as schema-valid config; 6/7 deep + 8/9/12 demo gold.
+    assert built == {str(i) for i in range(1, 13)}
 
 
 def test_load_pillar_06_deep(repo: ConfigRepository) -> None:

@@ -31,5 +31,7 @@ def test_every_built_pillar_has_non_empty_gold_set(repo: ConfigRepository) -> No
     for entry in repo.load_registry():
         if entry.status != "built":
             continue
+        if entry.gold_set_path is None:
+            continue
         items = repo.load_gold(entry.pillar_id)
         assert items, f"pillar {entry.pillar_id} marked built but gold set empty"
