@@ -1,0 +1,18 @@
+[project]
+name = "rie-classify"
+version = "0.1.0"
+description = "LLM classification + constrained decoding + regime assembly."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "rie-contracts",
+    "pydantic>=2.9",
+    "httpx>=0.27",
+    "tenacity>=9.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rie_classify"]
