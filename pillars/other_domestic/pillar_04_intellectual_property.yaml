@@ -2,16 +2,88 @@ pillar_id: "4"
 pillar_name: "Intellectual property"
 cluster: "other_domestic"
 document_profile: "mixed_regulatory"
-status: "stub"
-description: "Patent, copyright, trademark regimes and enforcement."
+status: "built"
+description: >
+  Copyright, patent, trademark and trade-secret regimes; enforcement provisions;
+  and TRIPS-plus elements relevant to digital trade.
+
 indicators:
   - indicator_id: "4.1"
-    name: "TRIPS-plus enforcement"
-    definition: "Whether enforcement provisions go beyond TRIPS minima."
+    name: "Copyright term and scope"
+    definition: >
+      Whether copyright protection meets or exceeds the Berne minimum
+      (life of author + 50 years) and covers digital works.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "Below TRIPS minima."
-      "0.5": "TRIPS minima."
-      "1": "TRIPS-plus enforcement."
+      "0": "Below Berne minimum or no general copyright statute."
+      "0.5": "Berne minimum (life + 50)."
+      "1": "Life + 70 years or longer, with digital-works coverage."
+    positive_keywords:
+      en: ["copyright", "term of protection", "life of the author", "literary and artistic works",
+           "computer programs", "database"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "4.2"
+    name: "Patent regime aligned with TRIPS"
+    definition: >
+      Whether the patent statute provides 20-year protection from filing date
+      and covers all fields of technology consistent with TRIPS Art. 27.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Term below 20 years or broad subject-matter exclusions."
+      "0.5": "20-year term but narrow subject-matter exclusions."
+      "1": "20 years from filing across all fields of technology."
+    positive_keywords:
+      en: ["patent", "twenty years from the filing date", "all fields of technology",
+           "invention", "novelty", "inventive step"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "4.3"
+    name: "Trade-secret protection"
+    definition: >
+      Whether the law provides civil and / or criminal remedies for
+      misappropriation of undisclosed information / trade secrets.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No specific protection."
+      "0.5": "Protection only via general unfair-competition or contract law."
+      "1": "Dedicated trade-secret statute with civil and criminal remedies."
+    positive_keywords:
+      en: ["trade secret", "undisclosed information", "confidential business information",
+           "misappropriation"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "4.4"
+    name: "Trademark protection and well-known marks"
+    definition: >
+      Whether trademark registration is available with protection for
+      well-known marks consistent with Paris Convention Art. 6bis.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No registration system or no well-known-mark protection."
+      "0.5": "Registration exists but no well-known-mark doctrine."
+      "1": "Registration plus well-known-mark protection extending to dissimilar goods."
+    positive_keywords:
+      en: ["trademark", "well-known mark", "registration", "Paris Convention"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "4.5"
+    name: "Civil and criminal IP enforcement"
+    definition: >
+      Whether the legal framework provides effective civil remedies
+      (injunctions, damages) and criminal sanctions for wilful infringement on a
+      commercial scale, consistent with TRIPS Part III.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No effective enforcement provisions."
+      "0.5": "Civil remedies available; criminal sanctions absent or weak."
+      "1": "Full civil and criminal enforcement, including border measures."
+    positive_keywords:
+      en: ["injunction", "damages", "infringement", "criminal penalty", "wilful",
+           "commercial scale", "border measures", "seizure"]
     authority_hints: ["tier_1_statute"]

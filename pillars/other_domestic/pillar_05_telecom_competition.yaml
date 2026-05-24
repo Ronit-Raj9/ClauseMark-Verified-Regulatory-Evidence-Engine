@@ -2,16 +2,96 @@ pillar_id: "5"
 pillar_name: "Telecom and competition"
 cluster: "other_domestic"
 document_profile: "mixed_regulatory"
-status: "stub"
-description: "Telecom market openness, independent regulator, competition law."
+status: "built"
+description: >
+  Telecommunications market openness, independence of the telecom regulator,
+  spectrum allocation transparency, and the competition-law framework as it
+  applies to digital infrastructure markets.
+
 indicators:
   - indicator_id: "5.1"
     name: "Independent telecom regulator"
-    definition: "Whether an independent telecom regulator exists with rule-making power."
+    definition: >
+      Whether an independent telecom regulator exists with rule-making and
+      enforcement powers, structurally separate from operators and ministerial
+      direction.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No independent regulator."
-      "0.5": "Regulator exists but lacks independence."
-      "1": "Independent regulator with rule-making power."
+      "0": "No independent regulator; functions held by ministry."
+      "0.5": "Regulator exists but subject to direct ministerial control or operator influence."
+      "1": "Independent regulator with rule-making and enforcement powers and budgetary autonomy."
+    positive_keywords:
+      en: ["independent regulator", "telecommunications authority", "shall be independent",
+           "separate from operators", "regulatory commission"]
+    negative_cues:
+      en: ["under the direction of the Minister", "ministry shall regulate"]
     authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "5.2"
+    name: "Spectrum allocation transparency"
+    definition: >
+      Whether spectrum allocation procedures are published in advance with
+      competitive, non-discriminatory award mechanisms (auctions or beauty
+      contests with published criteria).
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Allocations discretionary and unpublished."
+      "0.5": "Allocations published but criteria opaque or non-competitive."
+      "1": "Competitive allocation with published criteria and timetable."
+    positive_keywords:
+      en: ["spectrum allocation", "auction", "published criteria", "non-discriminatory",
+           "frequency allocation", "spectrum plan"]
+    authority_hints: ["tier_2_regulation", "tier_3_guideline"]
+
+  - indicator_id: "5.3"
+    name: "Competition law applicable to telecom / digital markets"
+    definition: >
+      Whether a general competition statute applies to telecom and digital
+      markets, with prohibitions on abuse of dominance and anti-competitive
+      agreements.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "prohibition"
+    scoring_criteria:
+      "0": "No competition statute or telecom expressly excluded."
+      "0.5": "Competition statute exists but with limited application to telecom."
+      "1": "Competition statute applies with sector-specific ex-ante telecom rules."
+    positive_keywords:
+      en: ["abuse of dominance", "anti-competitive agreement", "competition act",
+           "significant market power", "essential facility"]
+    negative_cues:
+      en: ["telecommunications sector is excluded", "shall not apply to telecom"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "5.4"
+    name: "Interconnection obligation"
+    definition: >
+      Whether operators with significant market power are required to provide
+      interconnection on fair, reasonable and non-discriminatory terms.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No interconnection obligation."
+      "0.5": "Interconnection obligation exists but pricing or terms not regulated."
+      "1": "Interconnection obligation with cost-oriented, non-discriminatory pricing."
+    positive_keywords:
+      en: ["interconnection", "significant market power", "cost-oriented",
+           "reference offer", "non-discriminatory terms"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "5.5"
+    name: "Foreign participation in telecom services"
+    definition: >
+      Whether foreign operators may provide telecom services with limited or no
+      equity restrictions and on a non-discriminatory licensing basis.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "conditional_regime"
+    scoring_criteria:
+      "0": "Foreign operators barred or capped below 25%."
+      "0.5": "Foreign equity capped between 25–74% or sectoral restrictions."
+      "1": "Foreign equity unrestricted or capped only at majority threshold for strategic infrastructure."
+    positive_keywords:
+      en: ["foreign operator", "foreign equity", "licence to provide telecommunications",
+           "market access"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]

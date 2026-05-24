@@ -2,16 +2,89 @@ pillar_id: "3"
 pillar_name: "Foreign direct investment"
 cluster: "other_domestic"
 document_profile: "mixed_regulatory"
-status: "stub"
-description: "Sectoral restrictions, screening regimes, investor protection."
+status: "built"
+description: >
+  Foreign investment screening regime, sectoral foreign-equity caps, investor
+  protection through bilateral investment treaties, and post-establishment
+  national treatment.
+
 indicators:
   - indicator_id: "3.1"
+    name: "FDI screening regime"
+    definition: >
+      Whether the jurisdiction maintains a foreign-investment screening regime
+      and the breadth of its scope (sectors, transaction thresholds).
+    evaluation_method: "clause_extraction"
+    clause_pattern: "conditional_regime"
+    scoring_criteria:
+      "0": "Broad screening covering most sectors and most transactions."
+      "0.5": "Screening targeted at national-security / strategic sectors."
+      "1": "Narrow screening limited to defined critical infrastructure."
+    positive_keywords:
+      en: ["foreign investment review", "screening", "national security review",
+           "investment approval", "FDI screening"]
+    negative_cues:
+      en: ["all foreign investment requires approval", "blanket approval"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "3.2"
     name: "Sectoral foreign equity caps"
-    definition: "Whether the law imposes foreign-equity caps in non-strategic sectors."
+    definition: >
+      Whether the law imposes foreign-equity caps in non-strategic economic
+      sectors.
     evaluation_method: "clause_extraction"
     clause_pattern: "prohibition"
     scoring_criteria:
       "0": "Broad caps across many sectors."
-      "0.5": "Caps in selected sectors."
-      "1": "No caps outside strategic sectors."
+      "0.5": "Caps in selected sectors (e.g. media, telecom, aviation)."
+      "1": "No caps outside strategic sectors (defence, nuclear)."
+    positive_keywords:
+      en: ["foreign equity cap", "foreign ownership limit", "maximum foreign shareholding",
+           "negative list", "reserved sector"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "3.3"
+    name: "Bilateral / multilateral investment treaty framework"
+    definition: >
+      Whether the jurisdiction is party to a meaningful network of bilateral
+      investment treaties or investment chapters in trade agreements.
+    evaluation_method: "treaty_lookup"
+    scoring_criteria:
+      "0": "Fewer than 5 BITs / investment chapters in force."
+      "0.5": "5–25 instruments in force."
+      "1": "More than 25 instruments in force."
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "3.4"
+    name: "Post-establishment national treatment"
+    definition: >
+      Whether established foreign investors receive national treatment
+      (taxation, regulation, access to courts) on the same basis as domestic
+      investors.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Significant discriminatory measures against established foreign investors."
+      "0.5": "Minor discriminatory measures (e.g. land ownership)."
+      "1": "Full national treatment post-establishment."
+    positive_keywords:
+      en: ["national treatment", "no less favourable", "treatment of foreign investors"]
+    negative_cues:
+      en: ["foreign-owned company shall not", "limited to nationals"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "3.5"
+    name: "Expropriation protections and compensation"
+    definition: >
+      Whether the law guarantees protection against direct and indirect
+      expropriation with prompt, adequate and effective compensation.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No statutory protection."
+      "0.5": "Protection limited to direct expropriation only or unclear compensation standard."
+      "1": "Full protection (direct and indirect) with prompt, adequate, effective compensation."
+    positive_keywords:
+      en: ["expropriation", "prompt and adequate compensation", "fair market value",
+           "lawful expropriation", "public purpose"]
     authority_hints: ["tier_1_statute"]

@@ -2,16 +2,82 @@ pillar_id: "2"
 pillar_name: "Public procurement"
 cluster: "other_domestic"
 document_profile: "mixed_regulatory"
-status: "stub"
-description: "Openness of public procurement to foreign suppliers, transparency."
+status: "built"
+description: >
+  Openness of public procurement to foreign suppliers, transparency obligations,
+  GPA membership, and the availability of e-procurement systems.
+
 indicators:
   - indicator_id: "2.1"
-    name: "Non-discrimination in procurement"
-    definition: "Whether procurement rules treat foreign and domestic suppliers equally."
+    name: "Procurement openness / non-discrimination"
+    definition: >
+      Whether procurement rules treat foreign and domestic suppliers equally and
+      avoid express domestic-supplier preferences above relevant thresholds.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "Express preference for domestic suppliers."
-      "0.5": "Limited preferences only."
-      "1": "Non-discrimination is the general rule."
+      "0": "Express preference for domestic suppliers across most procurement."
+      "0.5": "Domestic preferences limited (e.g. SME or small-value contracts)."
+      "1": "Non-discrimination is the general rule above WTO/GPA thresholds."
+    positive_keywords:
+      en: ["non-discrimination", "national treatment", "shall not discriminate",
+           "equal treatment", "open competitive tendering"]
+    negative_cues:
+      en: ["domestic preference", "price preference", "set-aside for local"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "2.2"
+    name: "WTO Government Procurement Agreement (GPA) membership"
+    definition: >
+      Whether the jurisdiction is a party (or observer) to the WTO Agreement on
+      Government Procurement (GPA 2012).
+    evaluation_method: "treaty_lookup"
+    scoring_criteria:
+      "0": "Not a party and not an observer."
+      "0.5": "Observer or in accession negotiations."
+      "1": "Full party to the GPA."
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "2.3"
+    name: "E-procurement portal in operation"
+    definition: >
+      Whether a centralised e-procurement portal publishes tender notices and
+      enables online bid submission.
+    evaluation_method: "tabular_lookup"
+    scoring_criteria:
+      "0": "No portal."
+      "0.5": "Portal publishes notices but no online bid submission."
+      "1": "Portal supports online publication and bid submission."
+    authority_hints: ["tier_2_regulation", "tier_3_guideline"]
+
+  - indicator_id: "2.4"
+    name: "Bid challenge / review mechanism"
+    definition: >
+      Whether suppliers have access to an independent administrative or
+      judicial review mechanism for procurement decisions.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No review mechanism."
+      "0.5": "Review by procuring entity only."
+      "1": "Independent review body with binding powers."
+    positive_keywords:
+      en: ["bid challenge", "procurement review", "complaint mechanism",
+           "review body", "judicial review"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "2.5"
+    name: "Procurement transparency thresholds"
+    definition: >
+      Whether contracts above defined thresholds must be advertised publicly in
+      a national procurement gazette or portal.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No publication threshold or unenforced."
+      "0.5": "Publication required only for very large contracts."
+      "1": "Publication required at WTO/GPA-aligned thresholds."
+    positive_keywords:
+      en: ["shall be published", "tender notice", "procurement notice",
+           "publication threshold"]
+    authority_hints: ["tier_2_regulation"]
