@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rie.un.example/schemas/gold-item.json",
+  "title": "Gold-set item",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "gold_id",
+    "pillar_id",
+    "indicator_id",
+    "jurisdiction",
+    "doc_id",
+    "span_text",
+    "expected_clause_pattern",
+    "expected_score_band",
+    "expected_authority_tier"
+  ],
+  "properties": {
+    "gold_id": { "type": "string" },
+    "pillar_id": { "type": "string" },
+    "indicator_id": { "type": "string" },
+    "jurisdiction": { "type": "string" },
+    "doc_id": { "type": "string" },
+    "span_text": { "type": "string", "minLength": 5 },
+    "expected_clause_pattern": {
+      "enum": ["obligation", "prohibition", "conditional_regime", "exemption", "definition"]
+    },
+    "expected_score_band": { "enum": ["0", "0.5", "1", "null"] },
+    "expected_authority_tier": {
+      "enum": ["tier_1_statute", "tier_2_regulation", "tier_3_guideline", "tier_4_informal"]
+    },
+    "notes": { "type": "string" }
+  }
+}

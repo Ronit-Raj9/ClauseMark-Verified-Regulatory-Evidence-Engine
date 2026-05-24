@@ -1,0 +1,27 @@
+items:
+  - gold_id: "p06_sample_dpa_xfer_001"
+    pillar_id: "6"
+    indicator_id: "6.4"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_dpa_2020"
+    span_text: >
+      An organisation shall not transfer any personal data outside the country
+      unless it has taken appropriate steps to ensure that the recipient is
+      bound by legally enforceable obligations to provide to the transferred
+      personal data a standard of protection that is comparable to the
+      protection under this Act.
+    expected_clause_pattern: "conditional_regime"
+    expected_score_band: "0.5"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Canonical 6.4 conditional regime (general prohibition + comparable-protection exception)."
+
+  - gold_id: "p06_sample_dpa_xfer_002"
+    pillar_id: "6"
+    indicator_id: "6.3"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_dpa_2020"
+    span_text: "Personal data of citizens shall be stored on servers located within the territory of the State."
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Mandatory data localisation."
