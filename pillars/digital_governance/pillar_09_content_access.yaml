@@ -2,34 +2,81 @@ pillar_id: "9"
 pillar_name: "Content access and lawful intercept"
 cluster: "digital_governance"
 document_profile: "statutory_legal_text"
-status: "stub"
+status: "built"
 description: >
-  Government powers to access electronic content, lawful intercept, and content
-  blocking obligations on intermediaries.
+  Government powers to access electronic content, lawful intercept of
+  communications, and obligations on intermediaries to block or take down
+  content. Due-process safeguards (judicial authorisation, transparency,
+  appeal) are central.
 
 indicators:
   - indicator_id: "9.1"
-    name: "Judicial authorisation for content access"
-    definition: "Whether government content access requires prior judicial authorisation."
+    name: "Lawful intercept regime with judicial authorisation"
+    definition: >
+      Whether interception of electronic communications by state authorities
+      requires prior judicial authorisation under a defined lawful-intercept
+      statute.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No judicial authorisation required."
-      "0.5": "Judicial authorisation required for certain categories only."
-      "1": "Judicial authorisation generally required."
+      "0": "Executive interception without judicial oversight."
+      "0.5": "Judicial authorisation required only for some categories or post-hoc review."
+      "1": "Prior judicial warrant generally required for interception."
     positive_keywords:
-      en: ["warrant", "judicial order", "court order", "prior authorisation by a judge"]
+      en: ["warrant", "judicial order", "court order", "prior authorisation by a judge",
+           "interception warrant", "issued by a judge", "magistrate"]
+    negative_cues:
+      en: ["without judicial authorisation", "executive order", "Minister may direct",
+           "may intercept at its discretion"]
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "9.2"
-    name: "Mandatory content blocking obligations"
-    definition: "Whether intermediaries are obliged to block or filter content on government order."
+    name: "Content takedown / blocking power"
+    definition: >
+      Whether the law confers on a public authority the power to order
+      intermediaries to block, disable, or take down specified content.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No blocking obligation."
-      "0.5": "Narrow blocking obligation (e.g. child sexual abuse material only)."
-      "1": "Broad blocking obligation."
+      "0": "No defined blocking power."
+      "0.5": "Narrow blocking power (e.g. CSAM, terrorism only)."
+      "1": "Broad blocking power across content categories."
     positive_keywords:
-      en: ["shall block", "disable access", "restrict access to"]
+      en: ["shall block", "disable access", "restrict access to", "take down",
+           "removal order", "blocking order"]
+    negative_cues:
+      en: ["no power to block", "blocking is prohibited"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "9.3"
+    name: "Due-process safeguards for blocking / takedown"
+    definition: >
+      Whether the blocking / takedown regime provides for notification of the
+      affected party, reasons, and a right of appeal to an independent body.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No notice, reasons, or appeal."
+      "0.5": "Some safeguards (notice OR appeal) but not all."
+      "1": "Notice, written reasons, and appeal to independent body all required."
+    positive_keywords:
+      en: ["right of appeal", "shall give reasons", "notice in writing",
+           "judicial review", "independent review", "may appeal"]
+    negative_cues:
+      en: ["no appeal", "without notice", "final and not subject to review"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "9.4"
+    name: "Transparency reporting obligation"
+    definition: >
+      Whether the law requires the authority or intermediaries to publish
+      periodic transparency reports on intercept / blocking orders issued.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No transparency requirement."
+      "0.5": "Aggregate reporting only or limited to one side."
+      "1": "Detailed periodic reporting required from authority and / or intermediaries."
+    positive_keywords:
+      en: ["transparency report", "annual report", "shall publish", "statistics on requests"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation", "tier_3_guideline"]

@@ -1,0 +1,37 @@
+# DRAFT skeleton — gold set for pillar 12 (Online transactions and e-commerce).
+# Substantive Lead to populate from real laws — Phase 2.
+# Status of every item below: "draft" (carried in `notes` because the FROZEN
+# GoldItem contract forbids extra fields).
+items:
+  - gold_id: "p12_draft_001"
+    pillar_id: "12"
+    indicator_id: "12.1"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_ecommerce_act_DRAFT"
+    span_text: "PLACEHOLDER electronic-signature recognition clause — to be replaced with verbatim statutory text."
+    expected_clause_pattern: "definition"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "[DRAFT] Substantive Lead to populate from real laws — Phase 2."
+
+  - gold_id: "p12_draft_002"
+    pillar_id: "12"
+    indicator_id: "12.2"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_ecommerce_act_DRAFT"
+    span_text: "PLACEHOLDER consumer-protection obligation for online sellers — replace with real wording."
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0.5"
+    expected_authority_tier: "tier_1_statute"
+    notes: "[DRAFT] Substantive Lead to populate from real laws — Phase 2."
+
+  - gold_id: "p12_draft_003"
+    pillar_id: "12"
+    indicator_id: "12.3"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_ecommerce_act_DRAFT"
+    span_text: "PLACEHOLDER electronic-contract validity provision — to be replaced with verbatim statute."
+    expected_clause_pattern: "definition"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "[DRAFT] Substantive Lead to populate from real laws — Phase 2."

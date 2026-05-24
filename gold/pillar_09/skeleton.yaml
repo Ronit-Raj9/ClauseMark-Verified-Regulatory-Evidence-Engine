@@ -1,0 +1,37 @@
+# DRAFT skeleton — gold set for pillar 9 (Content access and lawful intercept).
+# Substantive Lead to populate from real laws — Phase 2.
+# Status of every item below: "draft" (carried in `notes` because the FROZEN
+# GoldItem contract forbids extra fields).
+items:
+  - gold_id: "p09_draft_001"
+    pillar_id: "9"
+    indicator_id: "9.1"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_content_access_act_DRAFT"
+    span_text: "PLACEHOLDER lawful-intercept authorisation clause — to be replaced with verbatim statutory text."
+    expected_clause_pattern: "conditional_regime"
+    expected_score_band: "0.5"
+    expected_authority_tier: "tier_1_statute"
+    notes: "[DRAFT] Substantive Lead to populate from real laws — Phase 2."
+
+  - gold_id: "p09_draft_002"
+    pillar_id: "9"
+    indicator_id: "9.2"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_content_access_act_DRAFT"
+    span_text: "PLACEHOLDER judicial-warrant requirement for content access — replace with verbatim text."
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "[DRAFT] Substantive Lead to populate from real laws — Phase 2."
+
+  - gold_id: "p09_draft_003"
+    pillar_id: "9"
+    indicator_id: "9.3"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_content_access_act_DRAFT"
+    span_text: "PLACEHOLDER transparency-report obligation for content removals — replace with real wording."
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0.5"
+    expected_authority_tier: "tier_2_regulation"
+    notes: "[DRAFT] Substantive Lead to populate from real laws — Phase 2."

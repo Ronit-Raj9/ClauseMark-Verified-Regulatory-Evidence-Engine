@@ -2,34 +2,84 @@ pillar_id: "8"
 pillar_name: "Internet intermediary liability"
 cluster: "digital_governance"
 document_profile: "statutory_legal_text"
-status: "stub"
+status: "built"
 description: >
-  Liability regime for online intermediaries (hosts, conduits, search) for
-  third-party content; safe harbours; notice-and-action duties.
+  Liability regime for online intermediaries (hosts, conduits, search engines)
+  for third-party content. Covers conditional safe harbours, notice-and-action
+  duties, and any general monitoring obligation.
 
 indicators:
   - indicator_id: "8.1"
     name: "Conditional intermediary safe harbour"
-    definition: "Whether the law grants intermediaries conditional immunity for user content."
+    definition: >
+      Whether the law grants intermediaries conditional immunity from liability
+      for third-party content provided defined conditions are met (e.g. lack of
+      actual knowledge, expeditious removal upon notice).
     evaluation_method: "clause_extraction"
     clause_pattern: "conditional_regime"
     scoring_criteria:
-      "0": "No safe harbour; strict liability."
-      "0.5": "Narrow / sectoral safe harbour."
-      "1": "General conditional safe harbour."
+      "0": "No safe harbour; intermediaries face strict or primary liability."
+      "0.5": "Narrow or sectoral safe harbour (e.g. mere conduit only, or copyright only)."
+      "1": "General conditional safe harbour covering hosting, caching, and conduit functions."
     positive_keywords:
-      en: ["safe harbour", "mere conduit", "shall not be liable", "notice and takedown"]
+      en: ["safe harbour", "safe harbor", "mere conduit", "shall not be liable",
+           "no liability", "limitation of liability", "intermediary service provider",
+           "hosting service", "actual knowledge"]
+    negative_cues:
+      en: ["strictly liable", "primary liability", "shall be liable for all content"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "8.2"
     name: "Notice-and-action procedure"
-    definition: "Whether the law defines a notice-and-action procedure for unlawful content."
+    definition: >
+      Whether the law defines a formal notice-and-action procedure (notice,
+      removal, counter-notice / appeal) for allegedly unlawful content.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No procedure defined."
-      "0.5": "Procedure exists but lacks counter-notice or appeal."
-      "1": "Procedure includes counter-notice / appeal."
+      "0": "No defined procedure; ad-hoc removals only."
+      "0.5": "Notice-and-takedown defined but lacks counter-notice or appeal mechanism."
+      "1": "Full notice-and-action regime with counter-notice and appeal / restoration rights."
     positive_keywords:
-      en: ["notice", "expeditiously remove", "counter-notice", "takedown"]
+      en: ["notice", "expeditiously remove", "disable access", "counter-notice",
+           "takedown", "notification", "put-back", "restoration"]
+    negative_cues:
+      en: ["no procedure", "at discretion of the authority"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "8.3"
+    name: "Absence of general monitoring obligation"
+    definition: >
+      Whether the law expressly prohibits a general obligation on intermediaries
+      to monitor user content, or instead imposes active-monitoring duties.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "prohibition"
+    scoring_criteria:
+      "0": "Broad active-monitoring or filtering duty imposed."
+      "0.5": "Narrow monitoring duty for specific content categories."
+      "1": "No general monitoring obligation; express prohibition or silence with safe harbour."
+    positive_keywords:
+      en: ["no general obligation to monitor", "shall not impose a general obligation",
+           "no duty to monitor"]
+    negative_cues:
+      en: ["shall actively monitor", "general monitoring", "filter all content",
+           "proactive measures", "upload filter"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "8.4"
+    name: "Knowledge standard for liability"
+    definition: >
+      The standard of knowledge (actual knowledge vs constructive / should-have-known)
+      that triggers loss of safe harbour and intermediary liability.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "conditional_regime"
+    scoring_criteria:
+      "0": "Constructive knowledge or strict liability standard."
+      "0.5": "Mixed: actual knowledge for some content, constructive for others."
+      "1": "Actual knowledge standard applied generally."
+    positive_keywords:
+      en: ["actual knowledge", "upon obtaining knowledge", "upon becoming aware",
+           "where the provider has knowledge"]
+    negative_cues:
+      en: ["should have known", "constructive knowledge", "reason to know"]
     authority_hints: ["tier_1_statute"]

@@ -1,0 +1,39 @@
+# DRAFT skeleton — gold set for pillar 8 (Internet intermediary liability).
+# Substantive Lead to populate from real laws — Phase 2.
+# Status of every item below: "draft". `notes` carries the [DRAFT] tag so
+# downstream filters can exclude these from headline metrics until promoted.
+# Contracts are FROZEN — we cannot add a top-level `status` field to GoldItem;
+# the "draft" lifecycle marker therefore lives in `notes`.
+items:
+  - gold_id: "p08_draft_001"
+    pillar_id: "8"
+    indicator_id: "8.1"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_intermediary_act_DRAFT"
+    span_text: "PLACEHOLDER intermediary safe-harbour clause — to be replaced with verbatim statutory text."
+    expected_clause_pattern: "conditional_regime"
+    expected_score_band: "0.5"
+    expected_authority_tier: "tier_1_statute"
+    notes: "[DRAFT] Substantive Lead to populate from real laws — Phase 2."
+
+  - gold_id: "p08_draft_002"
+    pillar_id: "8"
+    indicator_id: "8.2"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_intermediary_act_DRAFT"
+    span_text: "PLACEHOLDER notice-and-takedown obligation — replace with verbatim statutory wording."
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "[DRAFT] Substantive Lead to populate from real laws — Phase 2."
+
+  - gold_id: "p08_draft_003"
+    pillar_id: "8"
+    indicator_id: "8.3"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_intermediary_act_DRAFT"
+    span_text: "PLACEHOLDER prohibition on general monitoring duty — replace with verbatim text."
+    expected_clause_pattern: "prohibition"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "[DRAFT] Substantive Lead to populate from real laws — Phase 2."
