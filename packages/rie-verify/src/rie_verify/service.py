@@ -36,6 +36,7 @@ to catch.
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Iterable, Mapping
 from datetime import UTC, datetime
 from typing import Final
 
@@ -49,6 +50,7 @@ from rie_contracts import (
 )
 from rie_contracts.ports import ElementTextResolver
 
+from rie_verify.kg_grounding import KgGroundingResult, run_kg_grounding_gate
 from rie_verify.nli import NliBackend
 from rie_verify.second_llm import SecondLlmBackend
 
@@ -58,7 +60,16 @@ _NLI_ENTAILMENT_THRESHOLD: Final[float] = 0.6
 
 
 class VerificationService:
-    """Concrete `VerifierPort`. Constructor-injected NLI + second-LLM backends."""
+    """Concrete `VerifierPort`. Constructor-injected NLI + second-LLM backends.
+
+    Phase 2: an optional 5th gate ("kg_grounding") is wired in behind the
+    ``kg_gate_enabled`` flag (default False — Phase 2 opt-in). It does NOT
+    change the canonical 4-gate ``verify(...)`` behaviour or status derivation.
+    To consume it, callers use the additive ``verify_with_kg(...)`` method,
+    which returns the standard ``VerificationReport`` plus a side-channel
+    ``KgGroundingResult``. The frozen ``rie_contracts.VerificationReport``
+    rejects extra gate entries, so we deliberately do not append.
+    """
 
     def __init__(
         self,
@@ -66,10 +77,16 @@ class VerificationService:
         second_llm: SecondLlmBackend,
         *,
         nli_entailment_threshold: float = _NLI_ENTAILMENT_THRESHOLD,
+        kg_gate_enabled: bool = False,
     ) -> None:
         self._nli: NliBackend = nli_model
         self._second_llm: SecondLlmBackend = second_llm
         self._nli_threshold: float = nli_entailment_threshold
+        self._kg_gate_enabled: bool = kg_gate_enabled
+
+    @property
+    def kg_gate_enabled(self) -> bool:
+        return self._kg_gate_enabled
 
     # ────────────────────────────────────────────────────────────────────
     # VerifierPort surface
@@ -127,6 +144,66 @@ class VerificationService:
             status=status,
             failure_reasons=failure_reasons,
         )
+
+    # ────────────────────────────────────────────────────────────────────
+    # Phase-2 opt-in — KG / entity-grounding (5th gate, side-channel)
+    # ────────────────────────────────────────────────────────────────────
+
+    def verify_with_kg(
+        self,
+        claim: Claim,
+        get_element_text: ElementTextResolver,
+        *,
+        parent_of: Mapping[str, str | None] | None = None,
+        extra_element_ids: Iterable[str] = (),
+    ) -> tuple[VerificationReport, KgGroundingResult | None]:
+        """Run the canonical 4 gates AND (if enabled) the KG-grounding gate.
+
+        Returns the frozen-contract ``VerificationReport`` *plus* a
+        ``KgGroundingResult`` (None when ``kg_gate_enabled`` is False).
+
+        Status semantics:
+          * deterministic failure (gates 1 or 2) → REJECTED — KG is not
+            consulted (broken offsets make entity extraction meaningless).
+          * model-gate failure (gates 3 or 4)    → FLAGGED.
+          * all 4 pass + KG flag                 → downgraded to FLAGGED.
+          * all 4 pass + KG pass                 → VERIFIED.
+
+        We deliberately do NOT push the KG result into ``report.gates``: the
+        ``rie_contracts.VerificationReport`` model_validator requires exactly
+        the 4 canonical gate names — adding a 5th would break the contract.
+        """
+        report = self.verify(claim, get_element_text)
+
+        if not self._kg_gate_enabled:
+            return report, None
+
+        # Skip KG when deterministic gates already rejected — broken offsets
+        # poison the entity extractor and the human review can't act on KG
+        # output anyway.
+        if report.status is VerificationStatus.REJECTED:
+            return report, None
+
+        kg_result = run_kg_grounding_gate(
+            claim,
+            get_element_text,
+            parent_of=parent_of,
+            extra_element_ids=extra_element_ids,
+        )
+
+        if not kg_result.passed and report.status is VerificationStatus.VERIFIED:
+            # Downgrade VERIFIED→FLAGGED on a KG flag. Build a fresh
+            # VerificationReport (the model is not frozen but we treat the
+            # original as immutable for downstream consumers).
+            new_reasons = [*report.failure_reasons, f"{kg_result.gate}: {kg_result.detail}"]
+            report = VerificationReport(
+                claim_id=report.claim_id,
+                gates=report.gates,
+                status=VerificationStatus.FLAGGED,
+                failure_reasons=new_reasons,
+            )
+
+        return report, kg_result
 
     # ────────────────────────────────────────────────────────────────────
     # Tier A — deterministic gates
