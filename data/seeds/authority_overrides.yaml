@@ -1,0 +1,34 @@
+# Authority-tier jurisdiction-specific overrides.
+#
+# Per §6 + §10 of systemArchitecture.md: the default tier assignment ("ministry
+# guidance = non-binding") is a Western-statute bias. In many civil-law and
+# regulator-driven jurisdictions, a regulator-issued circular IS binding. The
+# Substantive Lead authors these overrides per jurisdiction; the engine applies
+# them deterministically (no LLM authoring of authority).
+#
+# `source_pattern` is a Python regex matched against `source_id` AND `source_url`.
+# `authority_tier` is the tier the system will use after override.
+
+overrides:
+  # Example: an explanatory civil-law jurisdiction where regulator circulars are
+  # binding under the enabling statute.
+  - jurisdiction: "SAMPLE"
+    source_pattern: "^(sample_)?circular_.*"
+    authority_tier: "tier_1_statute"
+    rationale: >
+      In SAMPLE jurisdiction, circulars issued by the Data Protection Commission
+      under s. 30 of the Personal Data Protection Act, 2020 have binding force
+      on all data controllers. Default would mis-tag these as tier_3_guideline.
+
+  - jurisdiction: "SAMPLE"
+    source_pattern: ".*gazette_notification.*"
+    authority_tier: "tier_2_regulation"
+    rationale: >
+      Gazette notifications under enabling sections of statute carry regulatory
+      force, not merely guideline status.
+
+  # Example template for adding a real jurisdiction. Copy-and-edit.
+  # - jurisdiction: "EUE"
+  #   source_pattern: "^EDPB_guideline_.*"
+  #   authority_tier: "tier_2_regulation"
+  #   rationale: "EDPB guidelines binding on member-state DPAs."

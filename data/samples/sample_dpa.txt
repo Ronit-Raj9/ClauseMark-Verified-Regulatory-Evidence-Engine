@@ -1,0 +1,99 @@
+SAMPLE PERSONAL DATA PROTECTION ACT, 2020
+
+CHAPTER I — PRELIMINARY
+
+Section 1. Short title and commencement.
+(1) This Act may be cited as the Personal Data Protection Act, 2020.
+(2) It shall come into force on such date as the Minister may, by notification
+in the Gazette, appoint.
+
+Section 2. Definitions.
+In this Act, unless the context otherwise requires,—
+(a) "personal data" means data, whether true or not, about an individual who
+    can be identified from that data, or from that data and other information
+    to which the organisation has or is likely to have access;
+(b) "controller" means a person who, alone or jointly with others, determines
+    the purposes and means of the processing of personal data;
+(c) "Commissioner" means the Data Protection Commissioner appointed under
+    section 30;
+(d) "data subject" means an identified or identifiable natural person.
+
+CHAPTER II — GENERAL OBLIGATIONS
+
+Section 5. Lawful basis for processing.
+An organisation shall only process personal data with the consent of the data
+subject or on another lawful basis specified in section 6.
+
+Section 6. Lawful bases other than consent.
+Processing is lawful where it is necessary—
+(a) for the performance of a contract to which the data subject is a party;
+(b) for compliance with a legal obligation to which the controller is subject;
+(c) in order to protect the vital interests of the data subject;
+(d) for the performance of a task carried out in the public interest.
+
+Section 8. Notification of personal data breach.
+(1) A controller shall notify the Commissioner without undue delay, and in any
+    event within 72 hours, of any personal data breach, and shall notify
+    affected data subjects where the breach is likely to result in a high risk
+    to their rights.
+(2) The notification shall describe the nature of the breach, the categories
+    and approximate number of data subjects affected, and the measures taken
+    or proposed to address the breach.
+
+CHAPTER III — DATA SUBJECT RIGHTS
+
+Section 12. Right of access.
+A data subject has the right to obtain from the controller confirmation as to
+whether personal data concerning them is being processed, and where that is
+the case, access to the personal data.
+
+Section 13. Right to rectification.
+A data subject has the right to obtain from the controller without undue
+delay the rectification of inaccurate personal data concerning them.
+
+Section 14. Right to erasure.
+A data subject has the right to obtain from the controller the erasure of
+personal data concerning them without undue delay where one of the grounds in
+subsection (2) applies.
+
+CHAPTER IV — CROSS-BORDER TRANSFER AND LOCALISATION
+
+Section 25. Localisation of personal data of citizens.
+Personal data of citizens shall be stored on servers located within the
+territory of the State. Sectoral regulators may permit copy-on-shore exceptions
+where strictly necessary and subject to safeguards.
+
+Section 26. Transfer of personal data outside the country.
+(1) An organisation shall not transfer any personal data outside the country
+    unless it has taken appropriate steps to ensure that the recipient is
+    bound by legally enforceable obligations to provide to the transferred
+    personal data a standard of protection that is comparable to the
+    protection under this Act.
+(2) Subsection (1) does not apply where—
+    (a) the transfer is necessary for the conclusion or performance of a
+        contract between the data subject and the controller;
+    (b) the data subject has given explicit consent to the proposed transfer
+        after being informed of the possible risks; or
+    (c) the transfer is necessary on important public interest grounds
+        recognised by law.
+(3) The Commissioner may issue guidelines specifying jurisdictions that
+    provide a comparable level of protection for the purposes of subsection
+    (1), and may revise the list from time to time.
+
+CHAPTER V — THE DATA PROTECTION COMMISSION
+
+Section 30. Establishment of the Commission.
+There is hereby established a body to be known as the Data Protection
+Commission.
+
+Section 31. Independence of the Commission.
+The Data Protection Commission shall be independent in the exercise of its
+functions and shall not be subject to the direction or control of any person
+or authority.
+
+CHAPTER VI — ENFORCEMENT
+
+Section 40. Administrative fines.
+The Commissioner may impose administrative fines for contraventions of this
+Act, not exceeding ten million units of currency or two per cent of annual
+turnover, whichever is higher.

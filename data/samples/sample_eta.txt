@@ -1,0 +1,18 @@
+SAMPLE ELECTRONIC TRANSACTIONS ACT, 2019
+
+Section 1. Short title.
+This Act may be cited as the Electronic Transactions Act, 2019.
+
+Section 4. Legal recognition of data messages.
+Information shall not be denied legal effect, validity or enforceability
+solely on the grounds that it is in the form of a data message.
+
+Section 7. Legal recognition of electronic signatures.
+Where the law requires a signature of a person, that requirement is met by
+an electronic signature if the method used—
+(a) identifies the person; and
+(b) indicates the person's approval of the information communicated.
+
+Section 12. Formation and validity of electronic contracts.
+A contract shall not be denied validity or enforceability solely on the ground
+that a data message was used in its formation.
