@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Span highlight used by SpanViewer — Tailwind alone can't address a runtime
+   range, so we expose a tiny utility the component toggles via className. */
+.rie-span-highlight {
+  background-color: rgb(250 204 21 / 0.45); /* yellow-400 / 45% */
+  border-bottom: 2px solid rgb(202 138 4); /* yellow-600 */
+  border-radius: 2px;
+  padding: 0 1px;
+}
