@@ -4,6 +4,14 @@
 lever and is *never* skipped. The default model is the FastEmbed-hosted
 `Xenova/ms-marco-MiniLM-L-6-v2` cross-encoder — small enough to run on CPU,
 strong enough to materially improve MRR@5 on top of hybrid retrieval.
+
+PRODUCTION MULTILINGUAL NOTE (Phase 2):
+  `Xenova/ms-marco-MiniLM-L-6-v2` is trained on English MS-MARCO and will
+  silently under-rank CJK and Arabic candidates. For multilingual deployments
+  swap `model_name` to `BAAI/bge-reranker-v2-m3` (or `jinaai/jina-reranker-v2-
+  base-multilingual`) — both cover en/fr/es/de/zh/ar with comparable latency.
+  The constructor accepts an explicit `model_name` so the swap is a single
+  argument at wiring time, no code change inside this module.
 """
 
 from __future__ import annotations

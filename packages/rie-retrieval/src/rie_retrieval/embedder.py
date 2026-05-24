@@ -30,16 +30,30 @@ BGE_M3_DENSE_DIM: int = 1024
 
 @runtime_checkable
 class DenseEmbedderPort(Protocol):
-    """Anything that turns texts into fixed-width dense vectors."""
+    """Anything that turns texts into fixed-width dense vectors.
 
-    def embed_dense(self, texts: Sequence[str]) -> list[list[float]]: ...
+    `lang` is optional and accepted by the production BGE-M3 embedder for
+    parity with the sparse leg; it is intentionally a hint, not a routing key
+    — BGE-M3 is multilingual and a missing `lang` is never an error.
+    """
+
+    def embed_dense(
+        self, texts: Sequence[str], lang: str | None = None
+    ) -> list[list[float]]: ...
 
 
 @runtime_checkable
 class SparseEmbedderPort(Protocol):
-    """Anything that turns texts into BM25-style sparse term-id -> weight maps."""
+    """Anything that turns texts into BM25-style sparse term-id -> weight maps.
 
-    def embed_sparse(self, texts: Sequence[str]) -> list[dict[int, float]]: ...
+    `lang` drives per-language tokenization (NFKC normalisation, FR-style
+    elision split, CJK bigram fallback, stopword set). A missing `lang`
+    falls back to English-style behaviour — the historical default.
+    """
+
+    def embed_sparse(
+        self, texts: Sequence[str], lang: str | None = None
+    ) -> list[dict[int, float]]: ...
 
 
 class BgeM3Embedder:
@@ -83,7 +97,12 @@ class BgeM3Embedder:
 
     # ── public API ────────────────────────────────────────────────────────
 
-    def embed_dense(self, texts: Sequence[str]) -> list[list[float]]:
+    def embed_dense(
+        self, texts: Sequence[str], lang: str | None = None
+    ) -> list[list[float]]:
+        # `lang` is accepted for API parity but unused: BGE-M3 is multilingual
+        # and does not take a language hint at inference time.
+        del lang
         if not texts:
             return []
         model = self._dense()
@@ -94,7 +113,14 @@ class BgeM3Embedder:
             out.append([float(x) for x in vec])
         return out
 
-    def embed_sparse(self, texts: Sequence[str]) -> list[dict[int, float]]:
+    def embed_sparse(
+        self, texts: Sequence[str], lang: str | None = None
+    ) -> list[dict[int, float]]:
+        # `lang` is accepted for API parity. The Qdrant/bm25 sparse model used
+        # here does its own tokenization, so this hint is recorded for caller
+        # observability but not forwarded — when we swap to a per-language
+        # BM25 vocabulary we'll route on `lang` here.
+        del lang
         if not texts:
             return []
         model = self._sparse()

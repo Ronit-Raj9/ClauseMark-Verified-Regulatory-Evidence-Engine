@@ -13,6 +13,18 @@ Implements `RetrievalPort` (§6.1 of `systemArchitecture.md`):
      encoder rerank the top_k_initial down to top_k_rerank, then expand each
      surviving child into a `RetrievalHit` carrying its parent element id and
      graph neighbourhood.
+
+Multilingual notes (Phase 2):
+  * BGE-M3 is already multilingual — the dense leg needs no per-language
+    handling beyond passing the hint through for telemetry parity.
+  * The sparse leg uses `rie_retrieval.tokenizer.tokenize`, which
+    NFKC-normalises, splits on unicode whitespace+punct, handles FR-style
+    elision, and falls back to CJK character bigrams when a token has no
+    word boundary.
+  * Documents are indexed under `doc_meta.language`; queries take an
+    optional `lang` arg (added as a keyword-only parameter — the original
+    positional signature on `RetrievalPort.retrieve` is untouched so the
+    frozen contract still holds).
 """
 
 from __future__ import annotations
@@ -69,14 +81,33 @@ class _IndexedDocument:
     """In-memory bookkeeping for one indexed document.
 
     Kept alongside the vector store so retrieval can (a) reconstruct the
-    parent element from a child id without a DB call, and (b) hand back the
-    structure-graph neighbourhood the LLM needs for whole-law reasoning.
+    parent element from a child id without a DB call, (b) hand back the
+    structure-graph neighbourhood the LLM needs for whole-law reasoning, and
+    (c) route queries to the same tokenizer settings the document was
+    indexed under (`language`).
     """
 
     doc_id: str
     jurisdiction: str
+    language: str
     parent_of: dict[str, str]  # element_id -> parent_id (or self)
     neighbours_of: dict[str, list[str]]  # element_id -> sorted unique neighbours
+
+
+@dataclass(frozen=True)
+class _RetrievalQuery:
+    """Internal query carrier — extends the port's positional API with `lang`.
+
+    Lives here (NOT in `rie-contracts`) deliberately: the frozen contract
+    can't grow new fields, but the service is free to enrich what it actually
+    operates on. Constructed at the top of `retrieve(...)` so the rest of the
+    pipeline only touches this typed object.
+    """
+
+    text: str
+    jurisdiction: str | None
+    lang: str | None
+    top_k: int
 
 
 class RetrievalService(RetrievalPort):
@@ -135,6 +166,8 @@ class RetrievalService(RetrievalPort):
         child_texts: list[str] = []
         child_payloads: list[dict[str, str | int | float | bool | None]] = []
 
+        doc_language = doc_meta.language or "en"
+
         for el in leaves:
             parent_element_id = parent_of.get(el.element_id, el.element_id)
             neighbours = neighbours_of.get(el.element_id, [])
@@ -151,6 +184,7 @@ class RetrievalService(RetrievalPort):
                     "element_id": el.element_id,
                     "parent_element_id": parent_element_id,
                     "jurisdiction": doc_meta.jurisdiction,
+                    "lang": doc_language,
                     "char_start": abs_start,
                     "char_end": abs_end,
                     "snippet": snippet,
@@ -168,13 +202,14 @@ class RetrievalService(RetrievalPort):
             self._docs[doc_meta.doc_id] = _IndexedDocument(
                 doc_id=doc_meta.doc_id,
                 jurisdiction=doc_meta.jurisdiction,
+                language=doc_language,
                 parent_of=parent_of,
                 neighbours_of=neighbours_of,
             )
             return
 
-        dense_vecs = self._dense.embed_dense(child_texts)
-        sparse_vecs = self._sparse.embed_sparse(child_texts)
+        dense_vecs = self._dense.embed_dense(child_texts, lang=doc_language)
+        sparse_vecs = self._sparse.embed_sparse(child_texts, lang=doc_language)
 
         self._store.upsert(
             collection=self._collection,
@@ -187,6 +222,7 @@ class RetrievalService(RetrievalPort):
         self._docs[doc_meta.doc_id] = _IndexedDocument(
             doc_id=doc_meta.doc_id,
             jurisdiction=doc_meta.jurisdiction,
+            language=doc_language,
             parent_of=parent_of,
             neighbours_of=neighbours_of,
         )
@@ -198,12 +234,18 @@ class RetrievalService(RetrievalPort):
         query: str,
         jurisdiction: str | None,
         top_k: int = 8,
+        *,
+        lang: str | None = None,
     ) -> list[RetrievalHit]:
         if not query.strip():
             return []
 
-        dense_q = self._dense.embed_dense([query])[0]
-        sparse_q = self._sparse.embed_sparse([query])[0]
+        q = _RetrievalQuery(
+            text=query, jurisdiction=jurisdiction, lang=lang, top_k=top_k
+        )
+
+        dense_q = self._dense.embed_dense([q.text], lang=q.lang)[0]
+        sparse_q = self._sparse.embed_sparse([q.text], lang=q.lang)[0]
 
         # Over-fetch so jurisdiction filtering still leaves enough material to
         # rerank. 4x is the common heuristic — cheap, and the rerank cost is

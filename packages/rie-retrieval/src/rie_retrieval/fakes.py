@@ -5,17 +5,24 @@ These live in the production package (not the test tree) so:
     retrieval pipeline without spinning up Qdrant or downloading models
   * unit tests in this package can exercise `RetrievalService` end-to-end on
     CPU-only runners in <1 s
+
+Both dummy embedders route their text through `rie_retrieval.tokenizer.tokenize`
+so the fakes share the same multilingual splitter as the production sparse
+leg. Tests that pass `lang=` on `RetrievalService.retrieve(...)` therefore
+exercise the real tokenizer behaviour even though the embedders themselves
+remain pure-Python hash-based stand-ins.
 """
 
 from __future__ import annotations
 
 import hashlib
 import math
-import re
 from collections import defaultdict
 from collections.abc import Sequence
 
 from rie_contracts import VectorStorePort
+
+from rie_retrieval.tokenizer import tokenize
 
 __all__ = [
     "DummyDenseEmbedder",
@@ -28,12 +35,12 @@ __all__ = [
 # (`from rie_retrieval.fakes import IdentityReranker`) is the test entry point.
 from rie_retrieval.reranker import IdentityReranker
 
-_TOKEN_RE = re.compile(r"[a-z0-9]+")
 _DENSE_DIM = 64
 
 
-def _tokenise(text: str) -> list[str]:
-    return _TOKEN_RE.findall(text.lower())
+def _tokenise(text: str, lang: str | None = None) -> list[str]:
+    """Unicode-aware tokenizer shared by both dummy embedders."""
+    return tokenize(text, lang=lang)
 
 
 class DummyDenseEmbedder:
@@ -42,15 +49,21 @@ class DummyDenseEmbedder:
     Two texts that share many tokens will sit close in the resulting vector
     space; two unrelated texts will be near-orthogonal. Deterministic, fast,
     and dependency-free.
+
+    `lang` is accepted for parity with the production embedder API but only
+    used to steer stopword removal in the underlying tokenizer — the BGE-M3
+    dense model is multilingual without per-language hints.
     """
 
     dim: int = _DENSE_DIM
 
-    def embed_dense(self, texts: Sequence[str]) -> list[list[float]]:
+    def embed_dense(
+        self, texts: Sequence[str], lang: str | None = None
+    ) -> list[list[float]]:
         out: list[list[float]] = []
         for text in texts:
             vec = [0.0] * self.dim
-            for tok in _tokenise(text):
+            for tok in _tokenise(text, lang=lang):
                 h = int(hashlib.md5(tok.encode("utf-8")).hexdigest(), 16)
                 bucket = h % self.dim
                 # Sign bit on a separate byte so collisions don't always add.
@@ -64,13 +77,22 @@ class DummyDenseEmbedder:
 
 
 class DummySparseEmbedder:
-    """Token-id → frequency BM25-ish encoder using stable token hashing."""
+    """Token-id → frequency BM25-ish encoder using stable token hashing.
 
-    def embed_sparse(self, texts: Sequence[str]) -> list[dict[int, float]]:
+    Tokenization is delegated to `rie_retrieval.tokenizer.tokenize`, so the
+    sparse leg picks up: NFKC normalisation, unicode-aware whitespace+punct
+    splitting, FR-style elision split, CJK character-bigram fallback, and
+    per-language stopword removal. The hashed term-id space stays the same
+    across languages so a multilingual collection can share one BM25 index.
+    """
+
+    def embed_sparse(
+        self, texts: Sequence[str], lang: str | None = None
+    ) -> list[dict[int, float]]:
         out: list[dict[int, float]] = []
         for text in texts:
             freq: dict[int, float] = defaultdict(float)
-            for tok in _tokenise(text):
+            for tok in _tokenise(text, lang=lang):
                 h = int(hashlib.md5(tok.encode("utf-8")).hexdigest(), 16)
                 # Restrict to a 24-bit id space — plenty for tests, small for printing.
                 tid = h % (1 << 24)

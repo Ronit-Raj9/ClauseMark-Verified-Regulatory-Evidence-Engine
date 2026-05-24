@@ -31,6 +31,7 @@ from rie_retrieval.service import (
     DEFAULT_TOP_K_RERANK,
     RetrievalService,
 )
+from rie_retrieval.tokenizer import SUPPORTED_LANGUAGES, is_supported_language, tokenize
 
 __all__ = [
     "BGE_M3_DENSE_DIM",
@@ -38,6 +39,7 @@ __all__ = [
     "DEFAULT_CHILD_CHUNK_SIZE",
     "DEFAULT_TOP_K_INITIAL",
     "DEFAULT_TOP_K_RERANK",
+    "SUPPORTED_LANGUAGES",
     "BgeM3Embedder",
     "BgeReranker",
     "ChildChunk",
@@ -50,4 +52,6 @@ __all__ = [
     "RetrievalService",
     "SparseEmbedderPort",
     "chunk_text",
+    "is_supported_language",
+    "tokenize",
 ]
