@@ -1,0 +1,20 @@
+[project]
+name = "rie-eval"
+version = "0.1.0"
+description = "Gold-set runner, RAGAS metrics, ablations."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "rie-contracts",
+    "rie-config",
+    "rie-persistence",
+    "pydantic>=2.9",
+    "pandas>=2.2",
+    "typer>=0.21.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rie_eval"]
