@@ -1,0 +1,16 @@
+pillar_id: "10"
+pillar_name: "Non-technical non-tariff measures"
+cluster: "traditional_trade"
+document_profile: "structured_tabular"
+status: "stub"
+description: "Quotas, licensing, price controls and other non-technical NTMs."
+indicators:
+  - indicator_id: "10.1"
+    name: "Import licensing prevalence"
+    definition: "Share of HS6 lines subject to non-automatic import licensing."
+    evaluation_method: "tabular_lookup"
+    scoring_criteria:
+      "0": ">20% of lines"
+      "0.5": "5–20% of lines"
+      "1": "<5% of lines"
+    authority_hints: ["tier_2_regulation"]

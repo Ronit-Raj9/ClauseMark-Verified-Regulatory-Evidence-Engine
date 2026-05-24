@@ -1,0 +1,16 @@
+pillar_id: "1"
+pillar_name: "Tariffs and trade defense"
+cluster: "traditional_trade"
+document_profile: "structured_tabular"
+status: "stub"
+description: "MFN tariff levels, tariff dispersion, antidumping & countervailing measures."
+indicators:
+  - indicator_id: "1.1"
+    name: "Average MFN applied tariff"
+    definition: "Average MFN applied tariff across HS6 lines."
+    evaluation_method: "tabular_lookup"
+    scoring_criteria:
+      "0": ">15%"
+      "0.5": "5–15%"
+      "1": "<5%"
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]

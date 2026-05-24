@@ -1,0 +1,46 @@
+pillar_id: "12"
+pillar_name: "Online transactions and e-commerce"
+cluster: "digital_governance"
+document_profile: "statutory_legal_text"
+status: "stub"
+description: >
+  Recognition of electronic signatures, electronic contracts, consumer
+  protection for online transactions, and treaty memberships (e-CC, UNCITRAL
+  Model Laws).
+
+indicators:
+  - indicator_id: "12.1"
+    name: "Electronic signature recognition"
+    definition: "Whether electronic signatures have legal recognition equivalent to handwritten signatures."
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No recognition."
+      "0.5": "Recognition for limited contexts."
+      "1": "General recognition."
+    positive_keywords:
+      en: ["electronic signature", "shall not be denied legal effect",
+           "functional equivalent"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "12.2"
+    name: "Electronic contract enforceability"
+    definition: "Whether contracts formed electronically are enforceable."
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Not enforceable."
+      "0.5": "Enforceable subject to formalities."
+      "1": "Generally enforceable."
+    positive_keywords:
+      en: ["electronic contract", "by electronic means", "data message"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "12.10"
+    name: "UN Convention on Electronic Communications (e-CC) membership"
+    definition: "Whether the jurisdiction is party to the UN Convention on the Use of Electronic Communications in International Contracts."
+    evaluation_method: "treaty_lookup"
+    scoring_criteria:
+      "0": "Not a party."
+      "1": "Party."
+    authority_hints: ["tier_1_statute"]

@@ -1,0 +1,16 @@
+pillar_id: "11"
+pillar_name: "Standards and conformity assessment"
+cluster: "traditional_trade"
+document_profile: "structured_tabular"
+status: "stub"
+description: "Mandatory technical standards, conformity-assessment procedures, mutual recognition."
+indicators:
+  - indicator_id: "11.1"
+    name: "Mutual recognition of conformity assessment"
+    definition: "Whether the jurisdiction recognises foreign conformity-assessment results."
+    evaluation_method: "treaty_lookup"
+    scoring_criteria:
+      "0": "No recognition."
+      "0.5": "Recognition with limited partners."
+      "1": "Broad mutual recognition."
+    authority_hints: ["tier_2_regulation"]

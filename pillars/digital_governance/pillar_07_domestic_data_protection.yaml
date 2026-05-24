@@ -1,0 +1,87 @@
+pillar_id: "7"
+pillar_name: "Domestic data protection"
+cluster: "digital_governance"
+document_profile: "statutory_legal_text"
+status: "built"
+description: >
+  Domestic data protection rules — consent, lawful basis, data-subject rights,
+  breach notification, independent supervisory authority.
+
+indicators:
+  - indicator_id: "7.1"
+    name: "Comprehensive data protection law in force"
+    definition: >
+      Whether a horizontal data protection statute applicable across sectors
+      is in force.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No general data protection law."
+      "0.5": "Sectoral data protection law(s) only."
+      "1": "Comprehensive horizontal data protection law in force."
+    positive_keywords:
+      en: ["Personal Data Protection Act", "Data Protection Act", "this Act applies to"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "7.2"
+    name: "Lawful basis / consent for processing"
+    definition: >
+      Whether the law requires a lawful basis (consent or otherwise) for
+      processing personal data.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No general lawful-basis requirement."
+      "0.5": "Lawful basis required for specific data categories only."
+      "1": "General lawful-basis requirement (consent or enumerated alternatives)."
+    positive_keywords:
+      en: ["consent", "lawful basis", "shall only process", "with the consent of"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "7.3"
+    name: "Data-subject rights (access, rectification, erasure)"
+    definition: >
+      Whether data subjects have enforceable access, rectification, and erasure
+      rights against controllers.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No rights enumerated."
+      "0.5": "Partial rights (e.g. access only)."
+      "1": "Full triad: access + rectification + erasure (or equivalent)."
+    positive_keywords:
+      en: ["right to access", "right of access", "right to rectification",
+           "right to erasure", "right to be forgotten", "right to correction"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "7.4"
+    name: "Mandatory breach notification"
+    definition: >
+      Whether the law requires controllers to notify the supervisory authority
+      and/or data subjects of personal data breaches.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No breach notification."
+      "0.5": "Notification to authority only OR data subjects only."
+      "1": "Notification to authority AND data subjects."
+    positive_keywords:
+      en: ["notify the Commissioner", "without undue delay", "data breach notification",
+           "shall notify", "within 72 hours"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "7.5"
+    name: "Independent supervisory authority"
+    definition: >
+      Whether the law establishes an independent data protection / privacy
+      supervisory authority.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No supervisory authority."
+      "0.5": "Authority exists but lacks independence indicia (e.g. ministerial control)."
+      "1": "Independent authority with enforcement powers."
+    positive_keywords:
+      en: ["the Commission shall be independent", "Commissioner", "supervisory authority",
+           "Data Protection Commission", "Data Protection Authority"]
+    authority_hints: ["tier_1_statute"]

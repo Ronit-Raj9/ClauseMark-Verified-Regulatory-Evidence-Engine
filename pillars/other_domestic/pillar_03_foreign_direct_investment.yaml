@@ -1,0 +1,17 @@
+pillar_id: "3"
+pillar_name: "Foreign direct investment"
+cluster: "other_domestic"
+document_profile: "mixed_regulatory"
+status: "stub"
+description: "Sectoral restrictions, screening regimes, investor protection."
+indicators:
+  - indicator_id: "3.1"
+    name: "Sectoral foreign equity caps"
+    definition: "Whether the law imposes foreign-equity caps in non-strategic sectors."
+    evaluation_method: "clause_extraction"
+    clause_pattern: "prohibition"
+    scoring_criteria:
+      "0": "Broad caps across many sectors."
+      "0.5": "Caps in selected sectors."
+      "1": "No caps outside strategic sectors."
+    authority_hints: ["tier_1_statute"]

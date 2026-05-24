@@ -1,0 +1,111 @@
+pillar_id: "6"
+pillar_name: "Cross-border data transfers"
+cluster: "digital_governance"
+document_profile: "statutory_legal_text"
+status: "built"
+description: >
+  Restrictions, conditions and adequacy regimes governing the export of personal
+  data and other regulated data categories across national borders.
+
+indicators:
+  - indicator_id: "6.1"
+    name: "Free cross-border data flow"
+    definition: >
+      Whether the law permits cross-border transfer of personal data without
+      conditions on the receiving jurisdiction.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Outbound transfer prohibited or conditioned on regulator approval."
+      "0.5": "Outbound transfer permitted subject to comparable-protection or adequacy requirement."
+      "1": "Outbound transfer expressly permitted without conditions on receiving jurisdiction."
+    positive_keywords:
+      en: ["may transfer", "shall be permitted to transfer", "no restriction"]
+    negative_cues:
+      en: ["only if", "subject to", "prior authorisation", "prohibited"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "6.2"
+    name: "Prohibition on cross-border transfer"
+    definition: >
+      Whether the law prohibits or severely restricts the transfer of certain
+      data categories across borders.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "prohibition"
+    scoring_criteria:
+      "0": "No prohibition."
+      "0.5": "Prohibition applies to narrow data categories only."
+      "1": "General prohibition on outbound transfer (or for broad personal-data categories)."
+    positive_keywords:
+      en: ["shall not transfer", "prohibited from transferring", "is not permitted"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "6.3"
+    name: "Data localisation requirement"
+    definition: >
+      Whether the law requires personal or other regulated data to be stored or
+      processed locally.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No localisation."
+      "0.5": "Conditional localisation (sector-specific or copy-on-shore)."
+      "1": "Mandatory exclusive local storage / processing."
+    positive_keywords:
+      en: ["shall be stored within", "must be processed in", "local storage required",
+           "stored on a server located in"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "6.4"
+    name: "Conditional cross-border transfer regime (adequacy / safeguards)"
+    definition: >
+      Whether the law permits outbound transfer subject to one or more
+      conditions — e.g. adequacy decision, standard contractual clauses,
+      binding corporate rules, consent, or comparable-protection finding.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "conditional_regime"
+    scoring_criteria:
+      "0": "No conditional regime — either fully free or fully prohibited."
+      "0.5": "Conditions exist but are narrow or sectoral."
+      "1": "A general conditional regime is the operating rule for outbound transfers."
+    positive_keywords:
+      en: [
+        "comparable level of protection", "adequacy", "appropriate safeguards",
+        "standard contractual clauses", "binding corporate rules", "explicit consent",
+        "subject to", "provided that", "may transfer if", "where"
+      ]
+    negative_cues:
+      en: ["unconditional", "freely"]
+    few_shot_examples:
+      - text: |
+          An organisation shall not transfer any personal data outside the country
+          unless it has taken appropriate steps to ensure that the recipient is
+          bound by legally enforceable obligations to provide to the transferred
+          personal data a standard of protection that is comparable to the
+          protection under this Act.
+        decomposition:
+          subject: "organisation"
+          condition: "transfer of personal data outside the country"
+          constraint: "recipient bound by comparable-protection obligations"
+        label: "6.4"
+        score: 0.5
+        rationale: >
+          A general rule (prohibition on outbound transfer) coupled with a
+          comparable-protection exception — the canonical conditional regime
+          structure (general_rule + conditional_exception). Restrictiveness
+          (0.5 vs 1) is a regime-level judgment and must be confirmed by a
+          reviewer.
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "6.5"
+    name: "Cross-border treaty / mutual recognition membership"
+    definition: >
+      Whether the jurisdiction is party to a cross-border data treaty or mutual
+      recognition arrangement (e.g. APEC CBPR, Council of Europe Convention 108+,
+      OECD privacy framework).
+    evaluation_method: "treaty_lookup"
+    scoring_criteria:
+      "0": "No party to any qualifying instrument."
+      "0.5": "Party to one qualifying instrument."
+      "1": "Party to two or more qualifying instruments."
+    authority_hints: ["tier_1_statute"]

@@ -1,0 +1,35 @@
+pillar_id: "9"
+pillar_name: "Content access and lawful intercept"
+cluster: "digital_governance"
+document_profile: "statutory_legal_text"
+status: "stub"
+description: >
+  Government powers to access electronic content, lawful intercept, and content
+  blocking obligations on intermediaries.
+
+indicators:
+  - indicator_id: "9.1"
+    name: "Judicial authorisation for content access"
+    definition: "Whether government content access requires prior judicial authorisation."
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No judicial authorisation required."
+      "0.5": "Judicial authorisation required for certain categories only."
+      "1": "Judicial authorisation generally required."
+    positive_keywords:
+      en: ["warrant", "judicial order", "court order", "prior authorisation by a judge"]
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "9.2"
+    name: "Mandatory content blocking obligations"
+    definition: "Whether intermediaries are obliged to block or filter content on government order."
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No blocking obligation."
+      "0.5": "Narrow blocking obligation (e.g. child sexual abuse material only)."
+      "1": "Broad blocking obligation."
+    positive_keywords:
+      en: ["shall block", "disable access", "restrict access to"]
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]

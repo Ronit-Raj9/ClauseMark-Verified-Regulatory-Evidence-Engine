@@ -1,0 +1,17 @@
+pillar_id: "5"
+pillar_name: "Telecom and competition"
+cluster: "other_domestic"
+document_profile: "mixed_regulatory"
+status: "stub"
+description: "Telecom market openness, independent regulator, competition law."
+indicators:
+  - indicator_id: "5.1"
+    name: "Independent telecom regulator"
+    definition: "Whether an independent telecom regulator exists with rule-making power."
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No independent regulator."
+      "0.5": "Regulator exists but lacks independence."
+      "1": "Independent regulator with rule-making power."
+    authority_hints: ["tier_1_statute"]

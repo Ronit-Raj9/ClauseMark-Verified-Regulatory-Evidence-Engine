@@ -1,0 +1,24 @@
+pillar_id: "NN"
+pillar_name: "Replace me"
+cluster: "digital_governance"      # digital_governance | traditional_trade | other_domestic
+document_profile: "statutory_legal_text"  # statutory_legal_text | structured_tabular | mixed_regulatory | treaty_membership
+status: "stub"                     # stub → built when gold set populated
+description: ""
+
+indicators:
+  - indicator_id: "NN.1"
+    name: "Replace me"
+    definition: ""
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No measure found."
+      "0.5": "Partial measure or non-binding guidance."
+      "1": "Binding measure satisfies indicator."
+    positive_keywords:
+      en: []
+    negative_cues:
+      en: []
+    few_shot_examples: []
+    authority_hints:
+      - "tier_1_statute"

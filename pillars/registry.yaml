@@ -1,0 +1,107 @@
+# RDTII pillar registry — master index. The orchestrator iterates THIS file;
+# no pillar id is ever hard-coded in Python.
+#
+# Status convention:
+#   built   — populated with depth, gold set non-empty
+#   stub    — schema-valid skeleton, ready to flesh out
+#   roadmap — declared scope, not yet attempted
+
+pillars:
+  # ── Cluster 1: digital governance (MVP depth on 6 & 7) ──
+  - pillar_id: "6"
+    pillar_name: "Cross-border data transfers"
+    cluster: "digital_governance"
+    document_profile: "statutory_legal_text"
+    status: "built"
+    config_path: "pillars/digital_governance/pillar_06_cross_border_data.yaml"
+    gold_set_path: "gold/pillar_06"
+
+  - pillar_id: "7"
+    pillar_name: "Domestic data protection"
+    cluster: "digital_governance"
+    document_profile: "statutory_legal_text"
+    status: "built"
+    config_path: "pillars/digital_governance/pillar_07_domestic_data_protection.yaml"
+    gold_set_path: "gold/pillar_07"
+
+  - pillar_id: "8"
+    pillar_name: "Internet intermediary liability"
+    cluster: "digital_governance"
+    document_profile: "statutory_legal_text"
+    status: "stub"
+    config_path: "pillars/digital_governance/pillar_08_intermediary_liability.yaml"
+    gold_set_path: "gold/pillar_08"
+
+  - pillar_id: "9"
+    pillar_name: "Content access and lawful intercept"
+    cluster: "digital_governance"
+    document_profile: "statutory_legal_text"
+    status: "stub"
+    config_path: "pillars/digital_governance/pillar_09_content_access.yaml"
+    gold_set_path: "gold/pillar_09"
+
+  - pillar_id: "12"
+    pillar_name: "Online transactions and e-commerce"
+    cluster: "digital_governance"
+    document_profile: "statutory_legal_text"
+    status: "stub"
+    config_path: "pillars/digital_governance/pillar_12_online_transactions.yaml"
+    gold_set_path: "gold/pillar_12"
+
+  # ── Cluster 2: traditional trade (Phase 2 — different profiles) ──
+  - pillar_id: "1"
+    pillar_name: "Tariffs and trade defense"
+    cluster: "traditional_trade"
+    document_profile: "structured_tabular"
+    status: "stub"
+    config_path: "pillars/traditional_trade/pillar_01_tariffs_trade_defense.yaml"
+    gold_set_path: null
+
+  - pillar_id: "10"
+    pillar_name: "Non-technical non-tariff measures"
+    cluster: "traditional_trade"
+    document_profile: "structured_tabular"
+    status: "stub"
+    config_path: "pillars/traditional_trade/pillar_10_non_technical_ntms.yaml"
+    gold_set_path: null
+
+  - pillar_id: "11"
+    pillar_name: "Standards and conformity assessment"
+    cluster: "traditional_trade"
+    document_profile: "structured_tabular"
+    status: "stub"
+    config_path: "pillars/traditional_trade/pillar_11_standards_procedures.yaml"
+    gold_set_path: null
+
+  # ── Cluster 3: other domestic (Phase 2 — mixed profile) ──
+  - pillar_id: "2"
+    pillar_name: "Public procurement"
+    cluster: "other_domestic"
+    document_profile: "mixed_regulatory"
+    status: "stub"
+    config_path: "pillars/other_domestic/pillar_02_public_procurement.yaml"
+    gold_set_path: null
+
+  - pillar_id: "3"
+    pillar_name: "Foreign direct investment"
+    cluster: "other_domestic"
+    document_profile: "mixed_regulatory"
+    status: "stub"
+    config_path: "pillars/other_domestic/pillar_03_foreign_direct_investment.yaml"
+    gold_set_path: null
+
+  - pillar_id: "4"
+    pillar_name: "Intellectual property"
+    cluster: "other_domestic"
+    document_profile: "mixed_regulatory"
+    status: "stub"
+    config_path: "pillars/other_domestic/pillar_04_intellectual_property.yaml"
+    gold_set_path: null
+
+  - pillar_id: "5"
+    pillar_name: "Telecom and competition"
+    cluster: "other_domestic"
+    document_profile: "mixed_regulatory"
+    status: "stub"
+    config_path: "pillars/other_domestic/pillar_05_telecom_competition.yaml"
+    gold_set_path: null

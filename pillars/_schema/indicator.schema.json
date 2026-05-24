@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rie.un.example/schemas/indicator.json",
+  "title": "RIE Indicator",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["indicator_id", "name", "definition", "evaluation_method"],
+  "properties": {
+    "indicator_id": { "type": "string", "pattern": "^[0-9]{1,2}\\.[0-9]+$" },
+    "name": { "type": "string" },
+    "definition": { "type": "string" },
+    "evaluation_method": {
+      "enum": ["clause_extraction", "tabular_lookup", "treaty_lookup"]
+    },
+    "clause_pattern": {
+      "enum": [
+        "obligation",
+        "prohibition",
+        "conditional_regime",
+        "exemption",
+        "definition"
+      ]
+    },
+    "scoring_criteria": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "positive_keywords": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    },
+    "negative_cues": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    },
+    "few_shot_examples": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "authority_hints": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "tier_1_statute",
+          "tier_2_regulation",
+          "tier_3_guideline",
+          "tier_4_informal"
+        ]
+      }
+    }
+  }
+}

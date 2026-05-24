@@ -1,0 +1,17 @@
+pillar_id: "2"
+pillar_name: "Public procurement"
+cluster: "other_domestic"
+document_profile: "mixed_regulatory"
+status: "stub"
+description: "Openness of public procurement to foreign suppliers, transparency."
+indicators:
+  - indicator_id: "2.1"
+    name: "Non-discrimination in procurement"
+    definition: "Whether procurement rules treat foreign and domestic suppliers equally."
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Express preference for domestic suppliers."
+      "0.5": "Limited preferences only."
+      "1": "Non-discrimination is the general rule."
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]

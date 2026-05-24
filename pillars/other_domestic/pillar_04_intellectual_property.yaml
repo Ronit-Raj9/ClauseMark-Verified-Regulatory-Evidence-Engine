@@ -1,0 +1,17 @@
+pillar_id: "4"
+pillar_name: "Intellectual property"
+cluster: "other_domestic"
+document_profile: "mixed_regulatory"
+status: "stub"
+description: "Patent, copyright, trademark regimes and enforcement."
+indicators:
+  - indicator_id: "4.1"
+    name: "TRIPS-plus enforcement"
+    definition: "Whether enforcement provisions go beyond TRIPS minima."
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Below TRIPS minima."
+      "0.5": "TRIPS minima."
+      "1": "TRIPS-plus enforcement."
+    authority_hints: ["tier_1_statute"]
