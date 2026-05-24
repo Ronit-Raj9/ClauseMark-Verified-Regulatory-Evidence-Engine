@@ -67,15 +67,19 @@ def test_run_produces_jurisdiction_consistent_claims() -> None:
 def test_uses_only_built_pillars() -> None:
     package = run_pipeline(
         jurisdiction="SAMPLE",
-        pillar_ids=["6", "7", "8"],  # 8 is stub
+        pillar_ids=["6", "7", "8"],
         bundle=_make_bundle(),
     )
-    # No coverage rows for stub pillars (skipped during retrieve)
+    # Pillar 8 is built in Phase 2 — retrieve runs and coverage rows are emitted.
     pillar_8_indicators = {
         c["indicator_id"] for c in package["coverage"] if c["indicator_id"].startswith("8.")
     }
-    # Coverage builds for all selected pillars regardless; ensure stub still yields insufficient_coverage
-    if pillar_8_indicators:
-        for c in package["coverage"]:
-            if c["indicator_id"].startswith("8."):
-                assert c["state"] in {"insufficient_coverage", "no_evidence_in_searched_corpus"}
+    assert pillar_8_indicators, "built pillar 8 should produce coverage rows"
+    legal_states = {
+        "evidence_found",
+        "insufficient_coverage",
+        "no_evidence_in_searched_corpus",
+    }
+    for c in package["coverage"]:
+        if c["indicator_id"].startswith("8."):
+            assert c["state"] in legal_states

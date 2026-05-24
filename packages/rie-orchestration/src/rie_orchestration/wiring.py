@@ -121,6 +121,7 @@ def _build_real_bundle(config: ConfigRepositoryPort, samples_dir: Path) -> Adapt
             base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
             model=os.getenv("OLLAMA_VERIFIER_MODEL", "mistral:7b-instruct-q4_K_M"),
         ),
+        kg_gate_enabled=os.getenv("RIE_KG_GATE_ENABLED") == "1",
     )
 
     repo_root_path = samples_dir.parent.parent  # data/samples → repo root

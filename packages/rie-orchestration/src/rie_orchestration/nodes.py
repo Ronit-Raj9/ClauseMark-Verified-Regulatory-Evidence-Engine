@@ -7,11 +7,13 @@ same input state so the checkpointer can resume safely.
 from __future__ import annotations
 
 import logging
+import os
 
 from rie_contracts import (
     Claim,
     CoverageRecord,
     DocumentMeta,
+    DocumentType,
     Element,
     RetrievalHit,
     StructureEdge,
@@ -112,12 +114,13 @@ def classify_node(state: RieState, bundle: AdapterBundle) -> RieState:
                 continue
             neighbourhood = bundle.repo.get_elements(list(hit.neighbourhood_element_ids))
             try:
+                n_samples = int(os.getenv("RIE_N_SAMPLES", "3"))
                 claim = bundle.classifier.classify_clause(
                     clause_element=clause,
                     neighbourhood=neighbourhood,
                     pillar=pillar,
                     indicator_choices=pillar.indicators,
-                    n_samples=3,
+                    n_samples=n_samples,
                 )
             except Exception as e:
                 log.warning(
@@ -141,22 +144,35 @@ def classify_node(state: RieState, bundle: AdapterBundle) -> RieState:
 
 def verify_node(state: RieState, bundle: AdapterBundle) -> RieState:
     verifications: dict[str, VerificationReport] = {}
+    kg_enabled = os.getenv("RIE_KG_GATE_ENABLED") == "1"
+    kg_results: dict[str, object] = {}
     for claim in state.get("claims", []):
-        report = bundle.verifier.verify(claim, bundle.repo.get_element_text)
+        if kg_enabled and hasattr(bundle.verifier, "verify_with_kg"):
+            report, kg_result = bundle.verifier.verify_with_kg(  # type: ignore[attr-defined]
+                claim, bundle.repo.get_element_text
+            )
+            if kg_result is not None:
+                kg_results[claim.claim_id] = kg_result
+        else:
+            report = bundle.verifier.verify(claim, bundle.repo.get_element_text)
         bundle.repo.save_verification(report)
         verifications[claim.claim_id] = report
     state["verifications"] = verifications
+    if kg_results:
+        state["kg_results"] = kg_results
     log.info(
-        "verify: %d verified / %d flagged / %d rejected",
+        "verify: %d verified / %d flagged / %d rejected%s",
         sum(1 for r in verifications.values() if r.status == VerificationStatus.VERIFIED),
         sum(1 for r in verifications.values() if r.status == VerificationStatus.FLAGGED),
         sum(1 for r in verifications.values() if r.status == VerificationStatus.REJECTED),
+        f" (kg_gate={len(kg_results)} side-channel)" if kg_results else "",
     )
     return state
 
 
 def coverage_node(state: RieState, bundle: AdapterBundle) -> RieState:
     coverage: list[CoverageRecord] = []
+    enriched_rows: list[object] = []
     pillars_loaded = {p: bundle.config.load_pillar(p) for p in state["pillar_ids"]}
     verified = [
         c
@@ -164,6 +180,21 @@ def coverage_node(state: RieState, bundle: AdapterBundle) -> RieState:
         if state["verifications"].get(c.claim_id)
         and state["verifications"][c.claim_id].status == VerificationStatus.VERIFIED
     ]
+
+    corpus_completeness_enabled = os.getenv("RIE_CORPUS_COMPLETENESS_ENABLED") == "1"
+    manifest = None
+    ingested_types: list[DocumentType] = []
+    if corpus_completeness_enabled:
+        from rie_coverage import enrich_with_completeness, load_manifest
+
+        repo_root = bundle.samples_dir.parent.parent
+        manifest = load_manifest(repo_root, state["jurisdiction"])
+        seen_types: set[DocumentType] = set()
+        for doc in state.get("documents", []):
+            if doc.document_type not in seen_types:
+                seen_types.add(doc.document_type)
+                ingested_types.append(doc.document_type)
+
     for pillar_id, pillar in pillars_loaded.items():
         for ind in pillar.indicators:
             rec = bundle.coverage.evaluate(
@@ -172,10 +203,24 @@ def coverage_node(state: RieState, bundle: AdapterBundle) -> RieState:
                 verified_claims=verified,
                 gold_recall=_lookup_gold_recall(bundle, pillar_id, ind.indicator_id),
             )
+            if corpus_completeness_enabled and manifest is not None:
+                enriched = enrich_with_completeness(
+                    rec,
+                    ingested_source_types=ingested_types,
+                    manifest=manifest,
+                )
+                enriched_rows.append(enriched)
+                rec = enriched.to_contract_row()
             bundle.repo.save_coverage(rec)
             coverage.append(rec)
     state["coverage"] = coverage
-    log.info("coverage: produced %d records", len(coverage))
+    if enriched_rows:
+        state["enriched_coverage"] = enriched_rows
+    log.info(
+        "coverage: produced %d records%s",
+        len(coverage),
+        " (corpus completeness)" if enriched_rows else "",
+    )
     return state
 
 

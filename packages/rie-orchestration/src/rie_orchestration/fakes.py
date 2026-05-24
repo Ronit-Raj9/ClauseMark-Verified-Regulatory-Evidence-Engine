@@ -392,6 +392,15 @@ class FakeVerifier:
             failure_reasons=[],
         )
 
+    def verify_with_kg(
+        self,
+        claim: Claim,
+        get_element_text: Any,
+        **kwargs: Any,
+    ) -> tuple[VerificationReport, None]:
+        del kwargs
+        return self.verify(claim, get_element_text), None
+
 
 # ════════════════════════════════════════════════════════════════════════════
 # FakeCoverage — applies 3-state rule

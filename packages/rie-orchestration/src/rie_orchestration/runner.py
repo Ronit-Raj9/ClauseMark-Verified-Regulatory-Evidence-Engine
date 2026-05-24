@@ -157,7 +157,7 @@ def _build_evidence_package(run_id: str, opts: RunOptions, state: RieState) -> d
     verifications = state.get("verifications", {})
     coverage = state.get("coverage", [])
 
-    return {
+    package: dict[str, Any] = {
         "run_id": run_id,
         "jurisdiction": opts.jurisdiction,
         "pillar_ids": opts.pillar_ids,
@@ -179,3 +179,16 @@ def _build_evidence_package(run_id: str, opts: RunOptions, state: RieState) -> d
         "verifications": {cid: r.model_dump(mode="json") for cid, r in verifications.items()},
         "coverage": [c.model_dump(mode="json") for c in coverage],
     }
+    enriched = state.get("enriched_coverage")
+    if enriched:
+        package["enriched_coverage"] = [
+            row.model_dump(mode="json") if hasattr(row, "model_dump") else row
+            for row in enriched
+        ]
+    kg_results = state.get("kg_results")
+    if kg_results:
+        package["kg_results"] = {
+            cid: (r.model_dump(mode="json") if hasattr(r, "model_dump") else r)
+            for cid, r in kg_results.items()
+        }
+    return package
