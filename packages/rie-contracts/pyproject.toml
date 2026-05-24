@@ -1,0 +1,16 @@
+[project]
+name = "rie-contracts"
+version = "0.1.0"
+description = "Frozen contract layer: ports + Pydantic models for the Regulatory Intelligence Engine."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rie_contracts"]
