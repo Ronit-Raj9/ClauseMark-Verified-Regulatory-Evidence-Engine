@@ -10,8 +10,28 @@ yet installed in the environment (tests, OpenAPI generation, etc.).
 from __future__ import annotations
 
 import logging
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
+
+
+def _load_dotenv() -> None:
+    """Bootstrap env from .env at repo root — Makefile `include .env` does not
+    propagate to subprocesses, so do it explicitly here."""
+    cwd = Path.cwd()
+    for candidate in (cwd / ".env", cwd.parent / ".env", cwd.parent.parent / ".env"):
+        if candidate.exists():
+            for line in candidate.read_text().splitlines():
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+            return
+
+
+_load_dotenv()
 
 from fastapi import FastAPI
 from rie_config.loader import ConfigRepository
