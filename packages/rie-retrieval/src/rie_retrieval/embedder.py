@@ -18,6 +18,8 @@ from typing import Protocol, runtime_checkable
 
 __all__ = [
     "BGE_M3_DENSE_DIM",
+    "DEFAULT_DENSE_MODEL",
+    "DEFAULT_SPARSE_MODEL",
     "BgeM3Embedder",
     "DenseEmbedderPort",
     "SparseEmbedderPort",
@@ -26,6 +28,10 @@ __all__ = [
 
 # BGE-M3 dense vector dimensionality (fixed by the model architecture).
 BGE_M3_DENSE_DIM: int = 1024
+
+# §6.1 architecture defaults — single source of truth for wiring / env fallbacks.
+DEFAULT_DENSE_MODEL: str = "BAAI/bge-m3"
+DEFAULT_SPARSE_MODEL: str = "Qdrant/bm25"
 
 
 @runtime_checkable
@@ -69,8 +75,8 @@ class BgeM3Embedder:
 
     def __init__(
         self,
-        dense_model: str = "BAAI/bge-m3",
-        sparse_model: str = "Qdrant/bm25",
+        dense_model: str = DEFAULT_DENSE_MODEL,
+        sparse_model: str = DEFAULT_SPARSE_MODEL,
     ) -> None:
         self._dense_model_name = dense_model
         self._sparse_model_name = sparse_model

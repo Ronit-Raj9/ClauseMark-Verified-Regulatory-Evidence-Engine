@@ -2,23 +2,24 @@
 
 §6.1 of `systemArchitecture.md`: reranking is the highest-leverage precision
 lever and is *never* skipped. The default model is the FastEmbed-hosted
-`Xenova/ms-marco-MiniLM-L-6-v2` cross-encoder — small enough to run on CPU,
-strong enough to materially improve MRR@5 on top of hybrid retrieval.
+``BAAI/bge-reranker-v2-m3`` cross-encoder — multilingual (en/fr/es/de/zh/ar),
+aligned with the BGE-M3 dense leg, and strong enough to materially improve
+MRR@5 on top of hybrid retrieval.
 
-PRODUCTION MULTILINGUAL NOTE (Phase 2):
-  `Xenova/ms-marco-MiniLM-L-6-v2` is trained on English MS-MARCO and will
-  silently under-rank CJK and Arabic candidates. For multilingual deployments
-  swap `model_name` to `BAAI/bge-reranker-v2-m3` (or `jinaai/jina-reranker-v2-
-  base-multilingual`) — both cover en/fr/es/de/zh/ar with comparable latency.
-  The constructor accepts an explicit `model_name` so the swap is a single
-  argument at wiring time, no code change inside this module.
+Phase 2 alternatives (swap via ``model_name`` at wiring time):
+  * ``jinaai/jina-reranker-v2-base-multilingual`` — comparable latency/coverage.
+  * ``Xenova/ms-marco-MiniLM-L-6-v2`` — English-only, lighter CPU fallback for
+    dev boxes without GPU; not suitable for the multilingual legal corpus.
 """
 
 from __future__ import annotations
 
 from collections.abc import Sequence
 
-__all__ = ["BgeReranker", "IdentityReranker"]
+__all__ = ["DEFAULT_RERANKER_MODEL", "BgeReranker", "IdentityReranker"]
+
+# §6.1 architecture default — single source of truth for wiring / env fallbacks.
+DEFAULT_RERANKER_MODEL: str = "BAAI/bge-reranker-v2-m3"
 
 
 class BgeReranker:
@@ -29,7 +30,7 @@ class BgeReranker:
 
     _singletons: dict[str, object] = {}
 
-    def __init__(self, model_name: str = "Xenova/ms-marco-MiniLM-L-6-v2") -> None:
+    def __init__(self, model_name: str = DEFAULT_RERANKER_MODEL) -> None:
         self._model_name = model_name
 
     def _model(self) -> object:
