@@ -136,6 +136,72 @@ def test_scanned_path_without_vlm_degrades_gracefully(
     assert edges == []
 
 
+def test_born_digital_pdf_docling_chain_mock(monkeypatch: pytest.MonkeyPatch) -> None:
+    """§5.2: PyMuPDF text is merged with mocked Docling structure when available."""
+    from rie_contracts import Element, ElementType, StructureEdge, StructureEdgeType
+
+    from rie_extract.adapters.born_digital_pdf_extractor import BornDigitalPdfExtractor
+
+    docling_elements = [
+        Element(
+            element_id="test_pdf_p1",
+            doc_id="test_pdf",
+            element_type=ElementType.SECTION,
+            text="Section 1",
+            page=1,
+            char_start=0,
+            char_end=9,
+            extraction_confidence=0.95,
+            legal_numbering="1",
+        )
+    ]
+    docling_edges = [
+        StructureEdge(
+            from_element="test_pdf_p1",
+            to_element="test_pdf_p2",
+            edge_type=StructureEdgeType.CROSS_REFERENCE,
+            raw_reference="s. 2",
+        )
+    ]
+
+    class _MockDoclingExtractor:
+        def extract(self, doc_meta, raw):
+            del doc_meta, raw
+            return docling_elements, docling_edges
+
+    monkeypatch.setattr(
+        "rie_extract.adapters.born_digital_pdf_extractor.docling_available",
+        lambda: True,
+    )
+    monkeypatch.setattr(
+        "rie_extract.adapters.born_digital_pdf_extractor.DoclingExtractor",
+        _MockDoclingExtractor,
+    )
+
+    raw = (
+        b"%PDF-1.4\n1 0 obj<<>>endobj\n"
+        b"2 0 obj<</Type/Catalog/Pages 3 0 R>>endobj\n"
+        b"3 0 obj<</Type/Pages/Kids[4 0 R]/Count 1>>endobj\n"
+        b"4 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 3 0 R>>endobj\n"
+        b"xref\n0 5\n0000000000 65535 f \n"
+        b"trailer<</Size 5/Root 2 0 R>>\nstartxref\n0\n%%EOF"
+    )
+    meta = DocumentMeta(
+        doc_id="test_pdf",
+        jurisdiction="SAMPLE",
+        title="sample.pdf",
+        document_type=DocumentType.STATUTE,
+        authority_tier=AuthorityTier.TIER_1_STATUTE,
+        sha256="b" * 64,
+        retrieved_at=datetime(2026, 5, 24, tzinfo=UTC),
+        language="en",
+    )
+    elements, edges = BornDigitalPdfExtractor().extract(meta, raw)
+
+    assert isinstance(elements, list)
+    assert edges == docling_edges
+
+
 def test_vlm_extractor_marks_elements_with_vlm_engine_and_not_corrected() -> None:
     """Per CLAUDE.md / §5.2: VLM output is NEVER labelled 'faithful'.
 

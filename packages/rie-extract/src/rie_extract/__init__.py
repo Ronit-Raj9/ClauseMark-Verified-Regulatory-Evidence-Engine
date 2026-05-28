@@ -2,9 +2,9 @@
 
 Public entrypoint is `ExtractionService` which implements
 `rie_contracts.DocumentExtractorPort`. Extraction is routed per document
-type (PDF → PyMuPDF, HTML → BeautifulSoup, plain text → text splitter).
-The Docling adapter is opt-in and degrades gracefully if the heavy
-optional dependency is not importable. Scanned / image-only PDFs route
+type (PDF → PyMuPDF then Docling per §5.2, HTML → BeautifulSoup,
+plain text → text splitter). Docling enriches layout/structure when
+available and degrades gracefully to PyMuPDF-only. Scanned / image-only PDFs route
 to the VLM-OCR adapter when enabled, otherwise to a §11
 graceful-degradation stub.
 """

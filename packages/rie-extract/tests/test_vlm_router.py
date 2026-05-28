@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import UTC, datetime
 
 import pytest
 from rie_contracts import (
@@ -10,8 +11,8 @@ from rie_contracts import (
     DocumentMeta,
     DocumentType,
 )
-from datetime import UTC, datetime
 
+from rie_extract.adapters.born_digital_pdf_extractor import BornDigitalPdfExtractor
 from rie_extract.adapters.vlm_ocr import (
     ScannedNotEnabledExtractor,
     VlmOcrExtractor,
@@ -76,4 +77,4 @@ def test_non_scanned_routes_unaffected_by_vlm_env(monkeypatch: pytest.MonkeyPatc
         language="en",
     )
     adapter = pick_adapter(meta)
-    assert not isinstance(adapter, (VlmOcrExtractor, ScannedNotEnabledExtractor))
+    assert isinstance(adapter, BornDigitalPdfExtractor)

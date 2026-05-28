@@ -11,8 +11,8 @@ from typing import Protocol, runtime_checkable
 
 from rie_contracts import DocumentMeta, Element, StructureEdge
 
+from rie_extract.adapters.born_digital_pdf_extractor import BornDigitalPdfExtractor
 from rie_extract.adapters.html_extractor import HtmlExtractor
-from rie_extract.adapters.pymupdf_extractor import PyMuPdfExtractor
 from rie_extract.adapters.text_extractor import TextExtractor
 from rie_extract.adapters.vlm_ocr import (
     ScannedNotEnabledExtractor,
@@ -58,7 +58,7 @@ def pick_adapter(
     """Return the best-fit extractor for ``doc_meta``.
 
     Routing heuristic:
-      • PDF (.pdf / mime/extension hint) → PyMuPDF.
+      • PDF (.pdf / mime/extension hint) → PyMuPDF then Docling (§5.2 chain).
       • HTML (.htm/.html or document URL hint) → BeautifulSoup.
       • Anything else → plain-text extractor (also the .txt fallback).
       • Scanned / VLM-OCR path:
@@ -68,7 +68,8 @@ def pick_adapter(
             graceful-degradation stub that emits an empty placeholder
             element + a stdlib WARNING — it never crashes).
     """
-    hint = _hint_string(doc_meta, source_path)
+    hint_parts = _hint_parts(doc_meta, source_path)
+    hint = " ".join(hint_parts)
     vlm_enabled = _vlm_enabled(enable_vlm)
 
     if "scanned" in hint or "ocr" in hint:
@@ -85,11 +86,11 @@ def pick_adapter(
         )
         return ScannedNotEnabledExtractor()
 
-    if hint.endswith(".pdf"):
-        return PyMuPdfExtractor()
-    if hint.endswith((".html", ".htm")) or "<html" in hint:
+    if _any_part_suffix(hint_parts, ".pdf"):
+        return BornDigitalPdfExtractor()
+    if _any_part_suffix(hint_parts, ".html", ".htm") or "<html" in hint:
         return HtmlExtractor()
-    if hint.endswith(".txt"):
+    if _any_part_suffix(hint_parts, ".txt"):
         return TextExtractor()
     # Default: plain text. Safer than guessing PDF on raw bytes.
     return TextExtractor()
@@ -105,11 +106,15 @@ def _vlm_enabled(explicit: bool | None) -> bool:
     return bool(os.environ.get("OLLAMA_VLM_MODEL"))
 
 
-def _hint_string(doc_meta: DocumentMeta, source_path: str | Path | None) -> str:
+def _hint_parts(doc_meta: DocumentMeta, source_path: str | Path | None) -> list[str]:
     parts: list[str] = []
     if source_path is not None:
         parts.append(str(source_path).lower())
     if doc_meta.source_url:
         parts.append(doc_meta.source_url.lower())
     parts.append(doc_meta.title.lower())
-    return " ".join(parts)
+    return parts
+
+
+def _any_part_suffix(parts: Sequence[str], *suffixes: str) -> bool:
+    return any(part.endswith(suffix) for part in parts for suffix in suffixes)
