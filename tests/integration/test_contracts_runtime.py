@@ -73,3 +73,18 @@ def test_document_repository_has_port_methods() -> None:
         "list_coverage",
     ):
         assert hasattr(DocumentRepository, name), f"missing {name}"
+
+
+def test_orchestration_exposes_run_graph_and_resume() -> None:
+    """API lazy-import path requires ``build_run_graph`` + ``resume_pipeline``."""
+    import rie_orchestration as orch
+
+    assert callable(getattr(orch, "build_run_graph", None))
+    assert callable(getattr(orch, "resume_pipeline", None))
+    assert callable(getattr(orch, "run_pipeline", None))
+
+
+def test_gold_recall_lookup_is_importable() -> None:
+    from rie_orchestration.gold_recall import lookup_gold_recall
+
+    assert callable(lookup_gold_recall)

@@ -21,6 +21,7 @@ def test_sample_run_produces_evidence_package() -> None:
         pillar_ids=["6", "7"],
         use_fakes=True,
         repo_root=REPO_ROOT,
+        enable_hitl=False,
     )
     assert package["run_id"]
     assert package["counts"]["documents"] >= 1
@@ -38,6 +39,7 @@ def test_run_jurisdiction_consistent_in_claims() -> None:
         pillar_ids=["6", "7"],
         use_fakes=True,
         repo_root=REPO_ROOT,
+        enable_hitl=False,
     )
     for claim in package["claims"]:
         assert claim["jurisdiction"] == "SAMPLE"
@@ -50,6 +52,7 @@ def test_three_state_absence_never_emits_bare_zero() -> None:
         pillar_ids=["6", "7"],
         use_fakes=True,
         repo_root=REPO_ROOT,
+        enable_hitl=False,
     )
     valid_states = {
         "evidence_found",

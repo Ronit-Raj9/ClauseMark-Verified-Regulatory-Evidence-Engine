@@ -26,7 +26,7 @@ ALLOWED: dict[str, set[str]] = {
     "rie_retrieval": {"rie_contracts"},
     "rie_classify": {"rie_contracts"},
     "rie_verify": {"rie_contracts"},
-    "rie_coverage": {"rie_contracts"},
+    "rie_coverage": {"rie_contracts", "rie_domain"},
     "rie_persistence": {"rie_contracts"},
     "rie_orchestration": {
         "rie_contracts",
@@ -48,7 +48,7 @@ ALLOWED: dict[str, set[str]] = {
         "rie_config",
     },
     "rie_ui": {"rie_contracts"},  # UI calls API over HTTP, NOT in-process
-    "rie_eval": {"rie_contracts", "rie_config", "rie_persistence"},
+    "rie_eval": {"rie_contracts", "rie_config", "rie_persistence", "rie_verify"},
 }
 
 ALL_WORKSPACE_MODULES = set(ALLOWED.keys())
