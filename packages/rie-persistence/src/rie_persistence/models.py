@@ -81,6 +81,7 @@ class ClaimRow(Base):
     layer1_status: Mapped[str] = mapped_column(String(32), index=True)
     model_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     self_consistency_votes: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    layer2_recommendation: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     spans = relationship("EvidenceSpanRow", back_populates="claim", cascade="all, delete-orphan")
 

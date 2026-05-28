@@ -21,6 +21,7 @@ from rie_contracts import (
     GateName,
     GateResult,
     Layer1Status,
+    Layer2Recommendation,
     LegalRegime,
     OcrEngine,
     ReviewDecision,
@@ -288,6 +289,37 @@ class DocumentRepository:
                     else Layer1Status.REJECTED.value
                 )
 
+    def save_layer2_recommendation(self, recommendation: Layer2Recommendation) -> None:
+        """Persist a Layer-2 recommendation on the claim row."""
+        with session_scope(self.session_factory) as s:
+            row = s.get(ClaimRow, recommendation.claim_id)
+            if row is None:
+                raise KeyError(recommendation.claim_id)
+            row.layer2_recommendation = recommendation.model_dump(mode="json")
+
+    def get_layer2_recommendation(self, claim_id: str) -> Layer2Recommendation | None:
+        """Load a persisted Layer-2 recommendation, if any."""
+        with session_scope(self.session_factory) as s:
+            row = s.get(ClaimRow, claim_id)
+            if row is None:
+                raise KeyError(claim_id)
+            return _to_layer2(row)
+
+    def list_layer2_recommendations(
+        self,
+        jurisdiction: str | None = None,
+        pillar_id: str | None = None,
+    ) -> Sequence[Layer2Recommendation]:
+        """List persisted Layer-2 recommendations scoped to a run's jurisdiction/pillars."""
+        with session_scope(self.session_factory) as s:
+            stmt = select(ClaimRow).where(ClaimRow.layer2_recommendation.is_not(None))
+            if jurisdiction:
+                stmt = stmt.where(ClaimRow.jurisdiction == jurisdiction)
+            if pillar_id:
+                stmt = stmt.where(ClaimRow.pillar_id == pillar_id)
+            rows = s.scalars(stmt).all()
+            return [rec for r in rows if (rec := _to_layer2(r)) is not None]
+
     def latest_verification(self, claim_id: str) -> VerificationReport | None:
         with session_scope(self.session_factory) as s:
             rows = s.scalars(
@@ -468,3 +500,9 @@ def _to_coverage(row: CoverageRow) -> CoverageRecord:
         reason=row.reason,
         verified_claim_ids=list(row.verified_claim_ids or []),
     )
+
+
+def _to_layer2(row: ClaimRow) -> Layer2Recommendation | None:
+    if row.layer2_recommendation is None:
+        return None
+    return Layer2Recommendation.model_validate(row.layer2_recommendation)
