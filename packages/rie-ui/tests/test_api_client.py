@@ -18,6 +18,7 @@ from rie_contracts.models import (
     GateName,
     GateResult,
     Layer1Status,
+    Layer2Recommendation,
     LegalRegime,
     ReviewDecision,
     ScoreBand,
@@ -29,7 +30,6 @@ from rie_ui.api_client import (
     DEFAULT_BASE_URL,
     ApiClient,
     ApiError,
-    ClaimDetail,
     ClaimSummary,
 )
 
@@ -89,16 +89,30 @@ def _claim_payload() -> dict[str, Any]:
         gates=gates,
         status=VerificationStatus.VERIFIED,
     )
-    detail = ClaimDetail(
-        claim=claim,
-        document_text="0123456789verified text here continues...",
-        document_id="doc1",
-        document_title="PDPA",
-        verification=report,
-        elements=[],
-        reviews=[],
+    layer2 = Layer2Recommendation(
+        claim_id="c-1",
+        indicator_id="6.4",
+        recommended_band=ScoreBand.HALF,
+        rationale="Conditional adequacy regime present.",
+        open_questions=["Is the adequacy list current?"],
+        human_confirmation_required=True,
     )
-    return detail.model_dump(mode="json")
+    return {
+        "claim": claim.model_dump(mode="json"),
+        "verification": report.model_dump(mode="json"),
+        "citations": [
+            {
+                "span_id": span.span_id,
+                "doc_id": span.doc_id,
+                "element_id": span.element_id,
+                "text": "verified text",
+                "char_start": span.char_start,
+                "char_end": span.char_end,
+                "role": span.role.value,
+            }
+        ],
+        "layer2": layer2.model_dump(mode="json"),
+    }
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -189,18 +203,21 @@ def test_list_claims_no_filters(respx_mock: respx.MockRouter, client: ApiClient)
     route = respx_mock.get("/v1/claims").mock(
         return_value=httpx.Response(
             200,
-            json=[
-                {
-                    "claim_id": "c-1",
-                    "jurisdiction": "SG",
-                    "pillar_id": "6",
-                    "indicator_id": "6.4",
-                    "clause_id": "doc1_a1",
-                    "layer1_status": "verified",
-                    "verification_status": "verified",
-                    "snippet": "...",
-                }
-            ],
+            json={
+                "total": 1,
+                "items": [
+                    {
+                        "claim_id": "c-1",
+                        "jurisdiction": "SG",
+                        "pillar_id": "6",
+                        "indicator_id": "6.4",
+                        "clause_id": "doc1_a1",
+                        "layer1_status": "verified",
+                        "verification_status": "verified",
+                        "snippet": "...",
+                    }
+                ],
+            },
         )
     )
     out = client.list_claims()
@@ -215,7 +232,9 @@ def test_list_claims_no_filters(respx_mock: respx.MockRouter, client: ApiClient)
 
 @respx.mock(base_url=BASE)
 def test_list_claims_with_filters(respx_mock: respx.MockRouter, client: ApiClient) -> None:
-    route = respx_mock.get("/v1/claims").mock(return_value=httpx.Response(200, json=[]))
+    route = respx_mock.get("/v1/claims").mock(
+        return_value=httpx.Response(200, json={"total": 0, "items": []})
+    )
     client.list_claims(
         jurisdiction="SG",
         pillar_id="6",
@@ -235,11 +254,19 @@ def test_list_claims_with_filters(respx_mock: respx.MockRouter, client: ApiClien
 def test_get_claim_returns_detail(respx_mock: respx.MockRouter, client: ApiClient) -> None:
     payload = _claim_payload()
     respx_mock.get("/v1/claims/c-1").mock(return_value=httpx.Response(200, json=payload))
+    respx_mock.get("/v1/claims/c-1/reviews").mock(
+        return_value=httpx.Response(200, json={"total": 0, "items": []})
+    )
     detail = client.get_claim("c-1")
     assert detail.claim.claim_id == "c-1"
-    assert detail.document_id == "doc1"
+    assert len(detail.citations) == 1
+    assert detail.citations[0].text == "verified text"
     assert detail.verification is not None
     assert detail.verification.status is VerificationStatus.VERIFIED
+    assert detail.layer2 is not None
+    assert detail.layer2.recommended_band is ScoreBand.HALF
+    assert detail.layer2.human_confirmation_required is True
+    assert detail.layer2.open_questions == ["Is the adequacy list current?"]
 
 
 # ──────────────────────────────────────────────────────────────────────

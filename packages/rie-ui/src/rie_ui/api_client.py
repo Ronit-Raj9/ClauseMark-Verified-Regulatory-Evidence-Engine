@@ -20,7 +20,6 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 from rie_contracts.models import (
     Claim,
     CoverageRecord,
-    Element,
     Layer1Status,
     Layer2Recommendation,
     ReviewDecision,
@@ -86,15 +85,35 @@ class ClaimSummary(BaseModel):
     snippet: str = ""
 
 
+class Citation(BaseModel):
+    """Deterministic citation materialised by rie-api — never LLM-authored."""
+
+    model_config = ConfigDict(extra="forbid")
+    span_id: str
+    doc_id: str
+    element_id: str
+    text: str
+    char_start: int
+    char_end: int
+    role: str
+
+
+class ClaimDetailResponse(BaseModel):
+    """Wire shape from ``GET /v1/claims/{id}``."""
+
+    model_config = ConfigDict(extra="forbid")
+    claim: Claim
+    verification: VerificationReport | None = None
+    citations: list[Citation] = Field(default_factory=list)
+    layer2: Layer2Recommendation | None = None
+
+
 class ClaimDetail(BaseModel):
     """Full claim payload for the detail page."""
 
     model_config = ConfigDict(extra="allow")
     claim: Claim
-    document_text: str
-    document_id: str
-    document_title: str = ""
-    elements: list[Element] = Field(default_factory=list)
+    citations: list[Citation] = Field(default_factory=list)
     verification: VerificationReport | None = None
     layer2: Layer2Recommendation | None = None
     reviews: list[ReviewRecord] = Field(default_factory=list)
@@ -226,11 +245,27 @@ class ApiClient:
         if status is not None:
             params["status"] = status.value
         data = self._request("GET", "/v1/claims", params=params or None)
-        return _CLAIMS_ADAPTER.validate_python(data or [])
+        if isinstance(data, dict) and "items" in data:
+            raw_items = data["items"]
+        else:
+            raw_items = data or []
+        return _CLAIMS_ADAPTER.validate_python(raw_items)
 
     def get_claim(self, claim_id: str) -> ClaimDetail:
         data = self._request("GET", f"/v1/claims/{claim_id}")
-        return ClaimDetail.model_validate(data)
+        wire = ClaimDetailResponse.model_validate(data)
+        reviews_data = self._request("GET", f"/v1/claims/{claim_id}/reviews")
+        reviews: list[ReviewRecord] = []
+        if isinstance(reviews_data, dict):
+            for item in reviews_data.get("items", []):
+                reviews.append(ReviewRecord.model_validate(item))
+        return ClaimDetail(
+            claim=wire.claim,
+            citations=wire.citations,
+            verification=wire.verification,
+            layer2=wire.layer2,
+            reviews=reviews,
+        )
 
     # ──────────────────────────────────────────────────────────────────────
     # Reviews
@@ -289,7 +324,9 @@ __all__ = [
     "DEFAULT_BASE_URL",
     "ApiClient",
     "ApiError",
+    "Citation",
     "ClaimDetail",
+    "ClaimDetailResponse",
     "ClaimSummary",
     "ReviewRequest",
     "RunRequest",

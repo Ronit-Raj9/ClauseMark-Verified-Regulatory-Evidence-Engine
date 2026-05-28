@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from html import escape
+
 from rie_contracts.models import (
     ClausePattern,
     Layer1Status,
@@ -10,8 +12,7 @@ from rie_contracts.models import (
     VerificationStatus,
 )
 
-from rie_ui.api_client import ApiClient, ApiError, ClaimDetail
-from rie_ui.highlight import render_with_highlight
+from rie_ui.api_client import ApiClient, ApiError, Citation, ClaimDetail
 from rie_ui.state import get_active_claim, get_reviewer, set_reviewer
 
 # Visual chrome for the highlighted document.
@@ -56,14 +57,32 @@ def _layer1_badge(status: Layer1Status) -> str:
 
 
 def _render_document(st_mod, detail: ClaimDetail) -> None:
-    spans = [(s.char_start, s.char_end) for s in detail.claim.evidence_spans]
-    html = render_with_highlight(detail.document_text, spans)
+    citations = detail.citations
+    if not citations:
+        st_mod.info("No citations attached to this claim.")
+        return
+
     st_mod.markdown(_HIGHLIGHT_CSS, unsafe_allow_html=True)
-    st_mod.markdown(
-        f"**Document:** `{detail.document_id}` — {detail.document_title or '(untitled)'}"
+    st_mod.caption(
+        f"{len(citations)} cited span(s) — text materialised deterministically by rie-api."
     )
-    st_mod.caption(f"{len(detail.claim.evidence_spans)} cited span(s).")
-    st_mod.markdown(f'<div class="rie-doc">{html}</div>', unsafe_allow_html=True)
+
+    grouped: dict[tuple[str, str], list[Citation]] = {}
+    for citation in citations:
+        key = (citation.doc_id, citation.element_id)
+        grouped.setdefault(key, []).append(citation)
+
+    for (doc_id, element_id), items in grouped.items():
+        st_mod.markdown(f"**Document:** `{doc_id}` · element `{element_id}`")
+        for citation in items:
+            html = (
+                f'<div class="rie-doc"><mark>{escape(citation.text or "(empty span)")}</mark></div>'
+            )
+            st_mod.markdown(html, unsafe_allow_html=True)
+            st_mod.caption(
+                f"span `{citation.span_id}` · {citation.role} · "
+                f"offsets {citation.char_start}–{citation.char_end}"
+            )
 
 
 def _render_decomposition(st_mod, detail: ClaimDetail) -> None:
@@ -91,14 +110,21 @@ def _render_decomposition(st_mod, detail: ClaimDetail) -> None:
             st_mod.warning("\n".join(detail.verification.failure_reasons))
 
     if detail.layer2 is not None:
-        st_mod.markdown("**Layer-2 recommendation (human confirmation required)**")
-        st_mod.info(
-            f"Recommended band: **{detail.layer2.recommended_band.value}** — "
-            f"{detail.layer2.rationale}"
+        l2 = detail.layer2
+        band = (
+            l2.recommended_band.value
+            if isinstance(l2.recommended_band, ScoreBand)
+            else str(l2.recommended_band)
         )
-        if detail.layer2.open_questions:
+        st_mod.markdown("**Layer-2 recommendation**")
+        if l2.human_confirmation_required:
+            st_mod.caption(
+                "Human confirmation required — this is a recommendation, not a final score."
+            )
+        st_mod.info(f"Recommended band: **{band}** — {l2.rationale}")
+        if l2.open_questions:
             st_mod.markdown("Open questions:")
-            for q in detail.layer2.open_questions:
+            for q in l2.open_questions:
                 st_mod.markdown(f"- {q}")
 
     if detail.reviews:
@@ -120,11 +146,16 @@ def _render_review_form(st_mod, detail: ClaimDetail, client: ApiClient) -> None:
         "Provide corrected score band", value=False, key="rie-review-needs-score"
     )
     corrected: ScoreBand | None = None
+    default_band = (
+        detail.layer2.recommended_band
+        if detail.layer2 is not None
+        else ScoreBand.HALF
+    )
     if needs_score:
         choice = st_mod.selectbox(
             "Corrected band",
             options=[b.value for b in ScoreBand],
-            index=0,
+            index=[b.value for b in ScoreBand].index(default_band.value),
             key="rie-review-score",
         )
         corrected = ScoreBand(choice)
