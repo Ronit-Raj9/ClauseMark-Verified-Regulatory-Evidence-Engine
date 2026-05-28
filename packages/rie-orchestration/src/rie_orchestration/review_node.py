@@ -32,7 +32,8 @@ def review_node(state: RieState, bundle: AdapterBundle) -> RieState:
     flagged = [
         c
         for c in state.get("claims", [])
-        if state.get("verifications", {}).get(c.claim_id)
+        if c.layer1_status != Layer1Status.VERIFIED
+        and state.get("verifications", {}).get(c.claim_id)
         and state["verifications"][c.claim_id].status == VerificationStatus.FLAGGED
     ]
     if not flagged:

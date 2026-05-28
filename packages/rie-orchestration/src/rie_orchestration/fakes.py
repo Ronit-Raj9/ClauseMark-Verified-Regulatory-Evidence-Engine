@@ -73,6 +73,9 @@ class FakeRepo:
     def get_element(self, element_id: str) -> Element:
         return self.elements[element_id]
 
+    def get_document(self, doc_id: str) -> DocumentMeta:
+        return self.documents[doc_id]
+
     def get_elements(self, element_ids: Sequence[str]) -> Sequence[Element]:
         return [self.elements[i] for i in element_ids if i in self.elements]
 

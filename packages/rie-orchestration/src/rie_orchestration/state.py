@@ -13,6 +13,7 @@ from rie_contracts import (
     CoverageRecord,
     DocumentMeta,
     Element,
+    Layer2Recommendation,
     RetrievalHit,
     StructureEdge,
     VerificationReport,
@@ -44,6 +45,12 @@ class RieState(TypedDict, total=False):
 
     # Coverage output
     coverage: list[CoverageRecord]
+
+    # Layer-2 recommendations (never final scores)
+    layer2_recommendations: list[Layer2Recommendation]
+
+    # Graceful degradation (§11)
+    ingest_degraded: bool
 
     # Aggregates
     errors: list[str]

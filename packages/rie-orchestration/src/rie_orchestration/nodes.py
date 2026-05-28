@@ -15,29 +15,120 @@ from rie_contracts import (
     DocumentMeta,
     DocumentType,
     Element,
+    LegalRegime,
     RetrievalHit,
     StructureEdge,
     VerificationReport,
     VerificationStatus,
 )
 
+from rie_orchestration.gold_recall import lookup_gold_recall
+from rie_orchestration.regime import assemble_regime_for_clause
 from rie_orchestration.state import RieState
 from rie_orchestration.wiring import AdapterBundle
 
 log = logging.getLogger(__name__)
 
 
+def _apply_confidence_screening(
+    state: RieState,
+    bundle: AdapterBundle,
+    verifications: dict[str, VerificationReport],
+) -> dict[str, VerificationReport]:
+    """§6.7 — downgrade VERIFIED claims when gold-set confidence is not usable."""
+    from rie_orchestration.confidence import screen_pillar_confidence
+
+    screened: dict[str, object] = {}
+    for pillar_id in state.get("pillar_ids", []):
+        result = screen_pillar_confidence(
+            pillar_id, state.get("claims", []), bundle.config  # type: ignore[arg-type]
+        )
+        screened[pillar_id] = result
+    state["confidence_screen"] = screened
+
+    if all(getattr(r, "usable", False) for r in screened.values()):
+        return verifications
+
+    updated = dict(verifications)
+    claims_by_id = {c.claim_id: c for c in state.get("claims", [])}
+    downgraded = 0
+    for claim_id, report in verifications.items():
+        if report.status != VerificationStatus.VERIFIED:
+            continue
+        claim = claims_by_id.get(claim_id)
+        if claim is None:
+            continue
+        screen = screened.get(claim.pillar_id)
+        if screen is None:
+            continue
+        if getattr(screen, "usable", False) or getattr(screen, "insufficient_data", False):
+            continue
+        flagged = report.model_copy(
+            update={
+                "status": VerificationStatus.FLAGGED,
+                "failure_reasons": list(report.failure_reasons)
+                + ["confidence not screened on gold set — routed to review"],
+            }
+        )
+        bundle.repo.save_verification(flagged)
+        updated[claim_id] = flagged
+        downgraded += 1
+    if downgraded:
+        log.info(
+            "verify: confidence screening downgraded %d VERIFIED → FLAGGED", downgraded
+        )
+    return updated
+
+
+def _graph_regime_for_clause(
+    clause: Element,
+    state: RieState,
+) -> LegalRegime | None:
+    """Assemble regime from the structure graph when extract state is available."""
+    elements = state.get("elements_by_doc", {}).get(clause.doc_id)
+    edges = state.get("edges_by_doc", {}).get(clause.doc_id)
+    if not elements or not edges:
+        return None
+    elements_by_id = {element.element_id: element for element in elements}
+    return assemble_regime_for_clause(clause, elements_by_id, edges)
+
+
 def ingest_node(state: RieState, bundle: AdapterBundle) -> RieState:
     jurisdiction = state["jurisdiction"]
     log.info("ingest: jurisdiction=%s", jurisdiction)
-    entries = bundle.ingest.load_source_registry(jurisdiction)
     documents: list[DocumentMeta] = []
     raw_by_doc: dict[str, bytes] = {}
+    ingest_errors = 0
+
+    try:
+        from rie_ingest import IngestError
+    except ImportError:
+        IngestError = RuntimeError  # type: ignore[misc, assignment]
+
+    try:
+        entries = bundle.ingest.load_source_registry(jurisdiction)
+    except IngestError as exc:
+        log.warning("ingest: registry load failed — %s", exc)
+        state.setdefault("errors", []).append(f"ingest registry: {exc}")
+        state["ingest_degraded"] = True
+        state["documents"] = documents
+        state["raw_bytes_by_doc"] = raw_by_doc
+        return state
+
     for entry in entries:
-        meta, raw = bundle.ingest.load_document_bytes(entry)
+        try:
+            meta, raw = bundle.ingest.load_document_bytes(entry)
+        except IngestError as exc:
+            ingest_errors += 1
+            log.warning("ingest: source %s unreachable — %s", entry.source_id, exc)
+            state.setdefault("errors", []).append(f"ingest {entry.source_id}: {exc}")
+            continue
         documents.append(meta)
         raw_by_doc[meta.doc_id] = raw
         bundle.repo.save_document(meta)
+
+    if ingest_errors and not documents:
+        state["ingest_degraded"] = True
     state["documents"] = documents
     state["raw_bytes_by_doc"] = raw_by_doc
     return state
@@ -135,6 +226,9 @@ def classify_node(state: RieState, bundle: AdapterBundle) -> RieState:
                 continue
             if claim.jurisdiction != state["jurisdiction"]:
                 claim = claim.model_copy(update={"jurisdiction": state["jurisdiction"]})
+            graph_regime = _graph_regime_for_clause(clause, state)
+            if graph_regime is not None:
+                claim = claim.model_copy(update={"regime": graph_regime})
             bundle.repo.save_claim(claim)
             claims.append(claim)
     state["claims"] = claims
@@ -157,6 +251,7 @@ def verify_node(state: RieState, bundle: AdapterBundle) -> RieState:
             report = bundle.verifier.verify(claim, bundle.repo.get_element_text)
         bundle.repo.save_verification(report)
         verifications[claim.claim_id] = report
+    verifications = _apply_confidence_screening(state, bundle, verifications)
     state["verifications"] = verifications
     if kg_results:
         state["kg_results"] = kg_results
@@ -201,7 +296,9 @@ def coverage_node(state: RieState, bundle: AdapterBundle) -> RieState:
                 jurisdiction=state["jurisdiction"],
                 indicator_id=ind.indicator_id,
                 verified_claims=verified,
-                gold_recall=_lookup_gold_recall(bundle, pillar_id, ind.indicator_id),
+                gold_recall=lookup_gold_recall(
+                    bundle, pillar_id, ind.indicator_id, state=state
+                ),
             )
             if corpus_completeness_enabled and manifest is not None:
                 enriched = enrich_with_completeness(
@@ -224,12 +321,32 @@ def coverage_node(state: RieState, bundle: AdapterBundle) -> RieState:
     return state
 
 
-def _lookup_gold_recall(bundle: AdapterBundle, pillar_id: str, indicator_id: str) -> float | None:
-    try:
-        gold = bundle.config.load_gold(pillar_id)
-    except Exception:
-        return None
-    matching = [g for g in gold if g.indicator_id == indicator_id]
-    if not matching:
-        return None
-    return 0.82  # placeholder; real value comes from eval pipeline
+def layer2_node(state: RieState, bundle: AdapterBundle) -> RieState:
+    """Deterministic Layer-2 score-band recommendations for gate-verified claims."""
+    from rie_orchestration.layer2 import materialise_layer2_batch
+
+    verified = [
+        c
+        for c in state.get("claims", [])
+        if state.get("verifications", {}).get(c.claim_id)
+        and state["verifications"][c.claim_id].status == VerificationStatus.VERIFIED
+    ]
+    if not verified:
+        return state
+    scorer = getattr(bundle, "scorer", None)
+    recommendations = materialise_layer2_batch(
+        jurisdiction=state["jurisdiction"],
+        pillar_ids=state["pillar_ids"],
+        verified_claims=verified,
+        coverage_records=state.get("coverage", []),
+        config=bundle.config,
+        scorer=scorer,
+    )
+    if recommendations:
+        state["layer2_recommendations"] = recommendations
+        saver = getattr(bundle.repo, "save_layer2_recommendation", None)
+        if callable(saver):
+            for rec in recommendations:
+                saver(rec)
+        log.info("layer2: produced %d recommendations", len(recommendations))
+    return state
