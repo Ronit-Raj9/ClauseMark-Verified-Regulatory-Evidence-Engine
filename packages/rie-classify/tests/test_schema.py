@@ -91,6 +91,30 @@ def test_extra_fields_rejected(choices: list[IndicatorConfig]) -> None:
         model.model_validate(payload)
 
 
+def test_empty_decomposition_subject_rejected(choices: list[IndicatorConfig]) -> None:
+    model = build_output_model(choices)
+    payload = _valid_payload(INDICATOR_A)
+    payload["decomposition"] = {
+        "subject": "   ",
+        "condition": "outbound transfer",
+        "constraint": "comparable protection",
+    }
+    with pytest.raises(ValidationError):
+        model.model_validate(payload)
+
+
+def test_empty_decomposition_constraint_rejected(choices: list[IndicatorConfig]) -> None:
+    model = build_output_model(choices)
+    payload = _valid_payload(INDICATOR_A)
+    payload["decomposition"] = {
+        "subject": "organisation",
+        "condition": "outbound transfer",
+        "constraint": "",
+    }
+    with pytest.raises(ValidationError):
+        model.model_validate(payload)
+
+
 def test_empty_choices_rejected() -> None:
     with pytest.raises(ValueError, match="non-empty"):
         build_output_model([])

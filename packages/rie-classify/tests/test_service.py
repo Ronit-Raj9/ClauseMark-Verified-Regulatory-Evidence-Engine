@@ -63,6 +63,10 @@ def test_canonical_pdpa_classifies_as_64_conditional_regime(
     assert claim.layer1_status is Layer1Status.PENDING_VERIFICATION
     assert claim.self_consistency_votes[INDICATOR_64] >= 2
 
+    # §6.2 decomposition carried on the claim.
+    assert claim.decomposition.subject.strip()
+    assert claim.decomposition.constraint.strip()
+
     # Evidence materialised from the element store, not from the LLM string.
     assert claim.evidence_spans, "evidence_spans must not be empty"
     primary_spans = [s for s in claim.evidence_spans if s.role is SpanRole.PRIMARY]

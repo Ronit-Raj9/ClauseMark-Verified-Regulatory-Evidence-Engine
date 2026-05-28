@@ -15,9 +15,9 @@ to the LLM client as the ``format`` / ``guided_json`` payload.
 
 from __future__ import annotations
 
-from typing import Literal, cast
+from typing import Literal, Self, cast
 
-from pydantic import BaseModel, ConfigDict, Field, create_model
+from pydantic import BaseModel, ConfigDict, Field, create_model, model_validator
 from rie_contracts import ClausePattern, Decomposition, IndicatorConfig
 
 
@@ -53,6 +53,18 @@ class ClassificationOutputBase(BaseModel):
             "(definitions, exceptions, cross-referenced provisions)."
         ),
     )
+
+    @model_validator(mode="after")
+    def _decomposition_enforced(self) -> Self:
+        """§6.2 — subject and constraint must be non-empty after decoding."""
+
+        if not self.decomposition.subject.strip():
+            msg = "decomposition.subject must be non-empty"
+            raise ValueError(msg)
+        if not self.decomposition.constraint.strip():
+            msg = "decomposition.constraint must be non-empty"
+            raise ValueError(msg)
+        return self
 
 
 def build_output_model(

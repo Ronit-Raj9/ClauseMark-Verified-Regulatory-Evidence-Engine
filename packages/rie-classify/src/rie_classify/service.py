@@ -14,7 +14,9 @@ Pipeline per call:
    are the ones we use to materialise the Claim.
 5. Materialise `EvidenceSpan`s from element_ids using the injected
    ``get_element`` resolver — the LLM never wrote a citation string.
-6. Materialise `LegalRegime` from emitted ``regime_member_ids``.
+6. Materialise `LegalRegime` via injected ``regime_assembler`` when wired
+   (graph walk through ``assemble_regime``, seeded with LLM ``regime_member_ids``);
+   otherwise fall back to LLM ids via ``materialise_regime_from_llm_ids``.
 7. Stable `claim_id` = md5(jurisdiction + element_id + indicator_id).hex.
 8. `layer1_status = PENDING_VERIFICATION`; record `self_consistency_votes`.
 """
@@ -38,7 +40,6 @@ from rie_contracts import (
     EvidenceSpan,
     IndicatorConfig,
     Layer1Status,
-    LegalRegime,
     PillarConfig,
     SpanRole,
 )
@@ -47,6 +48,12 @@ from .config import ClassifierConfig
 from .language import DEFAULT_LANGUAGE, detect_language
 from .llm_client import LlmClient
 from .prompt import build_classification_prompt
+from .regime import (
+    RegimeAssembler,
+    invoke_regime_assembler,
+    materialise_regime_from_llm_ids,
+    merge_llm_regime_hints,
+)
 from .schema import ClassificationOutputBase, build_output_model
 
 
@@ -85,11 +92,13 @@ class ClassificationService(ClassifierPort):
         llm: LlmClient,
         get_element: Callable[[str], Element],
         get_jurisdiction: Callable[[str], str] | None = None,
+        regime_assembler: RegimeAssembler | None = None,
         now: Callable[[], datetime] | None = None,
         config: ClassifierConfig | None = None,
     ) -> None:
         self._llm = llm
         self._get_element = get_element
+        self._regime_assembler = regime_assembler
         # ClassifierPort.classify_clause does not take jurisdiction explicitly,
         # so the orchestrator wires a resolver (doc_id -> jurisdiction). The
         # default returns the doc_id, which keeps tests self-contained while
@@ -205,10 +214,23 @@ class ClassificationService(ClassifierPort):
             element_ids=chosen.evidence_element_ids,
             primary_element_id=clause_element.element_id,
         )
-        regime = self._materialise_regime(
-            primary_element_id=clause_element.element_id,
-            regime_member_ids=chosen.regime_member_ids,
-        )
+        if self._regime_assembler is not None:
+            graph_regime = invoke_regime_assembler(
+                self._regime_assembler,
+                clause=clause_element,
+                llm_regime_member_ids=chosen.regime_member_ids,
+            )
+            regime = merge_llm_regime_hints(
+                graph_regime,
+                chosen.regime_member_ids,
+                get_element=self._get_element,
+            )
+        else:
+            regime = materialise_regime_from_llm_ids(
+                primary_element_id=clause_element.element_id,
+                regime_member_ids=chosen.regime_member_ids,
+                get_element=self._get_element,
+            )
 
         jurisdiction = self._get_jurisdiction(clause_element.doc_id)
         claim_id = self._claim_id(
@@ -264,27 +286,6 @@ class ClassificationService(ClassifierPort):
                 "element_id was unknown to the element store."
             )
         return spans
-
-    def _materialise_regime(
-        self,
-        *,
-        primary_element_id: str,
-        regime_member_ids: Sequence[str],
-    ) -> LegalRegime:
-        members: list[str] = [primary_element_id]
-        for eid in regime_member_ids:
-            if eid == primary_element_id:
-                continue
-            try:
-                self._get_element(eid)  # validates existence
-            except KeyError:
-                logger.warning("Regime element_id %s not in element store", eid)
-                continue
-            members.append(eid)
-        return LegalRegime(
-            primary_element_id=primary_element_id,
-            member_element_ids=members,
-        )
 
     @staticmethod
     def _claim_id(*, jurisdiction: str, element_id: str, indicator_id: str) -> str:
