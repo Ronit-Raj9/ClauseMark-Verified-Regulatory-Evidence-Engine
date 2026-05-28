@@ -27,11 +27,17 @@ from rie_coverage.corpus_completeness import (
     format_corpus_incomplete_reason,
     load_manifest,
 )
+from rie_coverage.layer2_service import Layer2ScoringService
 from rie_coverage.policy import (
     classify,
     format_no_evidence_reason,
     miss_pct_from_recall,
     requires_authoritative_source_check,
+)
+from rie_coverage.scoring_policy import (
+    build_layer2_from_pillar,
+    build_layer2_recommendation,
+    recommend_band,
 )
 from rie_coverage.service import CoverageReasoner
 
@@ -42,6 +48,9 @@ __all__ = [
     "CorpusManifest",
     "CoverageReasoner",
     "EnrichedCoverageRow",
+    "Layer2ScoringService",
+    "build_layer2_from_pillar",
+    "build_layer2_recommendation",
     "classify",
     "compute_completeness",
     "default_manifest",
@@ -50,5 +59,6 @@ __all__ = [
     "format_no_evidence_reason",
     "load_manifest",
     "miss_pct_from_recall",
+    "recommend_band",
     "requires_authoritative_source_check",
 ]
