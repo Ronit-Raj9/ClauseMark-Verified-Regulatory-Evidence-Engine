@@ -2310,6 +2310,7 @@ dependencies = [
     { name = "rie-config" },
     { name = "rie-contracts" },
     { name = "rie-persistence" },
+    { name = "rie-verify" },
     { name = "typer" },
 ]
 
@@ -2320,6 +2321,7 @@ requires-dist = [
     { name = "rie-config", editable = "packages/rie-config" },
     { name = "rie-contracts", editable = "packages/rie-contracts" },
     { name = "rie-persistence", editable = "packages/rie-persistence" },
+    { name = "rie-verify", editable = "packages/rie-verify" },
     { name = "typer", specifier = ">=0.21.2" },
 ]
 
