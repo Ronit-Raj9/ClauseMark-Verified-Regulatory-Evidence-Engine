@@ -10,16 +10,20 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from fastapi import APIRouter, Depends, Query
+from rie_config.loader import ConfigRepository
 from rie_contracts import Claim, EvidenceSpan, Layer1Status
+from rie_orchestration.citations import materialise_citations
+from rie_orchestration.layer2 import materialise_layer2_for_claim
 from rie_persistence.repository import DocumentRepository
 
-from rie_api.deps import get_repo
+from rie_api.deps import get_config_repo, get_repo
 from rie_api.errors import NotFoundError
 from rie_api.schemas import (
     CitationDTO,
     ClaimDetailResponse,
     ClaimDTO,
     ClaimListResponse,
+    Layer2RecommendationDTO,
     VerificationReportDTO,
 )
 
@@ -29,28 +33,25 @@ router = APIRouter(prefix="/v1/claims", tags=["claims"])
 def _materialise_citations(
     spans: Sequence[EvidenceSpan], repo: DocumentRepository
 ) -> list[CitationDTO]:
-    """Deterministic ID-replacement: span_id → stored element text. Never LLM-authored."""
+    """Deterministic ID-replacement via ``rie_domain.build_citation``."""
+    span_by_id = {s.span_id: s for s in spans}
+    built = materialise_citations(
+        spans,
+        get_element_text=repo.get_element_text,
+        get_element=repo.get_element,
+        get_document=repo.get_document,
+    )
     out: list[CitationDTO] = []
-    for span in spans:
-        try:
-            text = repo.get_element_text(span.element_id)
-        except KeyError:
-            text = ""
-        # Slice the stored element text by the verified char offsets. If the
-        # offsets refer to document-global positions, fall back to the full
-        # element text — the verification gates guarantee correctness either
-        # way; we never invent characters here.
-        snippet = text[span.char_start : span.char_end] if text else ""
-        if not snippet:
-            snippet = text
+    for citation in built:
+        span = span_by_id[citation.span_id]
         out.append(
             CitationDTO(
-                span_id=span.span_id,
-                doc_id=span.doc_id,
+                span_id=citation.span_id,
+                doc_id=citation.doc_id,
                 element_id=span.element_id,
-                text=snippet,
-                char_start=span.char_start,
-                char_end=span.char_end,
+                text=citation.snippet,
+                char_start=citation.char_start,
+                char_end=citation.char_end,
                 role=span.role.value,
             )
         )
@@ -113,6 +114,7 @@ def list_claims(
 def get_claim(
     claim_id: str,
     repo: DocumentRepository = Depends(get_repo),
+    config_repo: ConfigRepository = Depends(get_config_repo),
 ) -> ClaimDetailResponse:
     try:
         claim = repo.get_claim(claim_id)
@@ -120,8 +122,23 @@ def get_claim(
         raise NotFoundError(f"claim {claim_id!r} not found") from exc
     report = repo.latest_verification(claim_id)
     citations = _materialise_citations(claim.evidence_spans, repo)
+    layer2_rec = None
+    getter = getattr(repo, "get_layer2_recommendation", None)
+    if callable(getter):
+        try:
+            layer2_rec = getter(claim_id)
+        except KeyError:
+            pass
+    if layer2_rec is None:
+        coverage_records = list(repo.list_coverage(jurisdiction=claim.jurisdiction))
+        layer2_rec = materialise_layer2_for_claim(
+            claim,
+            coverage_records=coverage_records,
+            config=config_repo,
+        )
     return ClaimDetailResponse(
         claim=ClaimDTO.from_model(claim),
         verification=VerificationReportDTO.from_model(report) if report else None,
         citations=citations,
+        layer2=Layer2RecommendationDTO.from_model(layer2_rec) if layer2_rec else None,
     )

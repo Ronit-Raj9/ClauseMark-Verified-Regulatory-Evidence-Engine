@@ -51,6 +51,20 @@ def test_get_claim_detail_returns_citations_and_verification(
     assert body["citations"][0]["text"]
 
 
+@pytest.mark.usefixtures("seed_claim", "seed_coverage")
+def test_get_claim_detail_includes_layer2_recommendation(
+    client: TestClient, seed_claim: Claim
+) -> None:
+    response = client.get(f"/v1/claims/{seed_claim.claim_id}")
+    assert response.status_code == 200
+    layer2 = response.json()["layer2"]
+    assert layer2 is not None
+    assert layer2["claim_id"] == seed_claim.claim_id
+    assert layer2["human_confirmation_required"] is True
+    assert layer2["recommended_band"]
+    assert layer2["rationale"]
+
+
 def test_get_unknown_claim_returns_404(client: TestClient) -> None:
     response = client.get("/v1/claims/does-not-exist")
     assert response.status_code == 404

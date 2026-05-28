@@ -81,7 +81,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     config_repo = ConfigRepository(repo_root=settings.repo_root)
 
     # Orchestration graph (lazy — never block startup on its absence).
-    run_graph = _try_import_concrete_run_graph()
+    run_graph = _try_import_concrete_run_graph(
+        repo_root=settings.repo_root,
+        use_fakes=os.getenv("RIE_FORCE_FAKES") == "1",
+    )
     if run_graph is None:
         logger.info(
             "rie_orchestration not wired — POST /v1/runs will return 503 "

@@ -12,7 +12,9 @@ isn't yet wired or its heavy deps aren't installed in the test env.
 from __future__ import annotations
 
 import logging
+import os
 from collections.abc import Callable, Sequence
+from pathlib import Path
 from typing import Any, Protocol
 
 from fastapi import Depends, Request
@@ -72,7 +74,11 @@ def get_config_repo(request: Request) -> ConfigRepository:
 # ──────────────────────────────────────────────────────────────────────────
 
 
-def _try_import_concrete_run_graph() -> RunGraph | None:
+def _try_import_concrete_run_graph(
+    *,
+    repo_root: Path,
+    use_fakes: bool | None = None,
+) -> RunGraph | None:
     """Best-effort import of the concrete graph runner from `rie_orchestration`.
 
     Returns ``None`` if the package isn't installed or doesn't yet expose
@@ -88,8 +94,9 @@ def _try_import_concrete_run_graph() -> RunGraph | None:
     if builder is None:
         logger.info("rie_orchestration present but build_run_graph not yet exposed")
         return None
+    force_fakes = use_fakes if use_fakes is not None else os.getenv("RIE_FORCE_FAKES") == "1"
     try:
-        graph = builder()
+        graph = builder(repo_root=repo_root, use_fakes=force_fakes)
     except Exception as exc:  # pragma: no cover - construction failure
         logger.warning("build_run_graph() raised: %s", exc)
         return None
@@ -109,7 +116,11 @@ def get_run_graph(request: Request) -> RunGraph:
     graph: RunGraph | None = getattr(request.app.state, "run_graph", None)
     if graph is not None:
         return graph
-    graph = _try_import_concrete_run_graph()
+    settings = get_settings(request)
+    graph = _try_import_concrete_run_graph(
+        repo_root=settings.repo_root,
+        use_fakes=os.getenv("RIE_FORCE_FAKES") == "1",
+    )
     if graph is None:
         raise DependencyUnavailableError(
             "orchestration graph not available — wire app.state.run_graph "

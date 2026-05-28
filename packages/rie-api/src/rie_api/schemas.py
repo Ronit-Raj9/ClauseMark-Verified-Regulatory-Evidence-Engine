@@ -24,6 +24,7 @@ from rie_contracts import (
     IndicatorConfig,
     Jurisdiction,
     Layer1Status,
+    Layer2Recommendation,
     LegalRegime,
     PillarConfig,
     RegistryEntry,
@@ -65,11 +66,35 @@ class RunStatusResponse(BaseModel):
 
     run_id: str
     jurisdiction: Jurisdiction | None = None
-    status: Literal["accepted", "running", "completed", "failed", "skipped", "unknown"]
+    status: Literal[
+        "accepted", "running", "completed", "failed", "skipped", "unknown", "interrupted"
+    ]
     claim_count: int = 0
     verified_count: int = 0
     flagged_count: int = 0
     coverage_count: int = 0
+
+
+class RunResumeRequest(BaseModel):
+    """Resume a HITL-interrupted pipeline run with reviewer decisions."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    decisions: dict[str, str] = Field(
+        description="claim_id → accept | correct | reject",
+        min_length=1,
+    )
+
+
+class RunResumeResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    run_id: str
+    status: Literal["completed", "failed", "interrupted", "unknown"]
+    detail: str = ""
+    claim_count: int = 0
+    verified_count: int = 0
+    flagged_count: int = 0
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -189,12 +214,37 @@ class ClaimDTO(BaseModel):
         )
 
 
+class Layer2RecommendationDTO(BaseModel):
+    """Layer-2 score recommendation — never a final score."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    claim_id: str
+    indicator_id: str
+    recommended_band: str
+    rationale: str
+    open_questions: list[str] = Field(default_factory=list)
+    human_confirmation_required: Literal[True] = True
+
+    @classmethod
+    def from_model(cls, rec: Layer2Recommendation) -> Layer2RecommendationDTO:
+        return cls(
+            claim_id=rec.claim_id,
+            indicator_id=rec.indicator_id,
+            recommended_band=rec.recommended_band.value,
+            rationale=rec.rationale,
+            open_questions=list(rec.open_questions),
+            human_confirmation_required=rec.human_confirmation_required,
+        )
+
+
 class ClaimDetailResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     claim: ClaimDTO
     verification: VerificationReportDTO | None = None
     citations: list[CitationDTO] = Field(default_factory=list)
+    layer2: Layer2RecommendationDTO | None = None
 
 
 class ClaimListResponse(BaseModel):
@@ -407,10 +457,13 @@ __all__: tuple[str, ...] = (
     "RunRequest",
     "RunResponse",
     "RunStatusResponse",
+    "RunResumeRequest",
+    "RunResumeResponse",
     # Claims
     "ClaimDTO",
     "ClaimDetailResponse",
     "ClaimListResponse",
+    "Layer2RecommendationDTO",
     "EvidenceSpanDTO",
     "GateResultDTO",
     "VerificationReportDTO",
