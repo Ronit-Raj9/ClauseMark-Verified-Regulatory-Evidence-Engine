@@ -6,6 +6,7 @@ from collections import Counter
 from collections.abc import Iterable, Sequence
 
 from rie_contracts import (
+    Claim,
     Element,
     Layer1Status,
     LegalRegime,
@@ -29,12 +30,19 @@ def assemble_regime(
     edges: Sequence[StructureEdge],
     max_depth: int = 2,
 ) -> LegalRegime:
-    """Walk the structure graph from a primary clause to assemble its regime.
+    """Walk the structure graph from a primary clause to assemble its regime (§6.4).
 
-    `max_depth` bounds graph traversal so a transitive web of references does
-    not explode context. Definitions and provisos are tracked separately so
-    the classifier and verifier can weight them deliberately.
+    Traverses ``REGIME_EDGE_TYPES`` (cross-references, definitions, provisos,
+    notwithstanding clauses). ``max_depth`` bounds graph traversal so a
+    transitive web of references does not explode context. Definitions and
+    provisos are tracked separately so the classifier and verifier can weight
+    them deliberately.
+
+    Returns a ``LegalRegime`` contract model suitable for ``Claim.regime``.
     """
+    if max_depth < 0:
+        msg = f"max_depth must be >= 0, got {max_depth}"
+        raise ValueError(msg)
 
     seen: set[str] = {primary.element_id}
     defs: list[str] = []
@@ -75,6 +83,33 @@ def assemble_regime(
     )
 
 
+def assemble_regime_from_claim(
+    claim: Claim,
+    elements_by_id: dict[str, Element],
+    edges: Sequence[StructureEdge],
+    *,
+    max_depth: int = 2,
+) -> LegalRegime:
+    """Assemble regime for a claim's primary clause via the structure graph.
+
+    Uses ``claim.regime.primary_element_id`` when present in *elements_by_id*,
+    otherwise falls back to ``claim.clause_id``. Raises ``ValueError`` when
+    neither resolves to a known element.
+    """
+    primary_id = claim.regime.primary_element_id
+    if primary_id not in elements_by_id:
+        primary_id = claim.clause_id
+    if primary_id not in elements_by_id:
+        msg = (
+            f"claim {claim.claim_id!r}: primary element "
+            f"{claim.regime.primary_element_id!r} / clause {claim.clause_id!r} not in graph"
+        )
+        raise ValueError(msg)
+    return assemble_regime(
+        elements_by_id[primary_id], elements_by_id, edges, max_depth=max_depth
+    )
+
+
 def consolidate_self_consistency_votes(
     indicator_ids: Iterable[str],
 ) -> tuple[str, dict[str, int]]:
@@ -95,3 +130,17 @@ def derive_layer1_status(
     if self_consistency_unstable:
         return Layer1Status.FLAGGED
     return Layer1Status.PENDING_VERIFICATION
+
+
+def enrich_claim_regime(
+    claim: Claim,
+    elements_by_id: dict[str, Element],
+    edges: Sequence[StructureEdge],
+    *,
+    max_depth: int = 2,
+) -> Claim:
+    """Re-assemble ``claim.regime`` from the structure graph and return an updated claim."""
+    regime = assemble_regime_from_claim(
+        claim, elements_by_id, edges, max_depth=max_depth
+    )
+    return claim.model_copy(update={"regime": regime})

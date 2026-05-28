@@ -7,6 +7,7 @@ so from stored metadata — never from model output.
 
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from rie_contracts import DocumentMeta, Element, EvidenceSpan
@@ -32,8 +33,18 @@ def build_citation(
     document: DocumentMeta,
     snippet: str,
 ) -> Citation:
-    assert span.element_id == element.element_id, "span/element mismatch"
-    assert element.doc_id == document.doc_id, "element/doc mismatch"
+    """Materialise a citation from stored metadata (§6.6 ID-replacement).
+
+    The LLM emits only ``span_id``; this function is the sole construction
+    point for human-readable citation fields. Raises ``ValueError`` when span,
+    element, or document identifiers are inconsistent.
+    """
+    if span.element_id != element.element_id:
+        msg = f"span/element mismatch: {span.element_id!r} != {element.element_id!r}"
+        raise ValueError(msg)
+    if element.doc_id != document.doc_id:
+        msg = f"element/doc mismatch: {element.doc_id!r} != {document.doc_id!r}"
+        raise ValueError(msg)
     locator = element.legal_numbering or f"page {element.page}"
     return Citation(
         span_id=span.span_id,
@@ -54,3 +65,32 @@ def render_citation_string(c: Citation) -> str:
     if c.effective_date:
         base += f" [eff. {c.effective_date}]"
     return base
+
+
+def extract_snippet(element_text: str, span: EvidenceSpan) -> str:
+    """Slice stored element text by verified char offsets; fall back to full text."""
+    if not element_text:
+        return ""
+    snippet = element_text[span.char_start : span.char_end]
+    return snippet or element_text
+
+
+def materialise_citations(
+    spans: Sequence[EvidenceSpan],
+    *,
+    get_element_text: Callable[[str], str],
+    get_element: Callable[[str], Element],
+    get_document: Callable[[str], DocumentMeta],
+) -> list[Citation]:
+    """Resolve span IDs to ``Citation`` objects — never LLM-authored."""
+    out: list[Citation] = []
+    for span in spans:
+        try:
+            element = get_element(span.element_id)
+            document = get_document(span.doc_id)
+            text = get_element_text(span.element_id)
+        except KeyError:
+            continue
+        snippet = extract_snippet(text, span)
+        out.append(build_citation(span, element, document, snippet))
+    return out
