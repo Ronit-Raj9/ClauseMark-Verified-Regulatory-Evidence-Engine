@@ -26,7 +26,8 @@ import type {
 // Bottom: Accept / Correct / Reject -> POST /v1/reviews via reviews.submit.
 //
 // No pillar id or indicator id is hard-coded — every label is rendered from
-// the API payload. Layer-2 score lives entirely in DecisionBar (human-authored).
+// the API payload. Layer-2 recommendation is shown above the decision bar;
+// the Correct score select is pre-filled from the recommended band.
 
 const LAYER1_TONES: Record<string, string> = {
   verified: "bg-gate-pass text-white",
@@ -139,7 +140,7 @@ export default function Review() {
     return <div className="text-sm text-slate-500">No claim returned.</div>;
   }
 
-  const { claim, verification, citations } = detail;
+  const { claim, verification, citations, layer2 } = detail;
   const layer1Tone = LAYER1_TONES[claim.layer1_status] ?? "bg-slate-300 text-slate-800";
   const decompEntries = decompositionEntries(claim.decomposition);
 
@@ -269,6 +270,45 @@ export default function Review() {
             </dl>
           </div>
 
+          {/* Layer-2 recommendation (human confirmation required) */}
+          {layer2 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-md">
+              <header className="px-3 py-2 border-b border-amber-200 bg-amber-100/60 text-xs font-semibold uppercase tracking-wide text-amber-900 flex items-center justify-between gap-2">
+                <span>Layer-2 recommendation</span>
+                {layer2.human_confirmation_required && (
+                  <span className="font-mono normal-case text-[10px] px-1.5 py-0.5 rounded bg-amber-200 shrink-0">
+                    human confirmation required
+                  </span>
+                )}
+              </header>
+              <div className="px-3 py-3 space-y-2 text-sm">
+                <div className="flex flex-wrap gap-2 items-center">
+                  <span className="text-xs font-mono text-amber-800">indicator</span>
+                  <span className="px-2 py-0.5 rounded-md bg-amber-800/90 text-white font-mono font-semibold text-xs">
+                    {layer2.indicator_id}
+                  </span>
+                  <span className="text-xs font-mono text-amber-800">recommended band</span>
+                  <span className="px-2 py-0.5 rounded-md bg-amber-900 text-white font-mono font-semibold text-xs">
+                    {layer2.recommended_band}
+                  </span>
+                </div>
+                <p className="text-slate-800 whitespace-pre-wrap">{layer2.rationale}</p>
+                {layer2.open_questions.length > 0 && (
+                  <div>
+                    <div className="text-xs font-semibold uppercase text-amber-900 mb-1">
+                      Open questions
+                    </div>
+                    <ul className="list-disc list-inside text-slate-700 space-y-0.5">
+                      {layer2.open_questions.map((q) => (
+                        <li key={q}>{q}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Verification gates */}
           <div className="bg-white border border-slate-200 rounded-md">
             <header className="px-3 py-2 border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600 flex items-center justify-between">
@@ -383,6 +423,7 @@ export default function Review() {
         onReviewerChange={setReviewer}
         disabled={submitMutation.isPending}
         lastError={submitError}
+        suggestedBand={layer2?.recommended_band ?? null}
         onSubmit={async (input) => {
           await submitMutation.mutateAsync(input);
         }}

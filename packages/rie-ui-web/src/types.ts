@@ -94,10 +94,20 @@ export interface ClaimDTO {
   created_at: string;
 }
 
+export interface Layer2RecommendationDTO {
+  claim_id: string;
+  indicator_id: string;
+  recommended_band: ScoreBand | string;
+  rationale: string;
+  open_questions: string[];
+  human_confirmation_required: boolean;
+}
+
 export interface ClaimDetailResponse {
   claim: ClaimDTO;
   verification: VerificationReportDTO | null;
   citations: CitationDTO[];
+  layer2: Layer2RecommendationDTO | null;
 }
 
 export interface ClaimListResponse {
@@ -225,6 +235,19 @@ export interface RunStatusResponse {
   verified_count: number;
   flagged_count: number;
   coverage_count: number;
+}
+
+export interface RunResumeRequest {
+  decisions: Record<string, string>;
+}
+
+export interface RunResumeResponse {
+  run_id: string;
+  status: "completed" | "failed" | "interrupted" | "unknown";
+  detail: string;
+  claim_count: number;
+  verified_count: number;
+  flagged_count: number;
 }
 
 // ── Health ─────────────────────────────────────────────────────────────────

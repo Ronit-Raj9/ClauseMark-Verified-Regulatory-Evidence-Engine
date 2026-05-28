@@ -17,6 +17,8 @@ import type {
   ReviewSubmit,
   RunRequest,
   RunResponse,
+  RunResumeRequest,
+  RunResumeResponse,
   RunStatusResponse,
 } from "@/types";
 
@@ -140,6 +142,11 @@ export const runs = {
   status: (runId: string, jurisdiction?: string) =>
     request<RunStatusResponse>(`/v1/runs/${encodeURIComponent(runId)}`, {
       query: { jurisdiction },
+    }),
+  resume: (runId: string, body: RunResumeRequest) =>
+    request<RunResumeResponse>(`/v1/runs/${encodeURIComponent(runId)}/resume`, {
+      method: "POST",
+      body: JSON.stringify(body),
     }),
 };
 

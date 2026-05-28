@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { ReviewDecision, ScoreBand } from "@/types";
 
@@ -19,9 +19,16 @@ interface Props {
   }) => Promise<void> | void;
   disabled?: boolean;
   lastError?: string | null;
+  /** Layer-2 recommended band — pre-fills the Correct score select only. */
+  suggestedBand?: ScoreBand | string | null;
 }
 
 const SCORE_BANDS: ScoreBand[] = ["0", "0.5", "1", "no_evidence", "insufficient_coverage"];
+
+function toScoreBand(value: ScoreBand | string | null | undefined): ScoreBand | null {
+  if (value == null) return null;
+  return SCORE_BANDS.includes(value as ScoreBand) ? (value as ScoreBand) : null;
+}
 
 export default function DecisionBar({
   reviewer,
@@ -29,10 +36,18 @@ export default function DecisionBar({
   onSubmit,
   disabled,
   lastError,
+  suggestedBand,
 }: Props) {
   const [note, setNote] = useState("");
-  const [correctedScore, setCorrectedScore] = useState<ScoreBand>("0.5");
+  const [correctedScore, setCorrectedScore] = useState<ScoreBand>(
+    () => toScoreBand(suggestedBand) ?? "0.5",
+  );
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const band = toScoreBand(suggestedBand);
+    if (band) setCorrectedScore(band);
+  }, [suggestedBand]);
 
   async function fire(decision: ReviewDecision) {
     if (!reviewer.trim()) return;
@@ -66,6 +81,11 @@ export default function DecisionBar({
 
         <label className="flex flex-col text-xs text-slate-600">
           Corrected score (for Correct)
+          {suggestedBand && (
+            <span className="text-[10px] text-amber-700 font-mono mt-0.5">
+              Layer-2 recommends {suggestedBand}
+            </span>
+          )}
           <select
             value={correctedScore}
             onChange={(e) => setCorrectedScore(e.target.value as ScoreBand)}
