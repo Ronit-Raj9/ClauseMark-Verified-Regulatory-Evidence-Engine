@@ -50,6 +50,7 @@ from rie_contracts import (
 )
 from rie_contracts.ports import ElementTextResolver
 
+from rie_verify.confidence import ConfidenceScreenResult, apply_confidence_routing
 from rie_verify.kg_grounding import KgGroundingResult, run_kg_grounding_gate
 from rie_verify.nli import NliBackend
 from rie_verify.second_llm import SecondLlmBackend
@@ -204,6 +205,22 @@ class VerificationService:
             )
 
         return report, kg_result
+
+    def verify_with_confidence_routing(
+        self,
+        claim: Claim,
+        get_element_text: ElementTextResolver,
+        confidence_screen: ConfidenceScreenResult,
+    ) -> VerificationReport:
+        """Run the canonical 4 gates, then apply §6.7 validated-confidence routing.
+
+        When the gold-set screen shows confidence is usable, VERIFIED claims below
+        the validated threshold are downgraded to FLAGGED. When the screen shows
+        confidence does not discriminate, all VERIFIED claims are routed to review.
+        Insufficient gold pairs leave routing unchanged.
+        """
+        report = self.verify(claim, get_element_text)
+        return apply_confidence_routing(report, claim, confidence_screen)
 
     # ────────────────────────────────────────────────────────────────────
     # Tier A — deterministic gates

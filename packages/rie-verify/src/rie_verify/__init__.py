@@ -18,6 +18,12 @@ the frozen ``rie_contracts.VerificationReport`` contract are unchanged.
 
 from __future__ import annotations
 
+from rie_verify.confidence import (
+    ConfidenceScreenResult,
+    apply_confidence_routing,
+    route_verifications_by_confidence,
+    screen_confidence_on_gold,
+)
 from rie_verify.kg_grounding import (
     KG_GATE_NAME,
     DocumentKg,
@@ -34,6 +40,7 @@ from rie_verify.service import VerificationService
 
 __all__ = [
     "KG_GATE_NAME",
+    "ConfidenceScreenResult",
     "DocumentKg",
     "Entity",
     "EntityKind",
@@ -46,7 +53,10 @@ __all__ = [
     "SecondLlmBackend",
     "TransformersNliBackend",
     "VerificationService",
+    "apply_confidence_routing",
     "build_document_kg",
     "extract_entities",
+    "route_verifications_by_confidence",
     "run_kg_grounding_gate",
+    "screen_confidence_on_gold",
 ]
