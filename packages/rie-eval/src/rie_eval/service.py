@@ -34,12 +34,18 @@ from rie_contracts import (
     ReviewRecord,
 )
 
+from rie_eval.gold_recall import (
+    compute_gold_set_recall,
+    compute_indicator_gold_recall,
+    gold_hit_in_retrieved,
+)
 from rie_eval.metrics import NO_CLAIM_LABEL, macro_avg, prf
 from rie_eval.ragas_metrics import (
     aggregate_recall,
     compute_context_recall,
     compute_faithfulness,
 )
+from rie_verify.confidence import screen_confidence_on_gold
 
 # ─── Lightweight repository protocol (subset of DocumentRepositoryPort) ──────
 # The Evaluator only needs three read-side operations. Defining a narrow local
@@ -134,6 +140,8 @@ class Evaluator:
         #   tokens that appear in the cited span text.
         context_recall, faithfulness = self._ragas_proxies(matched_pairs)
 
+        confidence_screen = screen_confidence_on_gold(gold, pillar_claims)
+
         return {
             **{f"precision[{k}]": v for k, v in precision_by_indicator.items()},
             **{f"recall[{k}]": v for k, v in recall_by_indicator.items()},
@@ -151,6 +159,9 @@ class Evaluator:
             "count_verified": float(count_verified),
             "count_flagged": float(count_flagged),
             "count_rejected": float(count_rejected),
+            "confidence_usable": 1.0 if confidence_screen.usable else 0.0,
+            "confidence_separation": confidence_screen.separation_score,
+            "confidence_screened_pairs": float(confidence_screen.screened_pairs),
         }
 
     # ─── Port: measure_retrieval_recall ─────────────────────────────────────
@@ -161,18 +172,28 @@ class Evaluator:
         retrieved_per_query: Sequence[Sequence[str]],
     ) -> float:
         gold = list(self.config.load_gold(pillar_id))
-        if not gold:
-            return 0.0
-        if len(retrieved_per_query) != len(gold):
-            raise ValueError(
-                f"retrieved_per_query length {len(retrieved_per_query)} "
-                f"!= gold length {len(gold)} for pillar {pillar_id}"
-            )
-        hits = 0
-        for item, retrieved in zip(gold, retrieved_per_query):
-            if _gold_hit_in_retrieved(item, retrieved):
-                hits += 1
-        return hits / len(gold)
+        return compute_gold_set_recall(gold, retrieved_per_query)
+
+    def lookup_gold_recall(
+        self,
+        pillar_id: str,
+        indicator_id: str,
+        jurisdiction: str,
+        retrieved: Sequence[str],
+    ) -> float | None:
+        """Measured gold-set recall for one ``(jurisdiction, indicator)`` pair.
+
+        Intended for orchestration's ``coverage_node`` when binding honest
+        absence reasoning (§7). Returns ``None`` when recall cannot be
+        measured (no gold for the pair, or empty retrieval output).
+        """
+        gold = list(self.config.load_gold(pillar_id))
+        return compute_indicator_gold_recall(
+            gold,
+            indicator_id=indicator_id,
+            jurisdiction=jurisdiction,
+            retrieved=retrieved,
+        )
 
     # ─── Public helpers — exposed so callers can build expanded reports ─────
 
@@ -403,31 +424,7 @@ def _match(
     return pairs, unmatched_gold, unmatched_claims
 
 
-def _gold_hit_in_retrieved(item: GoldItem, retrieved: Sequence[str]) -> bool:
-    """A gold item is recalled when either:
-    - any retrieved id literally equals an expected element_id we can derive
-      from the gold item (we don't know it directly, so we accept any id
-      containing the gold doc_id), OR
-    - the gold ``span_text`` appears (normalised) as a substring of any of
-      the retrieved ids/snippets (caller may pass plain text snippets).
-    """
-    if not retrieved:
-        return False
-    needle_doc = item.doc_id.lower()
-    needle_span = _normalise(item.span_text)
-    for rid in retrieved:
-        if rid is None:
-            continue
-        rid_norm = rid.lower()
-        if needle_doc and needle_doc in rid_norm:
-            return True
-        if needle_span and needle_span in _normalise(rid):
-            return True
-    return False
+# Re-export for orchestration call sites that import from service historically.
+_gold_hit_in_retrieved = gold_hit_in_retrieved
 
-
-def _normalise(s: str) -> str:
-    return " ".join(s.split()).lower()
-
-
-__all__ = ["Evaluator"]
+__all__ = ["Evaluator", "gold_hit_in_retrieved"]
