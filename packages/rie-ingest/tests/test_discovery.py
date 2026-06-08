@@ -18,7 +18,6 @@ from pathlib import Path
 import httpx
 import pytest
 import yaml
-
 from rie_ingest.discovery import (
     USER_AGENT,
     DiscoveryConfig,
@@ -166,10 +165,7 @@ def test_crawl_respects_robots_and_diff_cache(repo_root: Path) -> None:
     pdf_bytes = b"%PDF-1.4 allowed body"
     blocked_pdf = b"%PDF-1.4 blocked body"
 
-    robots_body = (
-        "User-agent: *\n"
-        "Disallow: /private/\n"
-    )
+    robots_body = "User-agent: *\nDisallow: /private/\n"
 
     routes: dict[str, httpx.Response] = {
         "https://laws.example.gov/robots.txt": httpx.Response(
@@ -241,9 +237,7 @@ def test_crawl_local_file_seed(repo_root: Path, tmp_path: Path) -> None:
     not assume HTTPS-only — useful for offline / hermetic testing."""
     docs_dir = tmp_path / "docs"
     docs_dir.mkdir()
-    (docs_dir / "index.html").write_bytes(
-        b'<html><body><a href="/laws/a.pdf">a</a></body></html>'
-    )
+    (docs_dir / "index.html").write_bytes(b'<html><body><a href="/laws/a.pdf">a</a></body></html>')
     (docs_dir / "laws").mkdir()
     (docs_dir / "laws" / "a.pdf").write_bytes(b"%PDF-1.4 local body")
 

@@ -244,9 +244,7 @@ class _DiffCache:
 
 # ─── Internals: link extraction ─────────────────────────────────────────────
 
-_HREF_RE: re.Pattern[str] = re.compile(
-    r"""href\s*=\s*['"]([^'"#]+)""", re.IGNORECASE
-)
+_HREF_RE: re.Pattern[str] = re.compile(r"""href\s*=\s*['"]([^'"#]+)""", re.IGNORECASE)
 
 
 def _extract_links(html: str, base_url: str) -> list[str]:
@@ -382,9 +380,7 @@ class DiscoveryCrawler:
 
     # ─── BFS core ───────────────────────────────────────────────────────────
 
-    def _crawl_with(
-        self, client: httpx.Client, cache: _DiffCache
-    ) -> list[ProposedSource]:
+    def _crawl_with(self, client: httpx.Client, cache: _DiffCache) -> list[ProposedSource]:
         robots = _RobotsCache(client)
         seen: set[str] = set()
         # Per-host last-fetch timestamp for the crawl-delay budget.
@@ -417,13 +413,13 @@ class DiscoveryCrawler:
                 continue
 
             content_type = resp.headers.get("content-type", "").lower() or None
-            primary_mime = (
-                content_type.split(";", 1)[0].strip() if content_type else None
-            )
+            primary_mime = content_type.split(";", 1)[0].strip() if content_type else None
             body = resp.content
             sha = hashlib.sha256(body).hexdigest()
 
-            mime_allowed = primary_mime is not None and primary_mime in self.config.patterns.mime_allow
+            mime_allowed = (
+                primary_mime is not None and primary_mime in self.config.patterns.mime_allow
+            )
 
             if mime_allowed and not cache.is_unchanged(url, sha):
                 # New or changed: propose. The reviewer decides authority.
@@ -483,9 +479,7 @@ def _host(url: str) -> str:
     return urllib.parse.urlparse(url).netloc.lower()
 
 
-_TITLE_RE: re.Pattern[str] = re.compile(
-    r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL
-)
+_TITLE_RE: re.Pattern[str] = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 
 
 def _extract_title(body: bytes, mime: str | None) -> str | None:
@@ -506,7 +500,11 @@ def _extract_title(body: bytes, mime: str | None) -> str | None:
 
 
 def write_proposals(
-    repo_root: Path, jurisdiction: str, proposals: Iterable[ProposedSource], *, now: datetime | None = None
+    repo_root: Path,
+    jurisdiction: str,
+    proposals: Iterable[ProposedSource],
+    *,
+    now: datetime | None = None,
 ) -> Path:
     """Persist proposals to `data/outputs/discovery/<j>/<ts>.yaml`.
 
