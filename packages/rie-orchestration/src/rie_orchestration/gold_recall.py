@@ -68,9 +68,7 @@ def _recall_from_run_hits(
         return None
     jurisdiction = state.get("jurisdiction", "")
     ind_gold = [
-        g
-        for g in gold
-        if g.indicator_id == indicator_id and g.jurisdiction == jurisdiction
+        g for g in gold if g.indicator_id == indicator_id and g.jurisdiction == jurisdiction
     ]
     if not ind_gold:
         return None
