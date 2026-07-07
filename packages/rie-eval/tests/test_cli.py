@@ -54,7 +54,9 @@ def test_metrics_no_db_path(runner: CliRunner) -> None:
     assert "f1_macro" in result.output
 
 
-def test_recall_command(runner: CliRunner, tmp_path: Path) -> None:
+def test_recall_command(runner: CliRunner, tmp_path: Path, frozen_repo_root: Path) -> None:
+    # Point at a frozen 3-item Pillar-7 gold repo so the assertion is stable as
+    # the live Round-1 gold corpus grows.
     payload = tmp_path / "retrieved.json"
     payload.write_text(
         '[["sample_dpa_2020_s6"], ["sample_dpa_2020_s33"], ["sample_dpa_2020_s7"]]',
@@ -69,7 +71,7 @@ def test_recall_command(runner: CliRunner, tmp_path: Path) -> None:
             "--retrieved",
             str(payload),
             "--repo-root",
-            str(REPO_ROOT),
+            str(frozen_repo_root),
         ],
     )
     assert result.exit_code == 0, result.output

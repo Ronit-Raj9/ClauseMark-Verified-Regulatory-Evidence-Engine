@@ -30,7 +30,7 @@ def test_evaluator_implements_port(config: ConfigRepository) -> None:
     assert isinstance(evaluator, EvaluatorPort)
 
 
-def test_perfect_predictions_pillar_07(config: ConfigRepository) -> None:
+def test_perfect_predictions_pillar_07(frozen_config: ConfigRepository) -> None:
     # Pillar 7 has three gold items: 7.2 (obligation), 7.4, 7.5.
     claims = [
         make_claim(
@@ -55,7 +55,7 @@ def test_perfect_predictions_pillar_07(config: ConfigRepository) -> None:
             char_start=300,
         ),
     ]
-    evaluator = Evaluator(config=config)
+    evaluator = Evaluator(config=frozen_config)
     out = evaluator.evaluate_pillar("7", claims)
     assert out["precision_macro"] == pytest.approx(1.0)
     assert out["recall_macro"] == pytest.approx(1.0)
@@ -66,13 +66,13 @@ def test_perfect_predictions_pillar_07(config: ConfigRepository) -> None:
     assert out["citation_support_precision"] == pytest.approx(1.0)
 
 
-def test_recall_drops_when_a_gold_item_is_missed(config: ConfigRepository) -> None:
+def test_recall_drops_when_a_gold_item_is_missed(frozen_config: ConfigRepository) -> None:
     # Drop the 7.5 claim: gold expects three, system emits two.
     claims = [
         make_claim(claim_id="c1", indicator_id="7.2", pillar_id="7", char_start=100),
         make_claim(claim_id="c2", indicator_id="7.4", pillar_id="7", char_start=200),
     ]
-    evaluator = Evaluator(config=config)
+    evaluator = Evaluator(config=frozen_config)
     out = evaluator.evaluate_pillar("7", claims)
     # 7.5 had 1 gold + 0 predictions → recall[7.5] == 0
     assert out["recall[7.5]"] == pytest.approx(0.0)
@@ -81,7 +81,7 @@ def test_recall_drops_when_a_gold_item_is_missed(config: ConfigRepository) -> No
 
 
 def test_indicator_swap_hits_precision_and_recall(
-    config: ConfigRepository,
+    frozen_config: ConfigRepository,
 ) -> None:
     # Swap 7.2 prediction → 7.4 (collides with existing 7.4 gold). System
     # also still emits a correct 7.4. Net: 7.2 missed, two 7.4 predictions
@@ -91,7 +91,7 @@ def test_indicator_swap_hits_precision_and_recall(
         make_claim(claim_id="c2", indicator_id="7.4", pillar_id="7", char_start=200),
         make_claim(claim_id="c3", indicator_id="7.5", pillar_id="7", char_start=300),
     ]
-    evaluator = Evaluator(config=config)
+    evaluator = Evaluator(config=frozen_config)
     out = evaluator.evaluate_pillar("7", claims)
     # 7.2: no prediction → P/R/F1 = 0
     assert out["recall[7.2]"] == pytest.approx(0.0)
@@ -324,14 +324,14 @@ def test_context_recall_and_faithfulness_keys_present(config: ConfigRepository) 
 
 
 def test_detailed_per_indicator_returns_grouped_view(
-    config: ConfigRepository,
+    frozen_config: ConfigRepository,
 ) -> None:
     claims = [
         make_claim(claim_id="c1", indicator_id="7.2", pillar_id="7", char_start=100),
         make_claim(claim_id="c2", indicator_id="7.4", pillar_id="7", char_start=200),
         make_claim(claim_id="c3", indicator_id="7.5", pillar_id="7", char_start=300),
     ]
-    evaluator = Evaluator(config=config)
+    evaluator = Evaluator(config=frozen_config)
     grouped = evaluator.detailed_per_indicator("7", claims)
     assert set(grouped) == {
         "precision_by_indicator",

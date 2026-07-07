@@ -38,6 +38,68 @@ def config(repo_root: Path) -> ConfigRepository:
     return ConfigRepository(repo_root=repo_root)
 
 
+# Live gold under gold/ now carries the REAL Round-1 corpus (Singapore/Australia/
+# Malaysia, dozens of P6/P7 rows). Unit tests of the recall/PRF *math* must not
+# depend on that growing tree — they pin a frozen 3-item Pillar-7 gold set in a
+# throwaway repo (only gold/ is needed; evaluate_pillar/measure_retrieval_recall
+# touch nothing else).
+_FROZEN_P7_GOLD = """\
+items:
+  - gold_id: "p07_frozen_consent_001"
+    pillar_id: "7"
+    indicator_id: "7.2"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_dpa_2020"
+    span_text: "An organisation shall only process personal data with the consent of the data subject or on another lawful basis specified in section 6."
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "frozen fixture"
+  - gold_id: "p07_frozen_breach_002"
+    pillar_id: "7"
+    indicator_id: "7.4"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_dpa_2020"
+    span_text: "A controller shall notify the Commissioner without undue delay, and in any event within 72 hours, of any personal data breach, and shall notify affected data subjects where the breach is likely to result in a high risk to their rights."
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "frozen fixture"
+  - gold_id: "p07_frozen_authority_003"
+    pillar_id: "7"
+    indicator_id: "7.5"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_dpa_2020"
+    span_text: "The Data Protection Commission shall be independent in the exercise of its functions and shall not be subject to the direction or control of any person or authority."
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "frozen fixture"
+"""
+
+
+@pytest.fixture
+def frozen_repo_root(tmp_path: Path) -> Path:
+    """Throwaway repo with a pinned 3-item Pillar-7 gold set + real gold schema."""
+    import shutil
+
+    (tmp_path / "gold" / "_schema").mkdir(parents=True)
+    shutil.copy(
+        REPO_ROOT / "gold" / "_schema" / "gold_item.schema.json",
+        tmp_path / "gold" / "_schema" / "gold_item.schema.json",
+    )
+    (tmp_path / "gold" / "pillar_07").mkdir(parents=True)
+    (tmp_path / "gold" / "pillar_07" / "frozen.yaml").write_text(
+        _FROZEN_P7_GOLD, encoding="utf-8"
+    )
+    return tmp_path
+
+
+@pytest.fixture
+def frozen_config(frozen_repo_root: Path) -> ConfigRepository:
+    return ConfigRepository(repo_root=frozen_repo_root)
+
+
 @dataclass
 class FakeRepo:
     """Minimal in-memory stand-in for the bits of `DocumentRepositoryPort`

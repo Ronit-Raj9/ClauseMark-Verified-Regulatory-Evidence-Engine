@@ -8,7 +8,7 @@ from rie_eval import Evaluator
 
 
 def test_recall_perfect_when_doc_id_in_every_retrieved_list(
-    config: ConfigRepository,
+    frozen_config: ConfigRepository,
 ) -> None:
     # Pillar 7 has 3 gold items, all touching sample_dpa_2020.
     retrieved = [
@@ -16,28 +16,28 @@ def test_recall_perfect_when_doc_id_in_every_retrieved_list(
         ["sample_dpa_2020_s33", "x"],
         ["sample_dpa_2020_s7"],
     ]
-    evaluator = Evaluator(config=config)
+    evaluator = Evaluator(config=frozen_config)
     assert evaluator.measure_retrieval_recall("7", retrieved) == pytest.approx(1.0)
 
 
-def test_recall_zero_when_nothing_matches(config: ConfigRepository) -> None:
+def test_recall_zero_when_nothing_matches(frozen_config: ConfigRepository) -> None:
     retrieved = [["foo"], ["bar"], ["baz"]]
-    evaluator = Evaluator(config=config)
+    evaluator = Evaluator(config=frozen_config)
     assert evaluator.measure_retrieval_recall("7", retrieved) == pytest.approx(0.0)
 
 
-def test_recall_partial(config: ConfigRepository) -> None:
+def test_recall_partial(frozen_config: ConfigRepository) -> None:
     # 2 of 3 retrieve the right doc.
     retrieved = [
         ["sample_dpa_2020_s6"],
         ["mismatch"],
         ["sample_dpa_2020_s7"],
     ]
-    evaluator = Evaluator(config=config)
+    evaluator = Evaluator(config=frozen_config)
     assert evaluator.measure_retrieval_recall("7", retrieved) == pytest.approx(2 / 3)
 
 
-def test_recall_via_span_text_substring(config: ConfigRepository) -> None:
+def test_recall_via_span_text_substring(frozen_config: ConfigRepository) -> None:
     # Caller supplies plain-text snippets. The gold span_text appears as a
     # normalised substring of the snippet — count as recalled.
     retrieved = [
@@ -58,17 +58,17 @@ def test_recall_via_span_text_substring(config: ConfigRepository) -> None:
             "direction or control of any person or authority."
         ],
     ]
-    evaluator = Evaluator(config=config)
+    evaluator = Evaluator(config=frozen_config)
     assert evaluator.measure_retrieval_recall("7", retrieved) == pytest.approx(1.0)
 
 
-def test_recall_mismatched_length_raises(config: ConfigRepository) -> None:
-    evaluator = Evaluator(config=config)
+def test_recall_mismatched_length_raises(frozen_config: ConfigRepository) -> None:
+    evaluator = Evaluator(config=frozen_config)
     with pytest.raises(ValueError, match="retrieved_per_query length"):
         evaluator.measure_retrieval_recall("7", [["foo"]])
 
 
-def test_recall_empty_gold_returns_zero(config: ConfigRepository) -> None:
+def test_recall_empty_gold_returns_zero(frozen_config: ConfigRepository) -> None:
     # Pillar 1 ships without a gold directory (tabular profile — gold optional).
-    evaluator = Evaluator(config=config)
+    evaluator = Evaluator(config=frozen_config)
     assert evaluator.measure_retrieval_recall("1", []) == 0.0
