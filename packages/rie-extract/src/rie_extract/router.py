@@ -43,9 +43,7 @@ class AdapterRouter:
 
     enable_vlm: bool = False
 
-    def pick(
-        self, doc_meta: DocumentMeta, *, source_path: str | Path | None = None
-    ) -> Extractor:
+    def pick(self, doc_meta: DocumentMeta, *, source_path: str | Path | None = None) -> Extractor:
         return pick_adapter(doc_meta, source_path=source_path, enable_vlm=self.enable_vlm)
 
 
@@ -54,6 +52,7 @@ def pick_adapter(
     *,
     source_path: str | Path | None = None,
     enable_vlm: bool | None = None,
+    raw: bytes | None = None,
 ) -> Extractor:
     """Return the best-fit extractor for ``doc_meta``.
 
@@ -92,7 +91,19 @@ def pick_adapter(
         return HtmlExtractor()
     if _any_part_suffix(hint_parts, ".txt"):
         return TextExtractor()
-    # Default: plain text. Safer than guessing PDF on raw bytes.
+
+    # No filename/URL hint — sniff the content's magic bytes. This is
+    # deterministic, not a guess: %PDF- and HTML signatures are unambiguous,
+    # and prevents binary PDF bytes from being mis-handled as plain text.
+    if raw is not None:
+        head = raw[:1024]
+        if head[:5] == b"%PDF-":
+            return BornDigitalPdfExtractor()
+        lowered = head.lstrip().lower()
+        if lowered.startswith((b"<!doctype html", b"<html")) or b"<html" in lowered:
+            return HtmlExtractor()
+
+    # Default: plain text (the .txt fallback).
     return TextExtractor()
 
 
