@@ -28,7 +28,16 @@
           },
           "effective_date": { "type": ["string", "null"], "format": "date" },
           "sha256_hash": { "type": ["string", "null"] },
-          "language": { "type": "string" }
+          "language": { "type": "string" },
+          "law_number_ref": {
+            "type": ["string", "null"],
+            "description": "Official law/act number reference (e.g. 'Act 709', 'No. 9 of 1988'). OPTIONAL. NB: the frozen rie-contracts SourceRegistryEntry model (extra='forbid') does NOT yet carry this field, so ConfigRepository.load_source_registry will REJECT any entry that sets it until the contract is extended. Do NOT populate on loaded entries until then — escalated to lead."
+          },
+          "last_amended": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Date of the most recent amendment in force. OPTIONAL. Same frozen-contract caveat as law_number_ref — not yet on the pydantic model; do NOT populate on loaded entries until the contract is extended."
+          }
         }
       }
     },

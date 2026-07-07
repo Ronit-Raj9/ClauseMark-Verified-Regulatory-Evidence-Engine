@@ -87,7 +87,8 @@
               "tier_4_informal"
             ]
           }
-        }
+        },
+        "weight": { "type": "number", "minimum": 0 }
       }
     }
   }
