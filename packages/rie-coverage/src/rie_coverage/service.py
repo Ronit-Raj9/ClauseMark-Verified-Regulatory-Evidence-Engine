@@ -20,6 +20,7 @@ from rie_contracts import (
     CoverageState,
 )
 
+from rie_coverage.authoritative_sources import is_defensible_zero
 from rie_coverage.policy import (
     classify,
     filter_qualifying_claims,
@@ -87,3 +88,59 @@ class CoverageReasoner(CoverageReasonerPort):
             reason=format_insufficient_coverage_reason(),
             verified_claim_ids=[],
         )
+
+    def evaluate_defensible(
+        self,
+        jurisdiction: str,
+        indicator_id: str,
+        verified_claims: Sequence[Claim],
+        gold_recall: float | None,
+        *,
+        reachability: float | None = None,
+    ) -> CoverageRecord:
+        """Phase 2 §7 upgrade: same 3-state output, defensibility-aware reason.
+
+        This is a strict superset of :meth:`evaluate` — the returned
+        ``CoverageRecord`` schema is UNCHANGED (still one of exactly three
+        :class:`CoverageState` values) and a bare ``0`` is STILL never emitted.
+        The only difference appears in the ``NO_EVIDENCE_IN_SEARCHED_CORPUS``
+        branch: the ``reason`` string is enriched with a defensibility verdict
+        derived from :func:`is_defensible_zero` over the measured gold-set
+        recall AND the authoritative-source ``reachability``.
+
+        * When recall and reachability both clear their floors, the reason
+          marks the result a **defensible-0 candidate** — a signal that a human
+          reviewer MAY treat the absence as a real ``0``. The state is NOT
+          changed and no ``0`` is written.
+        * Otherwise the reason marks the result **bounded** "no evidence in
+          searched corpus", noting the recall/reachability shortfall.
+
+        ``reachability`` defaults to ``0.0`` when omitted, which can never on
+        its own make an absence defensible — the conservative default.
+        """
+        base = self.evaluate(jurisdiction, indicator_id, verified_claims, gold_recall)
+
+        if base.state != CoverageState.NO_EVIDENCE_IN_SEARCHED_CORPUS:
+            return base
+
+        # Reachable only when gold_recall is not None — evaluate() enforces it.
+        assert gold_recall is not None
+        reach = 0.0 if reachability is None else reachability
+        defensible = is_defensible_zero(base.state, reach, gold_recall)
+
+        if defensible:
+            verdict = (
+                f"defensible-0 candidate: gold-set recall {gold_recall:.2f} and "
+                f"authoritative-source reachability {reach:.2f} both clear their "
+                "floors, so a reviewer MAY treat this absence as a real 0 "
+                "(still not auto-emitted)"
+            )
+        else:
+            verdict = (
+                f"bounded no-evidence: gold-set recall {gold_recall:.2f}, "
+                f"authoritative-source reachability {reach:.2f} below floor — "
+                "sources may be unreachable; NOT a defensible 0"
+            )
+
+        enriched_reason = f"{base.reason}; {verdict}"
+        return base.model_copy(update={"reason": enriched_reason})
