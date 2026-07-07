@@ -18,6 +18,7 @@ import typer
 from rie_config import ConfigError, ConfigRepository
 from rie_contracts import GoldItem
 
+from rie_eval.gold_harness import score_against_gold
 from rie_eval.hallucinated_words import compute_hallucinated_words_rate
 from rie_eval.service import Evaluator
 
@@ -197,6 +198,87 @@ def recall(
     evaluator = Evaluator(config=config, repo=None)
     score = evaluator.measure_retrieval_recall(pillar, payload)
     typer.echo(f"retrieval_recall[pillar {pillar}] = {score:.4f}")
+
+
+# ─── gold-score ────────────────────────────────────────────────────────────
+
+
+@app.command("gold-score")
+def gold_score(
+    pillar: Annotated[str, typer.Option("--pillar", "-p", help="Pillar id (e.g. '6').")],
+    predicted: Annotated[
+        Path,
+        typer.Option(
+            "--predicted",
+            help="JSON file: a list of predicted-provision records (see gold_harness docs).",
+        ),
+    ],
+    repo_root: Annotated[
+        Path | None,
+        typer.Option("--repo-root", help="Override repo root."),
+    ] = None,
+    as_json: Annotated[
+        bool,
+        typer.Option("--json", help="Emit the full score dict as JSON instead of the table."),
+    ] = False,
+) -> None:
+    """Score predicted provisions against the gold set; print an F1 table.
+
+    Substantive-Accuracy (40%) benchmark. ``--predicted`` points at a JSON
+    array of records (keys: jurisdiction, indicator_id, doc_id, span_text,
+    score_band, authority_tier, discovery_tag). Gold is loaded via rie_config
+    for ``--pillar``. Scoring is per (indicator, law) provision pair.
+    """
+    repo_root = repo_root if repo_root is not None else _repo_root_option()
+    if not predicted.exists():
+        typer.echo(f"missing file: {predicted}", err=True)
+        raise typer.Exit(code=1)
+    payload = json.loads(predicted.read_text(encoding="utf-8"))
+    # Accept either a bare list, or {"items": [...]} / {"provisions": [...]}.
+    if isinstance(payload, dict):
+        records = payload.get("items") or payload.get("provisions") or []
+    else:
+        records = payload
+    if not isinstance(records, list) or any(not isinstance(r, dict) for r in records):
+        typer.echo("--predicted must be a JSON list of record objects", err=True)
+        raise typer.Exit(code=1)
+
+    config = ConfigRepository(repo_root=repo_root)
+    gold = list(config.load_gold(pillar))
+    result = score_against_gold(records, gold)
+
+    if as_json:
+        typer.echo(json.dumps(result, indent=2, sort_keys=True))
+        return
+
+    counts = result["counts"]
+    assert isinstance(counts, dict)
+    typer.echo(f"== gold-score: pillar {pillar} ==")
+    typer.echo(
+        f"gold={counts['gold_total']}  predicted={counts['predicted_total']}  "
+        f"tp={counts['tp']}  fn={counts['fn']}  fp={counts['fp']}"
+    )
+    typer.echo(
+        f"precision={result['precision']:.4f}  recall={result['recall']:.4f}  "
+        f"f1={result['f1']:.4f}  (macro, per-provision)"
+    )
+    typer.echo(
+        f"field_accuracy={result['field_accuracy']:.4f}  "
+        f"citation_fidelity={result['citation_fidelity']:.4f}  "
+        f"false_zero_rate={result['false_zero_rate']:.4f}  "
+        f"discovery_new={result['discovery_new_count']}"
+    )
+    typer.echo("")
+    per_indicator = result["per_indicator"]
+    assert isinstance(per_indicator, dict)
+    typer.echo(f"{'indicator':<10}{'P':>8}{'R':>8}{'F1':>8}{'support':>9}{'field':>8}{'cite':>8}")
+    typer.echo("-" * 59)
+    for ind in sorted(per_indicator):
+        row = per_indicator[ind]
+        typer.echo(
+            f"{ind:<10}{row['precision']:>8.3f}{row['recall']:>8.3f}{row['f1']:>8.3f}"
+            f"{int(row['support']):>9}{row['field_accuracy']:>8.3f}{row['citation_fidelity']:>8.3f}"
+        )
 
 
 # ─── hallucinated ────────────────────────────────────────────────────────────
