@@ -21,8 +21,11 @@ def test_registry_has_all_12_pillars(repo: ConfigRepository) -> None:
 def test_registry_status_distribution(repo: ConfigRepository) -> None:
     entries = repo.load_registry()
     built = {e.pillar_id for e in entries if e.status == "built"}
-    # Phase 2: all 12 pillars ship as schema-valid config; 6/7 deep + 8/9/12 demo gold.
-    assert built == {str(i) for i in range(1, 13)}
+    # Built = digital-governance cluster (6/7 deep, 8/9/12 Phase-2 deepened + gold).
+    # 1-5/10/11 remain honest stubs (different doc profiles, no gold yet).
+    assert built == {"6", "7", "8", "9", "12"}
+    stubs = {e.pillar_id for e in entries if e.status == "stub"}
+    assert stubs == {"1", "2", "3", "4", "5", "10", "11"}
 
 
 def test_load_pillar_06_deep(repo: ConfigRepository) -> None:
