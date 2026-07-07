@@ -61,3 +61,13 @@ node_modules/
 *.tsbuildinfo
 packages/rie-ui-web/dist/
 packages/rie-ui-web/.env.local
+
+# Large reference material & generated artifacts (keep local, don't version)
+# Hackathon knowledge pack: ~62 MB of PDFs, workshop recordings, databases.
+Hackthon Knowledge Products/
+RDTII2-1.png
+# Generated pipeline run outputs at repo root (mirrors data/outputs/ rule).
+/outputs/
+# Generated RDTII DB analysis dumps (produced by scripts/analyze_rdtii_db.py).
+scripts/rdtii_db_analysis.json
+scripts/rdtii_db_summary.json
