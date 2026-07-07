@@ -4,79 +4,153 @@ cluster: "digital_governance"
 document_profile: "statutory_legal_text"
 status: "built"
 description: >
-  Legal recognition of electronic signatures and contracts, online consumer
-  protection, and membership in core UNCITRAL / UN instruments (MLEC, MLES,
-  e-Communications Convention).
+  Legal recognition of electronic signatures and contracts, enforceability of
+  data messages, online consumer protection, and membership in the core UNCITRAL
+  / UN instruments. Reference frameworks are the UNCITRAL Model Law on Electronic
+  Commerce (MLEC 1996), the Model Law on Electronic Signatures (MLES 2001), the
+  UN Convention on the Use of Electronic Communications in International Contracts
+  (ECC 2005), and the Model Law on Electronic Transferable Records (MLETR 2017).
+  The pillar rewards functional-equivalence and technology-neutrality principles.
 
 indicators:
   - indicator_id: "12.1"
-    name: "Electronic signature recognition"
+    name: "Electronic signature recognition (functional equivalence)"
     definition: >
       Whether electronic signatures have legal recognition equivalent to
-      handwritten signatures for the formation and execution of contracts.
+      handwritten signatures for the formation and execution of contracts, under
+      a technology-neutral functional-equivalence rule.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No legal recognition."
-      "0.5": "Recognition limited to specified contexts or qualified signatures only."
-      "1": "General functional-equivalence recognition for electronic signatures."
+      "0": "No legal recognition of electronic signatures."
+      "0.5": "Recognition limited to specified contexts or to qualified / prescribed signatures only."
+      "1": "General functional-equivalence recognition; signature not denied effect solely for being electronic."
     positive_keywords:
       en: ["electronic signature", "digital signature", "shall not be denied legal effect",
-           "functional equivalent", "advanced electronic signature"]
+           "functional equivalent", "advanced electronic signature", "reliable as appropriate"]
     negative_cues:
-      en: ["wet signature required", "handwritten signature is mandatory"]
+      en: ["wet signature required", "handwritten signature is mandatory",
+           "signature must be on paper"]
+    few_shot_examples:
+      - text: |
+          Where the law requires a signature of a person, that requirement is met
+          in relation to a data message if a method is used to identify that
+          person and to indicate that person's approval of the information
+          contained in the data message, and that method is as reliable as was
+          appropriate for the purpose for which the data message was generated.
+        decomposition:
+          subject: "any person whose signature the law requires"
+          rule: "signature requirement met by a reliable identification-and-approval method on a data message"
+          standard: "reliability appropriate to the purpose"
+        label: "12.1"
+        score: 1
+        rationale: >
+          Verbatim MLEC Article 7 functional-equivalence rule for signatures —
+          technology-neutral, generally applicable. Recognition confined to
+          qualified signatures only would score 0.5; reviewer confirms.
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "12.2"
     name: "Online consumer protection"
     definition: >
-      Whether the law provides specific consumer protections for online
-      transactions (pre-contract information, right of withdrawal, recourse).
+      Whether the law provides specific consumer protections for online and
+      distance transactions: pre-contract information, a right of withdrawal /
+      cooling-off period, and a redress mechanism.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
       "0": "No online-specific consumer protection."
       "0.5": "Partial protections (e.g. pre-contract disclosure only)."
-      "1": "Full set: disclosure, withdrawal / cooling-off, redress mechanism."
+      "1": "Full set: pre-contract disclosure, withdrawal / cooling-off, and redress mechanism."
     positive_keywords:
       en: ["right to withdraw", "cooling-off period", "pre-contract information",
-           "consumer protection", "distance selling", "online consumer"]
+           "consumer protection", "distance selling", "online consumer", "right of return"]
     negative_cues:
-      en: ["does not apply to electronic transactions"]
+      en: ["does not apply to electronic transactions", "no right of withdrawal"]
+    few_shot_examples:
+      - text: |
+          Before concluding a distance contract, a trader shall provide the
+          consumer with the main characteristics of the goods, the total price,
+          and the conditions for exercising the right of withdrawal, which the
+          consumer may exercise within fourteen days without giving any reason,
+          and shall make available an out-of-court complaints procedure.
+        decomposition:
+          subject: "trader in a distance contract"
+          obligations: "pre-contract disclosure + 14-day right of withdrawal + complaints procedure"
+        label: "12.2"
+        score: 1
+        rationale: >
+          Full triad: disclosure, cooling-off withdrawal right, and redress.
+          Disclosure-only or withdrawal-only regimes score 0.5; reviewer confirms.
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "12.3"
-    name: "Electronic contract validity"
+    name: "Electronic contract validity and enforceability"
     definition: >
-      Whether contracts concluded by electronic means are recognised as valid
-      and enforceable on the same footing as paper contracts.
+      Whether contracts concluded by electronic means (data messages) are
+      recognised as valid and enforceable on the same footing as paper contracts,
+      including satisfaction of writing and "original" requirements.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
       "0": "Electronic contracts not enforceable."
-      "0.5": "Enforceable subject to formalities (e.g. specified categories excluded)."
-      "1": "Generally enforceable; functional equivalence applied."
+      "0.5": "Enforceable subject to formalities, or with broad categories excluded."
+      "1": "Generally enforceable; functional equivalence for writing and original applied."
     positive_keywords:
       en: ["electronic contract", "by electronic means", "data message",
-           "shall not be denied validity", "writing requirement is met"]
+           "shall not be denied validity", "writing requirement is met",
+           "offer and acceptance may be expressed by data messages"]
     negative_cues:
-      en: ["paper original required", "void if concluded electronically"]
+      en: ["paper original required", "void if concluded electronically",
+           "shall be in writing on paper"]
+    few_shot_examples:
+      - text: |
+          A contract shall not be denied validity or enforceability solely on the
+          ground that it was concluded by means of data messages, and in the
+          context of contract formation an offer and the acceptance of an offer
+          may be expressed by means of data messages.
+        decomposition:
+          subject: "any contract concluded by data messages"
+          rule: "no denial of validity solely for being electronic; offer/acceptance by data message"
+        label: "12.3"
+        score: 1
+        rationale: >
+          MLEC Article 11 contract-formation rule plus the non-discrimination
+          principle. Regimes that exclude broad categories (e.g. real property,
+          wills) score 0.5; reviewer confirms.
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "12.4"
-    name: "Spam / unsolicited commercial communications regulation"
+    name: "Unsolicited commercial communications (spam) regulation"
     definition: >
-      Whether unsolicited commercial electronic communications are regulated
-      (opt-in, opt-out, sender identification, complaints regime).
+      Whether unsolicited commercial electronic communications are regulated —
+      consent basis (opt-in / opt-out), sender identification, and an
+      unsubscribe / enforcement regime.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No regulation."
+      "0": "No regulation of unsolicited commercial communications."
       "0.5": "Opt-out regime only."
       "1": "Opt-in (prior consent) regime with sender identification and enforcement."
     positive_keywords:
       en: ["unsolicited commercial", "spam", "prior consent", "opt-in", "opt-out",
-           "unsubscribe", "electronic marketing"]
+           "unsubscribe", "electronic marketing", "clearly identifiable as a commercial communication"]
+    negative_cues:
+      en: ["no regulation of marketing emails", "consent not required"]
+    few_shot_examples:
+      - text: |
+          A person shall not send a commercial electronic message unless the
+          recipient has given prior consent, the message clearly identifies the
+          sender, and the message contains a functional facility by which the
+          recipient may unsubscribe.
+        decomposition:
+          subject: "any sender of commercial electronic messages"
+          conditions: "prior consent (opt-in) + sender identification + unsubscribe facility"
+        label: "12.4"
+        score: 1
+        rationale: >
+          Opt-in consent plus identification and unsubscribe — the strongest
+          band. An opt-out-only regime scores 0.5; reviewer confirms.
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "12.10"

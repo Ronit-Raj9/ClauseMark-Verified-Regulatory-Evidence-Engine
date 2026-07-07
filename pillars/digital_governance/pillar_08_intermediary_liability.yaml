@@ -4,67 +4,130 @@ cluster: "digital_governance"
 document_profile: "statutory_legal_text"
 status: "built"
 description: >
-  Liability regime for online intermediaries (hosts, conduits, search engines)
-  for third-party content. Covers conditional safe harbours, notice-and-action
-  duties, and any general monitoring obligation.
+  Liability regime for online intermediaries (hosting providers, mere conduits,
+  caching services, search engines, marketplaces) for third-party content.
+  Covers conditional safe harbours, notice-and-action duties, counter-notice and
+  appeal rights, the prohibition on general (proactive) monitoring, and
+  transparency-reporting obligations. The reference frameworks are the EU
+  e-Commerce Directive (2000/31/EC) Articles 12-15, the EU Digital Services Act
+  (Regulation 2022/2065), and the US DMCA section 512 / CDA section 230 model.
 
 indicators:
   - indicator_id: "8.1"
     name: "Conditional intermediary safe harbour"
     definition: >
       Whether the law grants intermediaries conditional immunity from liability
-      for third-party content provided defined conditions are met (e.g. lack of
-      actual knowledge, expeditious removal upon notice).
+      for third-party content where defined conditions are met (e.g. lack of
+      actual knowledge, no editorial role, expeditious removal upon obtaining
+      knowledge). The canonical structure is a general non-liability rule subject
+      to forfeiture conditions.
     evaluation_method: "clause_extraction"
     clause_pattern: "conditional_regime"
     scoring_criteria:
-      "0": "No safe harbour; intermediaries face strict or primary liability."
+      "0": "No safe harbour; intermediaries face strict or primary liability for third-party content."
       "0.5": "Narrow or sectoral safe harbour (e.g. mere conduit only, or copyright only)."
       "1": "General conditional safe harbour covering hosting, caching, and conduit functions."
     positive_keywords:
       en: ["safe harbour", "safe harbor", "mere conduit", "shall not be liable",
            "no liability", "limitation of liability", "intermediary service provider",
-           "hosting service", "actual knowledge"]
+           "hosting service", "actual knowledge", "passive and neutral"]
     negative_cues:
-      en: ["strictly liable", "primary liability", "shall be liable for all content"]
+      en: ["strictly liable", "primary liability", "shall be liable for all content",
+           "jointly and severally liable for user content"]
+    few_shot_examples:
+      - text: |
+          A provider of a hosting service shall not be liable for information
+          stored at the request of a recipient of the service, on condition that
+          the provider does not have actual knowledge of illegal activity or
+          illegal content and, upon obtaining such knowledge, acts expeditiously
+          to remove or to disable access to that content.
+        decomposition:
+          subject: "provider of a hosting service"
+          general_rule: "not liable for stored third-party information"
+          forfeiture_condition: "actual knowledge of illegal content and failure to act expeditiously"
+        label: "8.1"
+        score: 1
+        rationale: >
+          Classic conditional safe harbour: a general non-liability rule for
+          hosted content, forfeited only on actual knowledge plus failure to act
+          (Article 14 e-Commerce Directive / DSA Article 6 structure). Coverage
+          across functions (0.5 vs 1) is a regime-level judgment a reviewer must
+          confirm.
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "8.2"
     name: "Notice-and-action procedure"
     definition: >
-      Whether the law defines a formal notice-and-action procedure (notice,
-      removal, counter-notice / appeal) for allegedly unlawful content.
+      Whether the law defines a formal notice-and-action procedure (submission of
+      a notice, removal or disabling of access, acknowledgement) for allegedly
+      unlawful content hosted by an intermediary.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
       "0": "No defined procedure; ad-hoc removals only."
-      "0.5": "Notice-and-takedown defined but lacks counter-notice or appeal mechanism."
-      "1": "Full notice-and-action regime with counter-notice and appeal / restoration rights."
+      "0.5": "Notice-and-takedown defined but lacks structured form requirements or timelines."
+      "1": "Structured notice-and-action regime with form requirements, acknowledgement, and acting timelines."
     positive_keywords:
-      en: ["notice", "expeditiously remove", "disable access", "counter-notice",
-           "takedown", "notification", "put-back", "restoration"]
+      en: ["notice", "expeditiously remove", "disable access", "takedown",
+           "notification", "notice and action", "sufficiently substantiated",
+           "without undue delay", "acknowledgement of receipt"]
     negative_cues:
-      en: ["no procedure", "at discretion of the authority"]
+      en: ["no procedure", "at discretion of the authority", "no obligation to act on notices"]
+    few_shot_examples:
+      - text: |
+          Upon receipt of a notice that is sufficiently precise and adequately
+          substantiated, the hosting service provider shall act without undue
+          delay to remove or disable access to the content identified and shall
+          send the notifying party a confirmation of receipt of the notice.
+        decomposition:
+          subject: "hosting service provider"
+          trigger: "receipt of a precise, substantiated notice"
+          obligation: "act without undue delay to remove or disable access; confirm receipt"
+        label: "8.2"
+        score: 1
+        rationale: >
+          Structured notice-and-action: defined notice quality threshold,
+          acting timeline ("without undue delay"), and acknowledgement duty
+          (DSA Articles 16-17). Whether this is "full" (1) versus partial (0.5)
+          turns on presence of form/timeline detail — a reviewer confirms.
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "8.3"
-    name: "Absence of general monitoring obligation"
+    name: "Counter-notice and appeal / restoration mechanism"
     definition: >
-      Whether the law expressly prohibits a general obligation on intermediaries
-      to monitor user content, or instead imposes active-monitoring duties.
+      Whether the law gives the affected content provider a right to contest a
+      removal through a counter-notice, internal complaint, or appeal mechanism,
+      with possible restoration (put-back) of wrongly removed content.
     evaluation_method: "clause_extraction"
-    clause_pattern: "prohibition"
+    clause_pattern: "obligation"
     scoring_criteria:
-      "0": "Broad active-monitoring or filtering duty imposed."
-      "0.5": "Narrow monitoring duty for specific content categories."
-      "1": "No general monitoring obligation; express prohibition or silence with safe harbour."
+      "0": "No counter-notice, complaint, or appeal mechanism."
+      "0.5": "Internal complaint mechanism only, without independent or out-of-court redress."
+      "1": "Counter-notice / internal complaint plus access to independent or out-of-court dispute settlement and restoration."
     positive_keywords:
-      en: ["no general obligation to monitor", "shall not impose a general obligation",
-           "no duty to monitor"]
+      en: ["counter-notice", "put-back", "restoration", "internal complaint",
+           "out-of-court dispute settlement", "right to lodge a complaint",
+           "appeal", "redress against the decision"]
     negative_cues:
-      en: ["shall actively monitor", "general monitoring", "filter all content",
-           "proactive measures", "upload filter"]
-    authority_hints: ["tier_1_statute"]
+      en: ["no right of appeal", "decision is final", "no restoration of removed content"]
+    few_shot_examples:
+      - text: |
+          A recipient whose content has been removed shall have access, for a
+          period of at least six months, to an internal complaint-handling system
+          and may further submit the dispute to a certified out-of-court dispute
+          settlement body, following which wrongly removed content shall be
+          reinstated.
+        decomposition:
+          subject: "recipient whose content was removed"
+          right: "internal complaint and certified out-of-court dispute settlement"
+          remedy: "reinstatement of wrongly removed content"
+        label: "8.3"
+        score: 1
+        rationale: >
+          Both an internal complaint mechanism and an independent out-of-court
+          redress route with restoration (DSA Articles 20-21). Internal-only
+          mechanisms score 0.5; reviewer confirms the band.
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "8.4"
     name: "Knowledge standard for liability"
@@ -79,7 +142,93 @@ indicators:
       "1": "Actual knowledge standard applied generally."
     positive_keywords:
       en: ["actual knowledge", "upon obtaining knowledge", "upon becoming aware",
-           "where the provider has knowledge"]
+           "where the provider has knowledge", "actual awareness of facts"]
     negative_cues:
-      en: ["should have known", "constructive knowledge", "reason to know"]
+      en: ["should have known", "constructive knowledge", "reason to know",
+           "ought reasonably to have known"]
+    few_shot_examples:
+      - text: |
+          An intermediary loses the protection of this section only where it has
+          actual knowledge that specific content is unlawful and fails to act;
+          a general awareness that unlawful content may be present on the service
+          shall not constitute such knowledge.
+        decomposition:
+          subject: "intermediary"
+          standard: "actual knowledge of specific unlawful content"
+          exclusion: "general awareness is insufficient"
+        label: "8.4"
+        score: 1
+        rationale: >
+          Pure actual-knowledge standard with express rejection of constructive
+          knowledge. Mixed regimes (constructive for some categories) score 0.5;
+          reviewer confirms.
     authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "8.5"
+    name: "Prohibition on general (proactive) monitoring"
+    definition: >
+      Whether the law prohibits imposing a general obligation on intermediaries
+      to monitor the information they transmit or store, or to actively seek
+      facts indicating illegal activity (no upload filters mandated).
+    evaluation_method: "clause_extraction"
+    clause_pattern: "prohibition"
+    scoring_criteria:
+      "0": "Broad active-monitoring, upload-filtering, or proactive-detection duty imposed."
+      "0.5": "Narrow monitoring duty for specific content categories (e.g. CSAM, terrorism)."
+      "1": "Express prohibition on any general monitoring obligation."
+    positive_keywords:
+      en: ["no general obligation to monitor", "shall not impose a general obligation",
+           "no duty to monitor", "no general obligation to seek facts"]
+    negative_cues:
+      en: ["shall actively monitor", "general monitoring", "filter all content",
+           "proactive measures required", "upload filter", "shall prevent re-upload"]
+    few_shot_examples:
+      - text: |
+          No general obligation shall be imposed on intermediary service providers
+          to monitor the information which they transmit or store, nor to actively
+          seek facts or circumstances indicating illegal activity.
+        decomposition:
+          subject: "intermediary service providers"
+          prohibited_duty: "general monitoring of transmitted/stored information; active fact-seeking"
+        label: "8.5"
+        score: 1
+        rationale: >
+          Verbatim Article 15 e-Commerce Directive / DSA Article 8 no-general-
+          monitoring rule. A narrow category-specific monitoring carve-out would
+          drop this to 0.5; reviewer confirms.
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "8.6"
+    name: "Transparency reporting obligation"
+    definition: >
+      Whether intermediaries must publish periodic transparency reports on
+      content moderation — notices received, actions taken, orders from
+      authorities, and complaints resolved.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "No transparency reporting requirement."
+      "0.5": "Aggregate reporting only, or limited to one category (e.g. removal orders)."
+      "1": "Detailed periodic reporting on notices, actions, orders, and complaints."
+    positive_keywords:
+      en: ["transparency report", "shall publish", "annual report",
+           "number of notices", "content moderation report", "at least once a year"]
+    negative_cues:
+      en: ["no reporting obligation", "not required to publish"]
+    few_shot_examples:
+      - text: |
+          Providers of hosting services shall publish, at least once a year, a
+          report setting out the number of notices received, the action taken in
+          response, the number of orders received from public authorities, and the
+          number of complaints handled through the internal complaint system.
+        decomposition:
+          subject: "providers of hosting services"
+          obligation: "publish annual report"
+          contents: "notices received, actions taken, authority orders, complaints handled"
+        label: "8.6"
+        score: 1
+        rationale: >
+          Detailed periodic transparency reporting across all four dimensions
+          (DSA Article 15). Aggregate-only or single-category reporting scores
+          0.5; reviewer confirms.
+    authority_hints: ["tier_1_statute", "tier_2_regulation", "tier_3_guideline"]

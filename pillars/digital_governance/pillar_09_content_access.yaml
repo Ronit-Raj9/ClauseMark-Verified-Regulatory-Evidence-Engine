@@ -4,79 +4,258 @@ cluster: "digital_governance"
 document_profile: "statutory_legal_text"
 status: "built"
 description: >
-  Government powers to access electronic content, lawful intercept of
-  communications, and obligations on intermediaries to block or take down
-  content. Due-process safeguards (judicial authorisation, transparency,
-  appeal) are central.
+  State powers to access electronic content, intercept communications, compel
+  data retention, and obtain decryption assistance, together with the
+  due-process safeguards that constrain those powers. Reference frameworks
+  include the Council of Europe Convention on Cybercrime (Budapest Convention),
+  the ECtHR proportionality jurisprudence (Weber and Saravia, Big Brother Watch),
+  and the CJEU data-retention line (Digital Rights Ireland, Tele2, La Quadrature).
+  The pillar rewards prior judicial authorisation, necessity-and-proportionality
+  safeguards, and transparency; it flags untargeted retention and unconstrained
+  decryption mandates.
 
 indicators:
   - indicator_id: "9.1"
-    name: "Lawful intercept regime with judicial authorisation"
+    name: "Lawful intercept regime with prior judicial authorisation"
     definition: >
       Whether interception of electronic communications by state authorities
-      requires prior judicial authorisation under a defined lawful-intercept
-      statute.
+      requires prior authorisation by a judge or independent judicial body under
+      a defined lawful-intercept statute.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "Executive interception without judicial oversight."
-      "0.5": "Judicial authorisation required only for some categories or post-hoc review."
+      "0": "Executive interception without independent oversight."
+      "0.5": "Judicial authorisation required only for some categories, or only post-hoc review."
       "1": "Prior judicial warrant generally required for interception."
     positive_keywords:
       en: ["warrant", "judicial order", "court order", "prior authorisation by a judge",
-           "interception warrant", "issued by a judge", "magistrate"]
+           "interception warrant", "issued by a judge", "magistrate", "authorised in advance"]
     negative_cues:
       en: ["without judicial authorisation", "executive order", "Minister may direct",
-           "may intercept at its discretion"]
+           "may intercept at its discretion", "no warrant required"]
+    few_shot_examples:
+      - text: |
+          No authority shall intercept any communication except under a warrant
+          issued in advance by a judge of the High Court, who must be satisfied
+          that the interception is necessary and proportionate to a legitimate aim.
+        decomposition:
+          subject: "any authority"
+          general_rule: "no interception"
+          condition: "prior warrant from a High Court judge on necessity-and-proportionality grounds"
+        label: "9.1"
+        score: 1
+        rationale: >
+          Prior judicial warrant is the general rule for interception. Regimes
+          with only post-hoc review or category-limited judicial control score
+          0.5; the reviewer confirms the band.
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "9.2"
-    name: "Content takedown / blocking power"
+    name: "Content blocking / takedown power"
     definition: >
       Whether the law confers on a public authority the power to order
-      intermediaries to block, disable, or take down specified content.
+      intermediaries to block, disable, or take down specified content, and how
+      broadly that power is framed.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
       "0": "No defined blocking power."
-      "0.5": "Narrow blocking power (e.g. CSAM, terrorism only)."
+      "0.5": "Narrow blocking power confined to specific categories (e.g. CSAM, terrorism)."
       "1": "Broad blocking power across content categories."
     positive_keywords:
       en: ["shall block", "disable access", "restrict access to", "take down",
-           "removal order", "blocking order"]
+           "removal order", "blocking order", "direct the intermediary to remove"]
     negative_cues:
       en: ["no power to block", "blocking is prohibited"]
+    few_shot_examples:
+      - text: |
+          The Authority may, by written order, direct any intermediary to block
+          public access to any information that it considers prejudicial to public
+          order, decency, or the security of the State.
+        decomposition:
+          subject: "the Authority"
+          power: "order intermediaries to block public access"
+          scope: "broad — public order, decency, security of the State"
+        label: "9.2"
+        score: 1
+        rationale: >
+          Broad, open-textured blocking power spanning multiple content
+          categories. A power confined to CSAM or terrorism would score 0.5.
+          Breadth is a regime-level judgment a reviewer confirms.
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "9.3"
-    name: "Due-process safeguards for blocking / takedown"
+    name: "Due-process safeguards (notice, reasons, appeal)"
     definition: >
-      Whether the blocking / takedown regime provides for notification of the
-      affected party, reasons, and a right of appeal to an independent body.
+      Whether the intercept / blocking / takedown regime provides for
+      notification of the affected party, written reasons, and a right of appeal
+      to an independent or judicial body.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
       "0": "No notice, reasons, or appeal."
-      "0.5": "Some safeguards (notice OR appeal) but not all."
-      "1": "Notice, written reasons, and appeal to independent body all required."
+      "0.5": "Some safeguards (notice OR appeal) but not the full set."
+      "1": "Notice, written reasons, and appeal to an independent body all required."
     positive_keywords:
       en: ["right of appeal", "shall give reasons", "notice in writing",
-           "judicial review", "independent review", "may appeal"]
+           "judicial review", "independent review", "may appeal", "statement of reasons"]
     negative_cues:
-      en: ["no appeal", "without notice", "final and not subject to review"]
+      en: ["no appeal", "without notice", "final and not subject to review",
+           "no obligation to give reasons"]
+    few_shot_examples:
+      - text: |
+          Before a blocking order takes effect, the affected content provider
+          shall be notified in writing of the reasons for the order and may, within
+          fifteen days, appeal the order to an independent tribunal whose decision
+          is subject to judicial review.
+        decomposition:
+          subject: "affected content provider"
+          safeguards: "written notice + reasons + appeal to independent tribunal + judicial review"
+        label: "9.3"
+        score: 1
+        rationale: >
+          Full safeguard set: notice, written reasons, and appeal to an
+          independent body. Presence of only one or two of these scores 0.5;
+          reviewer confirms.
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "9.4"
-    name: "Transparency reporting obligation"
+    name: "Data-retention mandate and its targeting"
     definition: >
-      Whether the law requires the authority or intermediaries to publish
-      periodic transparency reports on intercept / blocking orders issued.
+      Whether the law imposes a communications data-retention obligation on
+      providers, and whether it is general/indiscriminate or targeted and
+      time-limited. Untargeted blanket retention is disfavoured under CJEU
+      jurisprudence (Tele2, La Quadrature du Net).
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "General, indiscriminate retention of all subscribers' traffic and location data."
+      "0.5": "Retention mandate present but partially targeted or time-limited."
+      "1": "No general retention; retention only targeted, time-limited, and subject to safeguards."
+    positive_keywords:
+      en: ["targeted retention", "time-limited", "shall not be retained beyond",
+           "expedited preservation", "no general retention obligation"]
+    negative_cues:
+      en: ["shall retain all traffic data", "general and indiscriminate retention",
+           "retain for not less than", "all subscriber data shall be stored"]
+    few_shot_examples:
+      - text: |
+          Service providers shall retain the traffic and location data of all
+          subscribers for a period of not less than twenty-four months and make
+          such data available to law-enforcement authorities on request.
+        decomposition:
+          subject: "service providers"
+          obligation: "retain all subscribers' traffic and location data >= 24 months"
+          access: "available to law enforcement on request"
+        label: "9.4"
+        score: 0
+        rationale: >
+          General and indiscriminate retention of all subscribers' data — the
+          paradigm the CJEU held disproportionate. A targeted, time-limited
+          regime would score 0.5 or 1; the negative score itself is a regime
+          judgment a reviewer must confirm.
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  - indicator_id: "9.5"
+    name: "Encryption / decryption assistance mandate"
+    definition: >
+      Whether the law compels providers or individuals to assist with
+      decryption, hand over keys, or build decryption capability, and whether
+      such mandates are constrained (judicial authorisation, no general weakening
+      of encryption, technical-feasibility limits).
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": "Mandatory key disclosure or built-in decryption capability with no safeguards."
+      "0.5": "Decryption assistance compellable but limited by judicial control or feasibility."
+      "1": "No general mandate to weaken encryption; assistance only where technically feasible and judicially authorised."
+    positive_keywords:
+      en: ["technically feasible", "shall not require weakening of encryption",
+           "subject to a court order", "no obligation to decrypt where not feasible",
+           "shall not mandate a backdoor"]
+    negative_cues:
+      en: ["shall provide the decryption key", "shall maintain a decryption capability",
+           "shall provide a means of decryption", "shall build capability to decrypt"]
+    few_shot_examples:
+      - text: |
+          A provider may be required, only pursuant to a court order, to render
+          such assistance with decryption as is technically feasible, and nothing
+          in this Act shall require a provider to weaken or remove the encryption
+          applied to its service generally.
+        decomposition:
+          subject: "provider"
+          mandate: "decryption assistance only on a court order, only where technically feasible"
+          safeguard: "no general weakening of encryption"
+        label: "9.5"
+        score: 1
+        rationale: >
+          Assistance is judicially gated and feasibility-limited, with an express
+          bar on general encryption weakening. Unconstrained key-disclosure or
+          backdoor mandates score 0; reviewer confirms.
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "9.6"
+    name: "Proportionality and necessity safeguard"
+    definition: >
+      Whether the law expressly conditions access / intercept / blocking powers
+      on a necessity-and-proportionality test, with reference to a legitimate aim
+      and the least-intrusive-means principle.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "conditional_regime"
+    scoring_criteria:
+      "0": "No necessity or proportionality requirement."
+      "0.5": "Necessity OR proportionality referenced, but not a full least-intrusive-means test."
+      "1": "Express necessity-and-proportionality test with least-intrusive-means requirement."
+    positive_keywords:
+      en: ["necessary and proportionate", "least intrusive", "no less intrusive means",
+           "proportionate to the legitimate aim", "strictly necessary", "necessary in a democratic society"]
+    negative_cues:
+      en: ["without regard to proportionality", "at the discretion of the authority",
+           "no proportionality requirement"]
+    few_shot_examples:
+      - text: |
+          A power under this Part may be exercised only where it is strictly
+          necessary and proportionate to a legitimate aim, and where no less
+          intrusive means would achieve that aim.
+        decomposition:
+          subject: "any power under this Part"
+          condition: "strict necessity + proportionality + least-intrusive-means"
+        label: "9.6"
+        score: 1
+        rationale: >
+          Full necessity-and-proportionality gate with an express least-intrusive-
+          means limb (ECtHR / CJEU standard). A clause citing only "necessity"
+          without proportionality scores 0.5; reviewer confirms.
+    authority_hints: ["tier_1_statute"]
+
+  - indicator_id: "9.7"
+    name: "Transparency reporting on access / intercept orders"
+    definition: >
+      Whether the law requires the authority or providers to publish periodic
+      statistics on interception, access, and blocking orders issued.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
       "0": "No transparency requirement."
-      "0.5": "Aggregate reporting only or limited to one side."
-      "1": "Detailed periodic reporting required from authority and / or intermediaries."
+      "0.5": "Aggregate reporting only, or limited to one side (authority OR providers)."
+      "1": "Detailed periodic reporting required from the authority and / or providers."
     positive_keywords:
-      en: ["transparency report", "annual report", "shall publish", "statistics on requests"]
+      en: ["transparency report", "annual report", "shall publish",
+           "statistics on requests", "number of interception warrants", "report to Parliament"]
+    negative_cues:
+      en: ["no reporting obligation", "shall be kept secret", "not subject to publication"]
+    few_shot_examples:
+      - text: |
+          The oversight Commissioner shall lay before Parliament each year a
+          report stating the number of interception warrants issued, the number
+          refused, and the number of blocking orders made during the year.
+        decomposition:
+          subject: "oversight Commissioner"
+          obligation: "annual report to Parliament"
+          contents: "warrants issued, warrants refused, blocking orders made"
+        label: "9.7"
+        score: 1
+        rationale: >
+          Detailed periodic reporting covering issuance, refusal, and blocking.
+          Aggregate-only or one-sided reporting scores 0.5; reviewer confirms.
     authority_hints: ["tier_1_statute", "tier_2_regulation", "tier_3_guideline"]
