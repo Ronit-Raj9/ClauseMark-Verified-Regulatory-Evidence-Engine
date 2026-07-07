@@ -1,0 +1,126 @@
+# Source registry — Singapore (UN name: Singapore). RDTII 2.1 Pillar 6 + 7
+# primary instruments. Authority tiers per rie-contracts AuthorityTier enum.
+#
+# CONTRACT GAP: per-source `law_number_ref` and `last_amended` are allowed by the
+# JSON schema but rejected by the frozen rie-contracts SourceRegistryEntry model
+# (extra="forbid"); they are therefore NOT set on entries below (folded into
+# `title` / comments). ESCALATED to lead (see report). Primary law source is
+# Singapore Statutes Online (sso.agc.gov.sg).
+jurisdiction: "Singapore"
+language: "en"
+sources:
+  # ── PDPA 2012 — 6.1/6.3/6.4/7.1/7.3/7.4 keystone (horizontal DP framework) ──
+  # law_number_ref: "No. 26 of 2012" | last_amended: 2020 (Act 40 of 2020)
+  - source_id: "sg_pdpa_2012"
+    title: "Personal Data Protection Act 2012 (No. 26 of 2012)"
+    source_url: "https://sso.agc.gov.sg/Act/PDPA2012"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "2014-07-02"
+    language: "en"
+
+  # PDPA (Amendment) Act 2020 — mandatory breach notice; s.26 transfer regime.
+  # law_number_ref: "No. 40 of 2020" | last_amended: 2020
+  - source_id: "sg_pdpa_amendment_2020"
+    title: "Personal Data Protection (Amendment) Act 2020 (No. 40 of 2020)"
+    source_url: "https://sso.agc.gov.sg/Acts-Supp/40-2020/"
+    local_path: null
+    document_type: "amendment"
+    authority_tier: "tier_1_statute"
+    effective_date: "2021-02-01"
+    language: "en"
+
+  # ── Banking Act 1970 — 7.1 financial-sector confidentiality (s.47) ──────────
+  # law_number_ref: "No. 41 of 1970" | last_amended: 2020
+  - source_id: "sg_banking_act_1970"
+    title: "Banking Act 1970 (No. 41 of 1970)"
+    source_url: "https://sso.agc.gov.sg/Act/BA1970"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "1971-01-01"
+    language: "en"
+
+  # ── Cybersecurity Act 2018 — 7.2 dedicated horizontal cyber framework ───────
+  # law_number_ref: "No. 9 of 2018" | last_amended: 2024
+  - source_id: "sg_cybersecurity_act_2018"
+    title: "Cybersecurity Act 2018 (No. 9 of 2018)"
+    source_url: "https://sso.agc.gov.sg/Acts-Supp/9-2018/"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "2018-08-31"
+    language: "en"
+
+  # ── Companies Act 1967 — 6.2 / 7.3 accounting-records (s.199) ────────────────
+  # law_number_ref: "No. 42 of 1967" | last_amended: 2022
+  - source_id: "sg_companies_act_1967"
+    title: "Companies Act 1967 (No. 42 of 1967)"
+    source_url: "https://sso.agc.gov.sg/Act/CoA1967"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "1967-12-29"
+    language: "en"
+
+  # ── Income Tax Act 1947 — 7.3 income-records retention (s.67) ───────────────
+  # law_number_ref: "No. 39 of 1947" | last_amended: 2023
+  - source_id: "sg_income_tax_act_1947"
+    title: "Income Tax Act 1947 (No. 39 of 1947)"
+    source_url: "https://sso.agc.gov.sg/Act/ITA1947"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "1948-01-01"
+    language: "en"
+
+  # ── Employment Act 1968 — 7.3 employment-records retention (s.95) ───────────
+  # law_number_ref: "No. 17 of 1968" | last_amended: 2022
+  - source_id: "sg_employment_act_1968"
+    title: "Employment Act 1968 (No. 17 of 1968)"
+    source_url: "https://sso.agc.gov.sg/Act/EmA1968"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "1968-08-15"
+    language: "en"
+
+  # ── Telecommunications Act 1999 — 7.3 sectoral data-record retention ────────
+  # law_number_ref: "No. 43 of 1999" | last_amended: 2023
+  - source_id: "sg_telecommunications_act_1999"
+    title: "Telecommunications Act 1999 (No. 43 of 1999)"
+    source_url: "https://sso.agc.gov.sg/Act/TA1999"
+    local_path: "details/Sample Kit/Sample legislations/General/Telecommunications Act 1999.pdf"
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "1999-11-01"
+    language: "en"
+
+  # ── Criminal Procedure Code 2010 — 7.5 government access (ss.39/40) ──────────
+  # law_number_ref: "No. 15 of 2010" | last_amended: 2018
+  - source_id: "sg_criminal_procedure_code_2010"
+    title: "Criminal Procedure Code 2010 (No. 15 of 2010)"
+    source_url: "https://sso.agc.gov.sg/Act/CPC2010"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "2011-01-02"
+    language: "en"
+
+discovery:
+  seed_urls:
+    - "https://sso.agc.gov.sg/"
+    - "https://www.pdpc.gov.sg/"
+    - "https://www.imda.gov.sg/"
+  crawl_patterns:
+    link_regexes:
+      - "/Act/"
+      - "/Acts-Supp/"
+      - "\\.pdf$"
+    mime_allow:
+      - "application/pdf"
+      - "text/html"
+  depth_limit: 2
+  crawl_delay_seconds: 1.0
+  max_pages: 200

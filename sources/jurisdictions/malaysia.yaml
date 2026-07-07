@@ -1,0 +1,136 @@
+# Source registry — Malaysia (UN name: Malaysia). RDTII 2.1 Pillar 6 + 7 primary
+# instruments. Authority tiers per rie-contracts AuthorityTier enum.
+#
+# CONTRACT GAP: the task asked for per-source `law_number_ref` and `last_amended`
+# keys. The JSON schema (sources/_schema/source_registry.schema.json) now ALLOWS
+# them, but the FROZEN rie-contracts `SourceRegistryEntry` model uses
+# extra="forbid" and has no such fields, so ConfigRepository.load_source_registry
+# would REJECT any entry that sets them. They are therefore NOT set on entries
+# below; the law number is folded into `title` and the amendment context noted in
+# comments. ESCALATED to lead (see report).
+jurisdiction: "Malaysia"
+language: "en"
+sources:
+  # ── Pillar 6 + 7 keystone: PDPA Act 709 (horizontal data protection) ────────
+  # law_number_ref: "Act 709" | last_amended: 2024 (Act A1727 / A1693, 2024)
+  - source_id: "my_pdpa_2010"
+    title: "Personal Data Protection Act 2010 (Act 709)"
+    source_url: "https://www.pdp.gov.my"
+    local_path: "details/Sample Kit/Sample legislations/General/PERSONAL DATA PROTECTION ACT 2010.pdf"
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "2010-06-10"
+    language: "en"
+    law_number_ref: "Act 709"
+    last_amended: "2010"
+
+  # PDP (Amendment) Act 2024 — adds DPO, 72-hr breach notice, stricter s.129.
+  # law_number_ref: "Act A1727 (2024)" | last_amended: 2024
+  - source_id: "my_pdpa_amendment_2024"
+    title: "Personal Data Protection (Amendment) Act 2024 (Act A1727)"
+    source_url: "https://www.pdp.gov.my/ppdpv1/akta/akta-pdppindaan-2024/"
+    local_path: null
+    document_type: "amendment"
+    authority_tier: "tier_1_statute"
+    effective_date: "2024-10-17"
+    language: "en"
+
+  # ── Cyber Security Act 2024 (Act 854) — 7.2 dedicated horizontal cyber law ──
+  # law_number_ref: "Act 854" | last_amended: 2024
+  - source_id: "my_cyber_security_act_2024"
+    title: "Cyber Security Act 2024 (Act 854)"
+    source_url: "https://www.kkd.gov.my"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "2024-08-26"
+    language: "en"
+
+  # Computer Crimes Act 1997 (Act 563) — pre-Act-854 cybercrime statute, 7.2.
+  # law_number_ref: "Act 563" | last_amended: 1997
+  - source_id: "my_computer_crimes_act_1997"
+    title: "Computer Crimes Act 1997 (Act 563)"
+    source_url: "https://ccid.rmp.gov.my"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "1997-06-30"
+    language: "en"
+
+  # ── Sectoral codes of practice issued under the PDPA (tier_3 guidelines) ────
+  - source_id: "my_pdp_code_banking_2017"
+    title: "Personal Data Protection Code of Practice for the Banking and Financial Sector 2017"
+    source_url: "https://www.pdp.gov.my/ppdpv1/en/akta/personal-data-protection-code-of-practice-for-banking-sector-and-financial-institutions/"
+    local_path: null
+    document_type: "guideline"
+    authority_tier: "tier_3_guideline"
+    effective_date: "2017-01-01"
+    language: "en"
+
+  - source_id: "my_pdp_code_communications_2017"
+    title: "Personal Data Protection Code of Practice for Licensees under the Communications and Multimedia Act 1998, 2017"
+    source_url: "https://www.pdp.gov.my/ppdpv1/en/akta/personal-data-protection-code-of-practice-for-the-communications-sector/"
+    local_path: null
+    document_type: "guideline"
+    authority_tier: "tier_3_guideline"
+    effective_date: "2017-01-01"
+    language: "en"
+
+  # ── Tax statutes carrying local-retention obligations (6.2 / 7.3) ───────────
+  # law_number_ref: "Act 53" | last_amended: 2023
+  - source_id: "my_income_tax_act_1967"
+    title: "Income Tax Act 1967 (Act 53)"
+    source_url: "https://www.hasil.gov.my/en/legislation/act/"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "1967-09-28"
+    language: "en"
+
+  # law_number_ref: "Act 807" | last_amended: 2018
+  - source_id: "my_service_tax_act_2018"
+    title: "Service Tax Act 2018 (Act 807)"
+    source_url: "https://www.investmalaysia.gov.my"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "2018-09-01"
+    language: "en"
+
+  # ── 7.5 government-access statutes ───────────────────────────────────────────
+  # law_number_ref: "Act 747" | last_amended: 2012
+  - source_id: "my_sosma_2012"
+    title: "Security Offences (Special Measures) Act 2012 (Act 747)"
+    source_url: "https://www.agc.gov.my"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "2012-07-31"
+    language: "en"
+
+  # law_number_ref: "Act 593" | last_amended: 2018
+  - source_id: "my_criminal_procedure_code"
+    title: "Criminal Procedure Code (Act 593)"
+    source_url: "https://www.agc.gov.my"
+    local_path: null
+    document_type: "statute"
+    authority_tier: "tier_1_statute"
+    effective_date: "1976-01-10"
+    language: "en"
+
+discovery:
+  seed_urls:
+    - "https://www.pdp.gov.my/"
+    - "https://www.hasil.gov.my/en/legislation/act/"
+    - "https://ccid.rmp.gov.my/"
+    - "https://www.kkd.gov.my/"
+  crawl_patterns:
+    link_regexes:
+      - "/(akta|act|legislation|code-of-practice)/"
+      - "\\.pdf$"
+    mime_allow:
+      - "application/pdf"
+      - "text/html"
+  depth_limit: 2
+  crawl_delay_seconds: 1.0
+  max_pages: 200
