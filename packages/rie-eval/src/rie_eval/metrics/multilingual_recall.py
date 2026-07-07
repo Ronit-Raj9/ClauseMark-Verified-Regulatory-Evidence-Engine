@@ -89,9 +89,5 @@ def compute_multilingual_recall(
             )
         )
 
-    macro = (
-        sum(lr.recall_at_k for lr in per_language) / len(per_language)
-        if per_language
-        else 0.0
-    )
+    macro = sum(lr.recall_at_k for lr in per_language) / len(per_language) if per_language else 0.0
     return MultilingualRecallReport(per_language=per_language, macro_recall=macro)

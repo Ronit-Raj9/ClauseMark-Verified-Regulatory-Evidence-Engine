@@ -100,9 +100,7 @@ def compute_external_recall(
             out_of_corpus_count=0,
             external_recall=0.0,
         )
-    out_count = sum(
-        1 for item in gold_items if _is_out_of_corpus(item, ingested_doc_ids, side)
-    )
+    out_count = sum(1 for item in gold_items if _is_out_of_corpus(item, ingested_doc_ids, side))
     return ExternalRecallReport(
         total_gold=total,
         out_of_corpus_count=out_count,
