@@ -35,7 +35,7 @@ class ExtractionService:
         doc_meta: DocumentMeta,
         raw: bytes,
     ) -> tuple[Sequence[Element], Sequence[StructureEdge]]:
-        adapter: Extractor = pick_adapter(doc_meta)
+        adapter: Extractor = pick_adapter(doc_meta, raw=raw)
         elements, adapter_edges = adapter.extract(doc_meta, raw)
 
         # Graph builder runs over whatever the adapter produced; edges from
