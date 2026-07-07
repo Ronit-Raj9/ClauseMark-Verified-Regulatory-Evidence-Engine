@@ -15,6 +15,11 @@ Public surface:
 * :mod:`rie_coverage.policy` — pure-function helpers documenting the policy.
 """
 
+from rie_coverage.authoritative_sources import (
+    AuthoritativeSourceCheck,
+    assess_reachability,
+    is_defensible_zero,
+)
 from rie_coverage.corpus_completeness import (
     DEFAULT_EXPECTED_SOURCE_TYPES,
     DOWNGRADE_THRESHOLD,
@@ -27,6 +32,7 @@ from rie_coverage.corpus_completeness import (
     format_corpus_incomplete_reason,
     load_manifest,
 )
+from rie_coverage.cross_corpus import CorpusRecall, CrossCorpusRecall
 from rie_coverage.layer2_service import Layer2ScoringService
 from rie_coverage.policy import (
     classify,
@@ -44,11 +50,15 @@ from rie_coverage.service import CoverageReasoner
 __all__ = [
     "DEFAULT_EXPECTED_SOURCE_TYPES",
     "DOWNGRADE_THRESHOLD",
+    "AuthoritativeSourceCheck",
     "CompletenessReport",
     "CorpusManifest",
+    "CorpusRecall",
     "CoverageReasoner",
+    "CrossCorpusRecall",
     "EnrichedCoverageRow",
     "Layer2ScoringService",
+    "assess_reachability",
     "build_layer2_from_pillar",
     "build_layer2_recommendation",
     "classify",
@@ -57,6 +67,7 @@ __all__ = [
     "enrich_with_completeness",
     "format_corpus_incomplete_reason",
     "format_no_evidence_reason",
+    "is_defensible_zero",
     "load_manifest",
     "miss_pct_from_recall",
     "recommend_band",
