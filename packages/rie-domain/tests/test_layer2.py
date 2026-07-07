@@ -103,8 +103,7 @@ def _claim(*, claim_id: str = "claim_001", regime: LegalRegime | None = None) ->
                 char_end=10,
             )
         ],
-        regime=regime
-        or LegalRegime(primary_element_id="elem_1", member_element_ids=["elem_1"]),
+        regime=regime or LegalRegime(primary_element_id="elem_1", member_element_ids=["elem_1"]),
         layer1_status=Layer1Status.VERIFIED,
         created_at=datetime(2026, 5, 24, tzinfo=UTC),
     )

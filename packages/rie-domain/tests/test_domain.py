@@ -209,9 +209,7 @@ def test_build_citation_span_element_mismatch_raises() -> None:
         char_end=1,
         extraction_confidence=1.0,
     )
-    span = EvidenceSpan(
-        span_id="d1#0-1", element_id="OTHER", doc_id="d1", char_start=0, char_end=1
-    )
+    span = EvidenceSpan(span_id="d1#0-1", element_id="OTHER", doc_id="d1", char_start=0, char_end=1)
     with pytest.raises(ValueError, match="span/element mismatch"):
         build_citation(span, element, doc, "x")
 
