@@ -35,6 +35,7 @@ to catch.
 
 from __future__ import annotations
 
+import os
 from collections import Counter
 from collections.abc import Iterable, Mapping
 from datetime import UTC, datetime
@@ -50,10 +51,13 @@ from rie_contracts import (
 )
 from rie_contracts.ports import ElementTextResolver
 
+from rie_verify.adversarial import AdversarialPanel, OllamaRefuter
 from rie_verify.confidence import ConfidenceScreenResult, apply_confidence_routing
+from rie_verify.entity_grounding import EntityGroundingChecker, SpacyEntityExtractor
 from rie_verify.kg_grounding import KgGroundingResult, run_kg_grounding_gate
 from rie_verify.nli import NliBackend
 from rie_verify.second_llm import SecondLlmBackend
+from rie_verify.source_refetch import HttpSourceFetcher, SourceFetcher, verify_source_live
 
 # Tier-B thresholds — held here, not in pillar configs (these are engine-wide
 # verifier hyper-parameters, not pillar-specific logic).
@@ -79,15 +83,78 @@ class VerificationService:
         *,
         nli_entailment_threshold: float = _NLI_ENTAILMENT_THRESHOLD,
         kg_gate_enabled: bool = False,
+        entity_grounder: EntityGroundingChecker | None = None,
+        adversarial: AdversarialPanel | None = None,
+        source_fetcher: SourceFetcher | None = None,
     ) -> None:
         self._nli: NliBackend = nli_model
         self._second_llm: SecondLlmBackend = second_llm
         self._nli_threshold: float = nli_entailment_threshold
         self._kg_gate_enabled: bool = kg_gate_enabled
+        # Phase-2 ADVISORY entity-grounding. When set, its result is appended
+        # to VerificationReport.advisory_checks and NEVER affects status.
+        self._entity_grounder: EntityGroundingChecker | None = entity_grounder
+        # ADVISORY adversarial refutation panel. DEMOTE-only: a majority-refute
+        # can downgrade a VERIFIED claim to FLAGGED, but NEVER promotes.
+        self._adversarial: AdversarialPanel | None = adversarial
+        # ADVISORY source re-fetch (liveness of the citation URL). Never blocks.
+        self._source_fetcher: SourceFetcher | None = source_fetcher
 
     @property
     def kg_gate_enabled(self) -> bool:
         return self._kg_gate_enabled
+
+    @property
+    def entity_grounding_enabled(self) -> bool:
+        return self._entity_grounder is not None
+
+    @property
+    def adversarial_enabled(self) -> bool:
+        return self._adversarial is not None
+
+    @property
+    def source_refetch_enabled(self) -> bool:
+        return self._source_fetcher is not None
+
+    @classmethod
+    def from_env(
+        cls,
+        nli_model: NliBackend,
+        second_llm: SecondLlmBackend,
+        *,
+        nli_entailment_threshold: float = _NLI_ENTAILMENT_THRESHOLD,
+    ) -> VerificationService:
+        """Build a service, enabling the ADVISORY entity-grounding gate when
+        ``RIE_ENABLE_KG_GATE=1``.
+
+        The advisory gate uses ``SpacyEntityExtractor`` (lazy-loaded). If
+        spaCy / the model is absent at runtime, the checker degrades to an
+        advisory not-passed entry — it never raises and never blocks.
+        """
+        entity_grounder: EntityGroundingChecker | None = None
+        if os.environ.get("RIE_ENABLE_KG_GATE") == "1":
+            # SpacyEntityExtractor lazy-loads spaCy only on first extract(),
+            # so importing the class at module top costs nothing here.
+            entity_grounder = EntityGroundingChecker(SpacyEntityExtractor())
+
+        # ADVISORY adversarial panel — different model family via OllamaRefuter.
+        adversarial: AdversarialPanel | None = None
+        if os.environ.get("RIE_ADVERSARIAL") == "1":
+            adversarial = AdversarialPanel(OllamaRefuter.from_env())
+
+        # ADVISORY source re-fetch.
+        source_fetcher: SourceFetcher | None = None
+        if os.environ.get("RIE_SOURCE_REFETCH") == "1":
+            source_fetcher = HttpSourceFetcher.from_env()
+
+        return cls(
+            nli_model,
+            second_llm,
+            nli_entailment_threshold=nli_entailment_threshold,
+            entity_grounder=entity_grounder,
+            adversarial=adversarial,
+            source_fetcher=source_fetcher,
+        )
 
     # ────────────────────────────────────────────────────────────────────
     # VerifierPort surface
@@ -108,12 +175,35 @@ class VerificationService:
                 return self._gate_entailment(claim, get_element_text)
             case GateName.SELF_CONSISTENCY:
                 return self._gate_self_consistency(claim)
+            case GateName.ENTITY_GROUNDING:
+                # ADVISORY-only gate — not part of the required-4 port surface.
+                # It is run via verify() into advisory_checks, never run_gate().
+                if self._entity_grounder is None:
+                    msg = (
+                        "ENTITY_GROUNDING is an advisory gate; construct "
+                        "VerificationService with entity_grounder to enable it, "
+                        "and read it from VerificationReport.advisory_checks"
+                    )
+                    raise ValueError(msg)
+                return self._entity_grounder.check(claim, get_element_text)
 
     def verify(
         self,
         claim: Claim,
         get_element_text: ElementTextResolver,
+        *,
+        source_url: str | None = None,
+        indicator_def: str | None = None,
     ) -> VerificationReport:
+        """Run the required-4 gates, then any configured ADVISORY checks.
+
+        ``source_url`` / ``indicator_def`` are optional extras the bare
+        ``VerifierPort`` does not carry on the ``Claim``. They feed the
+        ADVISORY source-refetch and adversarial panel respectively. Both are
+        keyword-only so ``verify(claim, resolver)`` remains a valid
+        ``VerifierPort`` call. Advisory checks NEVER promote: they can only
+        demote a VERIFIED claim to FLAGGED (see class docstring + adversarial.py).
+        """
         # Tier A first — short-circuit nothing (we still want the gate result
         # for the report), but use the outcome to derive status.
         span_existence = self._gate_span_existence(claim, get_element_text)
@@ -139,11 +229,36 @@ class VerificationService:
         else:
             status = VerificationStatus.VERIFIED
 
+        # Phase-2 ADVISORY checks. All run AFTER status is already fixed by the
+        # required-4, so they can only DEMOTE (VERIFIED→FLAGGED), never promote.
+        advisory_checks: list[GateResult] = []
+        if self._entity_grounder is not None:
+            advisory_checks.append(self._entity_grounder.check(claim, get_element_text))
+
+        # ADVISORY adversarial panel — DEMOTE-only. A majority-refute downgrades
+        # a VERIFIED claim to FLAGGED; it can NEVER promote REJECTED/FLAGGED.
+        if self._adversarial is not None:
+            panel_result = self._adversarial.run(
+                claim_text=self._render_decomposition(claim),
+                indicator_def=indicator_def or self._fallback_indicator_def(claim),
+                span_text=self._primary_span_text(claim, get_element_text),
+            )
+            advisory_checks.append(panel_result)
+            if not panel_result.passed and status is VerificationStatus.VERIFIED:
+                status = VerificationStatus.FLAGGED
+                failure_reasons.append(f"adversarial panel refuted: {panel_result.detail}")
+
+        # ADVISORY source re-fetch — never blocks; only annotates a dead/changed
+        # URL. It does NOT change status by itself.
+        if self._source_fetcher is not None:
+            advisory_checks.append(verify_source_live(source_url, self._source_fetcher))
+
         return VerificationReport(
             claim_id=claim.claim_id,
             gates=gates,
             status=status,
             failure_reasons=failure_reasons,
+            advisory_checks=advisory_checks,
         )
 
     # ────────────────────────────────────────────────────────────────────
@@ -517,6 +632,42 @@ class VerificationService:
             if span.role.value == "primary":
                 return span
         return claim.evidence_spans[0]
+
+    @classmethod
+    def _primary_span_text(
+        cls,
+        claim: Claim,
+        get_element_text: ElementTextResolver,
+    ) -> str:
+        """Resolve the verbatim text of the primary span for the panel.
+
+        On any resolution failure → empty string (the panel's skeptics
+        default-to-refute on missing evidence, which is the safe behaviour).
+        """
+        span = cls._primary_span(claim)
+        if span is None:
+            return ""
+        try:
+            text = get_element_text(span.element_id)
+        except (KeyError, LookupError, ValueError):
+            return ""
+        if span.char_end <= len(text) and span.char_end >= span.char_start:
+            return text[span.char_start : span.char_end]
+        return text
+
+    @staticmethod
+    def _fallback_indicator_def(claim: Claim) -> str:
+        """A stand-in indicator description when the caller passes none.
+
+        The service has no indicator-config catalogue (that lives in pillars/),
+        so when ``indicator_def`` is not supplied we hand the skeptics the
+        claim's own indicator id + clause pattern. These are runtime values off
+        the claim, NOT hard-coded indicator literals.
+        """
+        return (
+            f"indicator {claim.indicator_id} (pillar {claim.pillar_id}); "
+            f"clause pattern: {claim.clause_pattern.value}"
+        )
 
     @staticmethod
     def _render_decomposition(claim: Claim) -> str:
