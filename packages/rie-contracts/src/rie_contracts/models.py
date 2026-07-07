@@ -90,6 +90,8 @@ class GateName(StrEnum):
     VERBATIM_MATCH = "verbatim_match"
     ENTAILMENT = "entailment"
     SELF_CONSISTENCY = "self_consistency"
+    # Phase 2 — advisory only. NOT one of the required-4. Never blocks; annotates.
+    ENTITY_GROUNDING = "entity_grounding"
 
 
 class VerificationStatus(StrEnum):
@@ -293,12 +295,18 @@ class GateResult(BaseModel):
 
 
 class VerificationReport(BaseModel):
-    """Outcome of running all 4 gates on a claim. Status is derived from gate results."""
+    """Outcome of running all 4 gates on a claim. Status is derived from gate results.
+
+    `advisory_checks` carries Phase-2 non-blocking signals (e.g. KG entity
+    grounding). They NEVER affect `status` — purely informational for the
+    reviewer. The required-4 gates remain the only status determinant.
+    """
 
     claim_id: str
     gates: list[GateResult]
     status: VerificationStatus
     failure_reasons: list[str] = Field(default_factory=list)
+    advisory_checks: list[GateResult] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _check_status(self) -> VerificationReport:
@@ -376,6 +384,8 @@ class IndicatorConfig(BaseModel):
     negative_cues: dict[str, list[str]] = Field(default_factory=dict)
     few_shot_examples: list[dict[str, str | float | dict[str, str]]] = Field(default_factory=list)
     authority_hints: list[AuthorityTier] = Field(default_factory=list)
+    # Additive (post-freeze): RDTII indicator weight (% within pillar). Optional.
+    weight: float | None = Field(default=None, ge=0.0)
 
 
 class PillarConfig(BaseModel):
@@ -412,6 +422,9 @@ class SourceRegistryEntry(BaseModel):
     sha256_hash: str | None = None
     language: str = "en"
     local_path: str | None = None
+    # Additive (post-freeze): display metadata for the judge-validated output.
+    law_number_ref: str | None = None
+    last_amended: str | None = None
 
 
 class GoldItem(BaseModel):
