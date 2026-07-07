@@ -23,8 +23,17 @@ indicators:
     positive_keywords:
       en: ["foreign investment review", "screening", "national security review",
            "investment approval", "FDI screening"]
+      fr: ["examen des investissements étrangers", "filtrage", "examen au titre de la sécurité nationale",
+           "agrément d'investissement", "filtrage des investissements directs étrangers"]
+      es: ["examen de las inversiones extranjeras", "control", "examen de seguridad nacional",
+           "aprobación de la inversión", "control de la inversión extranjera directa"]
+      zh: ["外商投资审查", "审查", "国家安全审查",
+           "投资核准", "外国直接投资审查"]
     negative_cues:
       en: ["all foreign investment requires approval", "blanket approval"]
+      fr: ["tout investissement étranger requiert une approbation", "approbation générale"]
+      es: ["toda inversión extranjera requiere aprobación", "aprobación general"]
+      zh: ["所有外商投资均须核准", "一揽子核准"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "3.2"
@@ -41,6 +50,12 @@ indicators:
     positive_keywords:
       en: ["foreign equity cap", "foreign ownership limit", "maximum foreign shareholding",
            "negative list", "reserved sector"]
+      fr: ["plafond de participation étrangère", "limite de propriété étrangère", "participation étrangère maximale",
+           "liste négative", "secteur réservé"]
+      es: ["límite de capital extranjero", "límite de propiedad extranjera", "participación extranjera máxima",
+           "lista negativa", "sector reservado"]
+      zh: ["外资股比上限", "外资所有权限制", "最高外资持股比例",
+           "负面清单", "限制行业"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "3.3"
@@ -69,8 +84,14 @@ indicators:
       "1": "Full national treatment post-establishment."
     positive_keywords:
       en: ["national treatment", "no less favourable", "treatment of foreign investors"]
+      fr: ["traitement national", "non moins favorable", "traitement des investisseurs étrangers"]
+      es: ["trato nacional", "no menos favorable", "trato de los inversores extranjeros"]
+      zh: ["国民待遇", "不低于", "外国投资者待遇"]
     negative_cues:
       en: ["foreign-owned company shall not", "limited to nationals"]
+      fr: ["une société à capitaux étrangers ne peut", "réservé aux ressortissants"]
+      es: ["una empresa de capital extranjero no podrá", "limitado a los nacionales"]
+      zh: ["外资企业不得", "仅限本国国民"]
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "3.5"
@@ -87,4 +108,10 @@ indicators:
     positive_keywords:
       en: ["expropriation", "prompt and adequate compensation", "fair market value",
            "lawful expropriation", "public purpose"]
+      fr: ["expropriation", "indemnisation prompte et adéquate", "juste valeur marchande",
+           "expropriation licite", "but d'utilité publique"]
+      es: ["expropiación", "indemnización pronta y adecuada", "valor justo de mercado",
+           "expropiación lícita", "fin de utilidad pública"]
+      zh: ["征收", "及时充分的补偿", "公平市场价值",
+           "合法征收", "公共目的"]
     authority_hints: ["tier_1_statute"]

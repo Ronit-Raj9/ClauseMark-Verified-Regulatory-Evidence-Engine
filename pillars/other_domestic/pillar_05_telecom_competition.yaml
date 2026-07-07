@@ -24,8 +24,17 @@ indicators:
     positive_keywords:
       en: ["independent regulator", "telecommunications authority", "shall be independent",
            "separate from operators", "regulatory commission"]
+      fr: ["régulateur indépendant", "autorité de régulation des télécommunications", "est indépendant",
+           "distinct des opérateurs", "commission de régulation"]
+      es: ["regulador independiente", "autoridad de telecomunicaciones", "será independiente",
+           "separado de los operadores", "comisión reguladora"]
+      zh: ["独立监管机构", "电信管理局", "应当独立",
+           "独立于运营商", "监管委员会"]
     negative_cues:
       en: ["under the direction of the Minister", "ministry shall regulate"]
+      fr: ["sous la direction du Ministre", "le ministère réglemente"]
+      es: ["bajo la dirección del Ministro", "el ministerio regulará"]
+      zh: ["在部长的指导下", "由部委监管"]
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "5.2"
@@ -43,6 +52,12 @@ indicators:
     positive_keywords:
       en: ["spectrum allocation", "auction", "published criteria", "non-discriminatory",
            "frequency allocation", "spectrum plan"]
+      fr: ["attribution du spectre", "enchères", "critères publiés", "non discriminatoire",
+           "attribution des fréquences", "plan de fréquences"]
+      es: ["asignación del espectro", "subasta", "criterios publicados", "no discriminatorio",
+           "asignación de frecuencias", "plan de frecuencias"]
+      zh: ["频谱分配", "拍卖", "公布的标准", "非歧视性",
+           "频率分配", "频谱规划"]
     authority_hints: ["tier_2_regulation", "tier_3_guideline"]
 
   - indicator_id: "5.3"
@@ -60,8 +75,17 @@ indicators:
     positive_keywords:
       en: ["abuse of dominance", "anti-competitive agreement", "competition act",
            "significant market power", "essential facility"]
+      fr: ["abus de position dominante", "entente anticoncurrentielle", "loi sur la concurrence",
+           "puissance significative sur le marché", "infrastructure essentielle"]
+      es: ["abuso de posición dominante", "acuerdo anticompetitivo", "ley de competencia",
+           "poder significativo de mercado", "instalación esencial"]
+      zh: ["滥用市场支配地位", "反竞争协议", "竞争法",
+           "重要市场支配力", "必要设施"]
     negative_cues:
       en: ["telecommunications sector is excluded", "shall not apply to telecom"]
+      fr: ["le secteur des télécommunications est exclu", "ne s'applique pas aux télécommunications"]
+      es: ["el sector de las telecomunicaciones queda excluido", "no se aplicará a las telecomunicaciones"]
+      zh: ["电信部门除外", "不适用于电信"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "5.4"
@@ -78,6 +102,12 @@ indicators:
     positive_keywords:
       en: ["interconnection", "significant market power", "cost-oriented",
            "reference offer", "non-discriminatory terms"]
+      fr: ["interconnexion", "puissance significative sur le marché", "orienté vers les coûts",
+           "offre de référence", "conditions non discriminatoires"]
+      es: ["interconexión", "poder significativo de mercado", "orientado a costos",
+           "oferta de referencia", "condiciones no discriminatorias"]
+      zh: ["互联互通", "重要市场支配力", "成本导向",
+           "参考报价", "非歧视性条件"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "5.5"
@@ -94,4 +124,10 @@ indicators:
     positive_keywords:
       en: ["foreign operator", "foreign equity", "licence to provide telecommunications",
            "market access"]
+      fr: ["opérateur étranger", "participation étrangère", "licence pour fournir des services de télécommunications",
+           "accès au marché"]
+      es: ["operador extranjero", "capital extranjero", "licencia para prestar servicios de telecomunicaciones",
+           "acceso al mercado"]
+      zh: ["外国运营商", "外资股权", "提供电信服务的许可",
+           "市场准入"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]

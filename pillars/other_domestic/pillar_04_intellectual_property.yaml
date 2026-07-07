@@ -22,6 +22,12 @@ indicators:
     positive_keywords:
       en: ["copyright", "term of protection", "life of the author", "literary and artistic works",
            "computer programs", "database"]
+      fr: ["droit d'auteur", "durée de protection", "vie de l'auteur", "œuvres littéraires et artistiques",
+           "programmes d'ordinateur", "base de données"]
+      es: ["derecho de autor", "plazo de protección", "vida del autor", "obras literarias y artísticas",
+           "programas de ordenador", "base de datos"]
+      zh: ["著作权", "保护期", "作者有生之年", "文学和艺术作品",
+           "计算机程序", "数据库"]
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "4.2"
@@ -38,6 +44,12 @@ indicators:
     positive_keywords:
       en: ["patent", "twenty years from the filing date", "all fields of technology",
            "invention", "novelty", "inventive step"]
+      fr: ["brevet", "vingt ans à compter de la date de dépôt", "tous les domaines technologiques",
+           "invention", "nouveauté", "activité inventive"]
+      es: ["patente", "veinte años contados desde la fecha de presentación", "todos los campos de la tecnología",
+           "invención", "novedad", "actividad inventiva"]
+      zh: ["专利", "自申请日起二十年", "所有技术领域",
+           "发明", "新颖性", "创造性"]
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "4.3"
@@ -54,6 +66,12 @@ indicators:
     positive_keywords:
       en: ["trade secret", "undisclosed information", "confidential business information",
            "misappropriation"]
+      fr: ["secret d'affaires", "renseignements non divulgués", "informations commerciales confidentielles",
+           "appropriation illicite"]
+      es: ["secreto comercial", "información no divulgada", "información comercial confidencial",
+           "apropiación indebida"]
+      zh: ["商业秘密", "未披露信息", "保密商业信息",
+           "不正当获取"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "4.4"
@@ -69,6 +87,9 @@ indicators:
       "1": "Registration plus well-known-mark protection extending to dissimilar goods."
     positive_keywords:
       en: ["trademark", "well-known mark", "registration", "Paris Convention"]
+      fr: ["marque de commerce", "marque notoire", "enregistrement", "Convention de Paris"]
+      es: ["marca", "marca notoriamente conocida", "registro", "Convenio de París"]
+      zh: ["商标", "驰名商标", "注册", "巴黎公约"]
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "4.5"
@@ -86,4 +107,10 @@ indicators:
     positive_keywords:
       en: ["injunction", "damages", "infringement", "criminal penalty", "wilful",
            "commercial scale", "border measures", "seizure"]
+      fr: ["injonction", "dommages-intérêts", "contrefaçon", "sanction pénale", "délibéré",
+           "échelle commerciale", "mesures à la frontière", "saisie"]
+      es: ["mandamiento judicial", "daños y perjuicios", "infracción", "sanción penal", "doloso",
+           "escala comercial", "medidas en frontera", "incautación"]
+      zh: ["禁令", "损害赔偿", "侵权", "刑事处罚", "故意",
+           "商业规模", "边境措施", "扣押"]
     authority_hints: ["tier_1_statute"]

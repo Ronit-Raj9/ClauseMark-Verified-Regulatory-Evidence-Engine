@@ -22,8 +22,17 @@ indicators:
     positive_keywords:
       en: ["non-discrimination", "national treatment", "shall not discriminate",
            "equal treatment", "open competitive tendering"]
+      fr: ["non-discrimination", "traitement national", "ne doit pas exercer de discrimination",
+           "égalité de traitement", "appel d'offres ouvert"]
+      es: ["no discriminación", "trato nacional", "no discriminará",
+           "igualdad de trato", "licitación pública abierta"]
+      zh: ["非歧视", "国民待遇", "不得歧视",
+           "平等待遇", "公开竞争性招标"]
     negative_cues:
       en: ["domestic preference", "price preference", "set-aside for local"]
+      fr: ["préférence nationale", "préférence de prix", "réservé aux entreprises locales"]
+      es: ["preferencia nacional", "preferencia de precio", "reservado para empresas locales"]
+      zh: ["国内优惠", "价格优惠", "为本地企业预留"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "2.2"
@@ -64,6 +73,12 @@ indicators:
     positive_keywords:
       en: ["bid challenge", "procurement review", "complaint mechanism",
            "review body", "judicial review"]
+      fr: ["contestation de l'offre", "recours en matière de marchés publics", "mécanisme de plainte",
+           "organe de recours", "recours juridictionnel"]
+      es: ["impugnación de la licitación", "recurso en materia de contratación", "mecanismo de reclamación",
+           "órgano de revisión", "revisión judicial"]
+      zh: ["投标质疑", "采购复审", "投诉机制",
+           "复审机构", "司法审查"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "2.5"
@@ -80,4 +95,10 @@ indicators:
     positive_keywords:
       en: ["shall be published", "tender notice", "procurement notice",
            "publication threshold"]
+      fr: ["doit être publié", "avis d'appel d'offres", "avis de marché",
+           "seuil de publication"]
+      es: ["deberá publicarse", "anuncio de licitación", "anuncio de contratación",
+           "umbral de publicación"]
+      zh: ["应予公布", "招标公告", "采购公告",
+           "公布门槛"]
     authority_hints: ["tier_2_regulation"]
