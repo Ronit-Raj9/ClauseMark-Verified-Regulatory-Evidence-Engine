@@ -181,3 +181,60 @@ def test_filtering_jurisdiction_and_indicator(reasoner: CoverageReasoner) -> Non
     )
     assert rec.state == CoverageState.NO_EVIDENCE_IN_SEARCHED_CORPUS
     assert rec.verified_claim_ids == []
+
+
+# ── Phase 2 §7 upgrade: evaluate_defensible (optional method) ─────────────────
+
+
+def test_evaluate_defensible_preserves_three_state_schema(
+    reasoner: CoverageReasoner,
+) -> None:
+    """The Phase 2 method MUST keep the unchanged 3-state CoverageRecord schema
+    and never emit a bare 0 — it only enriches the reason string."""
+    method = getattr(reasoner, "evaluate_defensible", None)
+    if method is None:
+        pytest.skip("evaluate_defensible is an optional Phase 2 method")
+
+    legal = {
+        CoverageState.EVIDENCE_FOUND,
+        CoverageState.NO_EVIDENCE_IN_SEARCHED_CORPUS,
+        CoverageState.INSUFFICIENT_COVERAGE,
+    }
+    cases = [
+        ([_verified_claim(claim_id="c1")], 0.9, 1.0, CoverageState.EVIDENCE_FOUND),
+        ([], 0.9, 0.95, CoverageState.NO_EVIDENCE_IN_SEARCHED_CORPUS),
+        ([], 0.9, 0.2, CoverageState.NO_EVIDENCE_IN_SEARCHED_CORPUS),
+        ([], None, 1.0, CoverageState.INSUFFICIENT_COVERAGE),
+    ]
+    for claims, recall, reach, expected_state in cases:
+        rec = method(
+            jurisdiction="SAMPLE",
+            indicator_id="6.4",
+            verified_claims=claims,
+            gold_recall=recall,
+            reachability=reach,
+        )
+        assert isinstance(rec, CoverageRecord)
+        assert rec.state in legal
+        assert rec.state == expected_state
+        # No score field exists on the record — a bare 0 is structurally
+        # impossible to write.
+        assert not hasattr(rec, "score")
+
+
+def test_evaluate_defensible_high_recall_high_reach_flags_defensible(
+    reasoner: CoverageReasoner,
+) -> None:
+    method = getattr(reasoner, "evaluate_defensible", None)
+    if method is None:
+        pytest.skip("evaluate_defensible is an optional Phase 2 method")
+    rec = method(
+        jurisdiction="SAMPLE",
+        indicator_id="6.4",
+        verified_claims=[],
+        gold_recall=0.9,
+        reachability=0.95,
+    )
+    assert rec.state == CoverageState.NO_EVIDENCE_IN_SEARCHED_CORPUS
+    assert rec.reason is not None
+    assert "defensible" in rec.reason.lower()

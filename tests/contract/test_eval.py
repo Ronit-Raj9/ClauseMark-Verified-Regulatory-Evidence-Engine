@@ -56,9 +56,13 @@ def test_evaluate_pillar_returns_canonical_metric_keys(evaluator: Evaluator) -> 
         assert isinstance(out[key], float), f"{key} not a float"
 
 
-def test_measure_retrieval_recall_returns_float_in_range(evaluator: Evaluator) -> None:
-    # Pillar 7 ships three gold items.
-    retrieved = [["nothing"], ["nothing"], ["nothing"]]
+def test_measure_retrieval_recall_returns_float_in_range(
+    evaluator: Evaluator, config: ConfigRepository
+) -> None:
+    # One retrieved list per gold item (live gold size varies as the real
+    # Round-1 corpus grows, so size the input to the actual gold count).
+    n_gold = len(list(config.load_gold("7")))
+    retrieved = [["nothing"]] * n_gold
     score = evaluator.measure_retrieval_recall("7", retrieved)
     assert isinstance(score, float)
     assert 0.0 <= score <= 1.0

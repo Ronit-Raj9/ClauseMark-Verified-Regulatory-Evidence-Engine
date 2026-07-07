@@ -139,7 +139,6 @@ def test_scanned_path_without_vlm_degrades_gracefully(
 def test_born_digital_pdf_docling_chain_mock(monkeypatch: pytest.MonkeyPatch) -> None:
     """§5.2: PyMuPDF text is merged with mocked Docling structure when available."""
     from rie_contracts import Element, ElementType, StructureEdge, StructureEdgeType
-
     from rie_extract.adapters.born_digital_pdf_extractor import BornDigitalPdfExtractor
 
     docling_elements = [
@@ -212,7 +211,6 @@ def test_vlm_extractor_marks_elements_with_vlm_engine_and_not_corrected() -> Non
 
     import pymupdf  # type: ignore[import-untyped]
     from rie_contracts import OcrEngine
-
     from rie_extract.adapters.vlm_ocr import VlmOcrExtractor
     from rie_extract.vlm_client import FakeVlmClient
 

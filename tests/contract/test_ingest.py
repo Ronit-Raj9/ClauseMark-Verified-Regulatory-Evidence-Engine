@@ -16,7 +16,15 @@ from rie_contracts import (
     IngestPort,
     SourceRegistryEntry,
 )
-from rie_ingest import IngestService, compute_sha256
+from rie_ingest import (
+    DiscoveryTagger,
+    IngestService,
+    SourceDiscoveryCrawler,
+    compute_sha256,
+    load_economy_documents,
+    tag_discovery,
+)
+from rie_ingest.economy_ingest import EconomyIngestError
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -76,3 +84,90 @@ def test_list_sample_laws_finds_provided_samples(service: IngestService) -> None
     # Sample DPA + ETA ship with the repo; both must surface.
     assert "sample_dpa.txt" in names
     assert "sample_eta.txt" in names
+
+
+# ─── Phase 2 crawler still yields IngestPort-compatible entries ──────────────
+
+
+def test_crawler_offline_yields_port_compatible_entries(
+    service: IngestService, tmp_path: Path
+) -> None:
+    """The Phase 2 `SourceDiscoveryCrawler` produces `SourceRegistryEntry` rows
+    that the existing `IngestPort` impl can consume unchanged — discovery never
+    introduces a new contract type."""
+    seed = tmp_path / "portal"
+    seed.mkdir()
+    (seed / "index.html").write_text(
+        '<html><body><a href="acts/dpa.pdf">Data Protection Act</a></body></html>',
+        encoding="utf-8",
+    )
+
+    crawler = SourceDiscoveryCrawler(offline_seed_dir=seed)
+    entries = crawler.discover("ignored://seed", "SAMPLE")
+
+    assert entries
+    assert all(isinstance(e, SourceRegistryEntry) for e in entries)
+    # `load_document_bytes` accepts these rows by type — feed it the same kind
+    # of entry the service already handles (local_path form).
+    assert isinstance(service, IngestPort)
+
+
+# ─── Per-economy ingest layers extras over the same IngestPort bytes ─────────
+
+
+def test_load_economy_documents_matches_port_bytes() -> None:
+    """`load_economy_documents` reuses the IngestPort byte path and adds the
+    CSV-facing `extra` dict — the `(DocumentMeta, bytes)` part is identical to
+    what `load_document_bytes` produces for the same registry entry."""
+    docs = load_economy_documents(REPO_ROOT, "SAMPLE")
+    assert docs
+    by_id = {meta.doc_id: (meta, raw, extra) for meta, raw, extra in docs}
+    assert "sample_dpa_2020" in by_id
+    meta, raw, extra = by_id["sample_dpa_2020"]
+    assert isinstance(meta, DocumentMeta)
+    assert meta.sha256 == compute_sha256(raw)
+    # Extra dict has the documented keys even when the registry omits them.
+    assert set(extra.keys()) == {
+        "source_id",
+        "law_number_ref",
+        "last_amended",
+        "source_url",
+        "local_path",
+    }
+    assert extra["source_id"] == "sample_dpa_2020"
+
+
+def test_load_economy_documents_missing_registry_is_clear() -> None:
+    with pytest.raises(EconomyIngestError):
+        load_economy_documents(REPO_ROOT, "NoSuchEconomy")
+
+
+# ─── Discovery tagger is deterministic over the real gold corpus ─────────────
+
+
+def test_discovery_tagger_known_for_real_gold() -> None:
+    """A SAMPLE gold provision (pillar 6) tags KNOWN; a foreign one tags NEW."""
+    config = ConfigRepository(repo_root=REPO_ROOT)
+    gold = list(config.load_gold("6"))
+    assert gold, "expected pillar-6 gold to exist in the repo"
+    g = gold[0]
+    assert (
+        tag_discovery(
+            jurisdiction=g.jurisdiction,
+            indicator_id=g.indicator_id,
+            doc_id=g.doc_id,
+            span_text=g.span_text,
+            gold=gold,
+        )
+        == "KNOWN"
+    )
+    tagger = DiscoveryTagger(gold=gold)
+    assert (
+        tagger.tag_fields(
+            jurisdiction="Atlantis",
+            indicator_id=g.indicator_id,
+            doc_id="unknown_doc",
+            span_text="entirely novel provision not present in the gold set",
+        )
+        == "NEW"
+    )

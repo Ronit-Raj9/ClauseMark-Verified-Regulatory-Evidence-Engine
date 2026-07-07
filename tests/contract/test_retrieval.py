@@ -170,3 +170,32 @@ def test_retrieval_e2e_with_fakes(
     assert "def_pd" in top.neighbourhood_element_ids
     assert top.snippet
     assert top.rerank_score is not None
+
+
+def test_retrieve_backcompat_without_new_kwargs(
+    doc_meta: DocumentMeta, elements: list[Element], edges: list[StructureEdge]
+) -> None:
+    # Phase 2 added optional `query_expander` ctor arg + `keywords_by_lang`
+    # retrieve kwarg. Existing callers that pass NEITHER must see byte-identical
+    # behaviour: the positional `retrieve(query, jurisdiction, top_k)` API and
+    # its results are unchanged.
+    service = RetrievalService(
+        vector_store=InMemoryVectorStore(),
+        reranker=IdentityReranker(),
+        dense_embedder=DummyDenseEmbedder(),
+        sparse_embedder=DummySparseEmbedder(),
+        collection="contract_backcompat",
+    )
+    service.index_document(doc_meta, elements, edges)
+
+    hits = service.retrieve("outbound transfer comparable protection", "SAMPLE", 3)
+    assert hits
+    assert hits[0].element_id == "p_xb"
+    # Passing keywords_by_lang with NO expander wired is a safe no-op (identical).
+    hits_kw = service.retrieve(
+        "outbound transfer comparable protection",
+        "SAMPLE",
+        3,
+        keywords_by_lang={"fr": ["transfert transfrontalier"]},
+    )
+    assert [h.element_id for h in hits_kw] == [h.element_id for h in hits]
