@@ -105,9 +105,7 @@ def assemble_regime_from_claim(
             f"{claim.regime.primary_element_id!r} / clause {claim.clause_id!r} not in graph"
         )
         raise ValueError(msg)
-    return assemble_regime(
-        elements_by_id[primary_id], elements_by_id, edges, max_depth=max_depth
-    )
+    return assemble_regime(elements_by_id[primary_id], elements_by_id, edges, max_depth=max_depth)
 
 
 def consolidate_self_consistency_votes(
@@ -140,7 +138,5 @@ def enrich_claim_regime(
     max_depth: int = 2,
 ) -> Claim:
     """Re-assemble ``claim.regime`` from the structure graph and return an updated claim."""
-    regime = assemble_regime_from_claim(
-        claim, elements_by_id, edges, max_depth=max_depth
-    )
+    regime = assemble_regime_from_claim(claim, elements_by_id, edges, max_depth=max_depth)
     return claim.model_copy(update={"regime": regime})

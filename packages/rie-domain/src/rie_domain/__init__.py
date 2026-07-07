@@ -29,8 +29,8 @@ from rie_domain.layer2 import (
     score_bands_from_criteria,
     score_from_few_shots,
 )
-from rie_domain.regime import REGIME_EDGE_TYPES
 from rie_domain.regime import (
+    REGIME_EDGE_TYPES,
     assemble_regime,
     assemble_regime_from_claim,
     consolidate_self_consistency_votes,
@@ -40,9 +40,9 @@ from rie_domain.regime import (
 from rie_domain.verification import derive_status
 
 __all__ = [
+    "REGIME_EDGE_TYPES",
     "AuthorityResolver",
     "Citation",
-    "REGIME_EDGE_TYPES",
     "apply_authority_overrides",
     "assemble_regime",
     "assemble_regime_from_claim",
