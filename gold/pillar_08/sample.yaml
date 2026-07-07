@@ -1,0 +1,78 @@
+# Gold set for pillar 8 (Internet intermediary liability).
+# SAMPLE jurisdiction; doc is a named placeholder statute whose clause text is a
+# plausible rendering of the EU e-Commerce Directive / DSA model. Spans are
+# illustrative gold targets, not verbatim extracts from a real corpus document.
+items:
+  - gold_id: "p08_sample_iml_001"
+    pillar_id: "8"
+    indicator_id: "8.1"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_intermediary_liability_act_2021"
+    span_text: >
+      A provider of a hosting service shall not be liable for information stored
+      at the request of a recipient of the service, on condition that the provider
+      does not have actual knowledge of illegal content and, upon obtaining such
+      knowledge, acts expeditiously to remove or disable access to that content.
+    expected_clause_pattern: "conditional_regime"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Canonical conditional hosting safe harbour (e-Commerce Directive Art 14 / DSA Art 6)."
+
+  - gold_id: "p08_sample_iml_002"
+    pillar_id: "8"
+    indicator_id: "8.2"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_intermediary_liability_act_2021"
+    span_text: >
+      Upon receipt of a notice that is sufficiently precise and adequately
+      substantiated, the hosting service provider shall act without undue delay
+      to remove or disable access to the identified content and shall send the
+      notifying party a confirmation of receipt.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Structured notice-and-action with timeline and acknowledgement (DSA Arts 16-17)."
+
+  - gold_id: "p08_sample_iml_003"
+    pillar_id: "8"
+    indicator_id: "8.3"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_intermediary_liability_act_2021"
+    span_text: >
+      A recipient whose content has been removed shall have access to an internal
+      complaint-handling system and may submit the dispute to a certified
+      out-of-court dispute settlement body, following which wrongly removed
+      content shall be reinstated.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Counter-notice plus independent redress and restoration (DSA Arts 20-21)."
+
+  - gold_id: "p08_sample_iml_004"
+    pillar_id: "8"
+    indicator_id: "8.5"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_intermediary_liability_act_2021"
+    span_text: >
+      No general obligation shall be imposed on intermediary service providers to
+      monitor the information which they transmit or store, nor to actively seek
+      facts or circumstances indicating illegal activity.
+    expected_clause_pattern: "prohibition"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "No-general-monitoring rule (e-Commerce Directive Art 15 / DSA Art 8)."
+
+  - gold_id: "p08_sample_iml_005"
+    pillar_id: "8"
+    indicator_id: "8.6"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_intermediary_liability_act_2021"
+    span_text: >
+      Providers of hosting services shall publish, at least once a year, a report
+      setting out the number of notices received, the action taken in response,
+      the number of orders received from public authorities, and the number of
+      complaints handled.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Detailed annual transparency report (DSA Art 15)."

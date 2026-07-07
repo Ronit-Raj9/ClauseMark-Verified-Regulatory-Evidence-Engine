@@ -1,0 +1,77 @@
+# Gold set for pillar 9 (Content access and lawful intercept).
+# SAMPLE jurisdiction; doc is a named placeholder statute whose clause text is a
+# plausible rendering of lawful-intercept / surveillance law constrained by
+# ECtHR and CJEU proportionality jurisprudence. Spans are illustrative gold
+# targets, not verbatim extracts from a real corpus document.
+items:
+  - gold_id: "p09_sample_lia_001"
+    pillar_id: "9"
+    indicator_id: "9.1"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_lawful_intercept_act_2018"
+    span_text: >
+      No authority shall intercept any communication except under a warrant
+      issued in advance by a judge of the High Court, who must be satisfied that
+      the interception is necessary and proportionate to a legitimate aim.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Prior judicial warrant as the general rule for interception."
+
+  - gold_id: "p09_sample_lia_002"
+    pillar_id: "9"
+    indicator_id: "9.3"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_lawful_intercept_act_2018"
+    span_text: >
+      Before a blocking order takes effect, the affected content provider shall
+      be notified in writing of the reasons for the order and may, within fifteen
+      days, appeal the order to an independent tribunal whose decision is subject
+      to judicial review.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Full due-process triad: notice, reasons, independent appeal."
+
+  - gold_id: "p09_sample_lia_003"
+    pillar_id: "9"
+    indicator_id: "9.4"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_lawful_intercept_act_2018"
+    span_text: >
+      Service providers shall retain the traffic and location data of all
+      subscribers for a period of not less than twenty-four months and make such
+      data available to law-enforcement authorities on request.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: "General and indiscriminate data retention; disfavoured (CJEU Tele2 / La Quadrature)."
+
+  - gold_id: "p09_sample_lia_004"
+    pillar_id: "9"
+    indicator_id: "9.5"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_lawful_intercept_act_2018"
+    span_text: >
+      A provider may be required, only pursuant to a court order, to render such
+      assistance with decryption as is technically feasible, and nothing in this
+      Act shall require a provider to weaken or remove the encryption applied to
+      its service generally.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Judicially gated, feasibility-limited decryption assistance; no general encryption weakening."
+
+  - gold_id: "p09_sample_lia_005"
+    pillar_id: "9"
+    indicator_id: "9.6"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_lawful_intercept_act_2018"
+    span_text: >
+      A power under this Part may be exercised only where it is strictly necessary
+      and proportionate to a legitimate aim, and where no less intrusive means
+      would achieve that aim.
+    expected_clause_pattern: "conditional_regime"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Full necessity-and-proportionality test with least-intrusive-means limb."

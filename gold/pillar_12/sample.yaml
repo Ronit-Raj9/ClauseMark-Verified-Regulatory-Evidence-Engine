@@ -1,0 +1,62 @@
+# Gold set for pillar 12 (Online transactions and e-commerce).
+# SAMPLE jurisdiction; clause text is a plausible rendering of an Electronic
+# Transactions Act based on UNCITRAL MLEC / MLES. Spans are illustrative gold
+# targets, not verbatim extracts from a real corpus document.
+items:
+  - gold_id: "p12_sample_eta_001"
+    pillar_id: "12"
+    indicator_id: "12.1"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_eta_2019"
+    span_text: >
+      Where the law requires a signature of a person, that requirement is met in
+      relation to a data message if a method is used to identify that person and
+      to indicate that person's approval of the information contained in the data
+      message, and that method is as reliable as was appropriate for the purpose.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Functional-equivalence rule for electronic signatures (MLEC Art 7)."
+
+  - gold_id: "p12_sample_eta_002"
+    pillar_id: "12"
+    indicator_id: "12.3"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_eta_2019"
+    span_text: >
+      A contract shall not be denied validity or enforceability solely on the
+      ground that it was concluded by means of data messages, and an offer and the
+      acceptance of an offer may be expressed by means of data messages.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Electronic contract validity and formation (MLEC Art 11)."
+
+  - gold_id: "p12_sample_eta_003"
+    pillar_id: "12"
+    indicator_id: "12.2"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_eta_2019"
+    span_text: >
+      Before concluding a distance contract, a trader shall provide the consumer
+      with the main characteristics of the goods, the total price, and the
+      conditions for exercising the right of withdrawal, which the consumer may
+      exercise within fourteen days without giving any reason.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Online consumer protection: disclosure plus cooling-off withdrawal right."
+
+  - gold_id: "p12_sample_eta_004"
+    pillar_id: "12"
+    indicator_id: "12.4"
+    jurisdiction: "SAMPLE"
+    doc_id: "sample_eta_2019"
+    span_text: >
+      A person shall not send a commercial electronic message unless the recipient
+      has given prior consent, the message clearly identifies the sender, and the
+      message contains a functional facility by which the recipient may unsubscribe.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: "Opt-in spam regime with sender identification and unsubscribe facility."
