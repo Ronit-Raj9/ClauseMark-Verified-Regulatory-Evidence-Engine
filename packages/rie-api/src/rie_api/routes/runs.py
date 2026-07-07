@@ -25,7 +25,6 @@ from rie_contracts import Claim, Layer1Status
 from rie_persistence.repository import DocumentRepository
 
 from rie_api.deps import get_repo, get_run_graph, get_settings
-from rie_api.settings import Settings
 from rie_api.errors import DependencyUnavailableError
 from rie_api.schemas import (
     RunRequest,
@@ -34,6 +33,7 @@ from rie_api.schemas import (
     RunResumeResponse,
     RunStatusResponse,
 )
+from rie_api.settings import Settings
 
 router = APIRouter(prefix="/v1/runs", tags=["runs"])
 
