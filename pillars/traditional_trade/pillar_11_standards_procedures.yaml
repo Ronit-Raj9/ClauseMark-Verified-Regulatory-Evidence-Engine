@@ -24,6 +24,12 @@ indicators:
     positive_keywords:
       en: ["sanitary measure", "phytosanitary", "risk assessment", "scientific evidence",
            "SPS enquiry point", "Codex Alimentarius", "OIE", "IPPC"]
+      fr: ["mesure sanitaire", "phytosanitaire", "évaluation des risques", "preuves scientifiques",
+           "point d'information SPS", "Codex Alimentarius", "OIE", "CIPV"]
+      es: ["medida sanitaria", "fitosanitaria", "evaluación del riesgo", "pruebas científicas",
+           "servicio de información MSF", "Codex Alimentarius", "OIE", "CIPF"]
+      zh: ["卫生措施", "植物卫生", "风险评估", "科学证据",
+           "卫生与植物卫生措施咨询点", "食品法典", "世界动物卫生组织", "国际植物保护公约"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "11.2"
@@ -64,8 +70,17 @@ indicators:
     positive_keywords:
       en: ["international standard", "ISO", "IEC", "Codex", "based on",
            "in accordance with international standards"]
+      fr: ["norme internationale", "ISO", "CEI", "Codex", "fondé sur",
+           "conformément aux normes internationales"]
+      es: ["norma internacional", "ISO", "CEI", "Codex", "basado en",
+           "de conformidad con las normas internacionales"]
+      zh: ["国际标准", "ISO", "IEC", "食品法典", "基于",
+           "符合国际标准"]
     negative_cues:
       en: ["national standard only", "deviate from international"]
+      fr: ["norme nationale uniquement", "s'écarter des normes internationales"]
+      es: ["norma nacional únicamente", "apartarse de las normas internacionales"]
+      zh: ["仅国家标准", "偏离国际标准"]
     authority_hints: ["tier_1_statute", "tier_2_regulation", "tier_3_guideline"]
 
   - indicator_id: "11.5"
@@ -82,4 +97,10 @@ indicators:
     positive_keywords:
       en: ["public consultation", "comment period", "draft technical regulation",
            "notice and comment", "shall be published"]
+      fr: ["consultation publique", "délai de présentation d'observations", "projet de règlement technique",
+           "avis et observations", "doit être publié"]
+      es: ["consulta pública", "plazo para presentar observaciones", "proyecto de reglamento técnico",
+           "aviso y observaciones", "deberá publicarse"]
+      zh: ["公众咨询", "评论期", "技术法规草案",
+           "通知与评论", "应予公布"]
     authority_hints: ["tier_2_regulation"]

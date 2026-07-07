@@ -56,6 +56,9 @@ indicators:
       "1": "No import-related price controls."
     positive_keywords:
       en: ["minimum import price", "reference price", "price control", "administered price"]
+      fr: ["prix minimal à l'importation", "prix de référence", "contrôle des prix", "prix administré"]
+      es: ["precio mínimo de importación", "precio de referencia", "control de precios", "precio administrado"]
+      zh: ["最低进口价格", "参考价格", "价格管制", "政府定价"]
     authority_hints: ["tier_2_regulation"]
 
   - indicator_id: "10.5"
@@ -72,4 +75,10 @@ indicators:
     positive_keywords:
       en: ["state trading enterprise", "exclusive right to import", "sole importer",
            "monopoly right"]
+      fr: ["entreprise commerciale d'État", "droit exclusif d'importer", "importateur unique",
+           "droit de monopole"]
+      es: ["empresa comercial del Estado", "derecho exclusivo de importación", "importador único",
+           "derecho de monopolio"]
+      zh: ["国营贸易企业", "进口专营权", "独家进口商",
+           "垄断权"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]

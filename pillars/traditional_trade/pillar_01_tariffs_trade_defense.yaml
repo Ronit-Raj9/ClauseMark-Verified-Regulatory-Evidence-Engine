@@ -47,6 +47,12 @@ indicators:
     positive_keywords:
       en: ["anti-dumping", "dumping margin", "injury determination", "investigating authority",
            "sunset review", "lesser duty"]
+      fr: ["antidumping", "marge de dumping", "détermination du dommage", "autorité chargée de l'enquête",
+           "réexamen à l'expiration", "droit moindre"]
+      es: ["antidumping", "margen de dumping", "determinación del daño", "autoridad investigadora",
+           "examen por extinción", "derecho inferior"]
+      zh: ["反倾销", "倾销幅度", "损害裁定", "调查机关",
+           "日落复审", "从低征税"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
   - indicator_id: "1.4"
@@ -63,6 +69,12 @@ indicators:
     positive_keywords:
       en: ["countervailing duty", "subsidy", "subsidised imports", "specificity",
            "countervailable"]
+      fr: ["droit compensateur", "subvention", "importations subventionnées", "spécificité",
+           "passible de droits compensateurs"]
+      es: ["derecho compensatorio", "subvención", "importaciones subvencionadas", "especificidad",
+           "sujeto a derechos compensatorios"]
+      zh: ["反补贴税", "补贴", "受补贴进口产品", "专向性",
+           "可诉补贴"]
     authority_hints: ["tier_1_statute"]
 
   - indicator_id: "1.5"
@@ -79,4 +91,10 @@ indicators:
     positive_keywords:
       en: ["safeguard measure", "serious injury", "unforeseen developments",
            "progressive liberalisation", "time-limited"]
+      fr: ["mesure de sauvegarde", "dommage grave", "évolution imprévue des circonstances",
+           "libéralisation progressive", "durée limitée"]
+      es: ["medida de salvaguardia", "daño grave", "evolución imprevista de las circunstancias",
+           "liberalización progresiva", "duración limitada"]
+      zh: ["保障措施", "严重损害", "未预见的发展",
+           "逐步放宽", "限时"]
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
