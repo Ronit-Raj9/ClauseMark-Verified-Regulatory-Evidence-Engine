@@ -15,6 +15,8 @@ from rie_retrieval.embedder import (
     BGE_M3_DENSE_DIM,
     DEFAULT_DENSE_MODEL,
     DEFAULT_SPARSE_MODEL,
+    MULTILINGUAL_DENSE_DIM,
+    MULTILINGUAL_DENSE_MODEL,
     BgeM3Embedder,
     DenseEmbedderPort,
     SparseEmbedderPort,
@@ -24,6 +26,7 @@ from rie_retrieval.fakes import (
     DummySparseEmbedder,
     InMemoryVectorStore,
 )
+from rie_retrieval.multilingual import LanguageAwareQueryExpander, detect_language
 from rie_retrieval.qdrant_store import QdrantVectorStore
 from rie_retrieval.reranker import (
     DEFAULT_RERANKER_MODEL,
@@ -41,13 +44,15 @@ from rie_retrieval.tokenizer import SUPPORTED_LANGUAGES, is_supported_language, 
 
 __all__ = [
     "BGE_M3_DENSE_DIM",
+    "DEFAULT_CHILD_CHUNK_OVERLAP",
+    "DEFAULT_CHILD_CHUNK_SIZE",
     "DEFAULT_DENSE_MODEL",
     "DEFAULT_RERANKER_MODEL",
     "DEFAULT_SPARSE_MODEL",
-    "DEFAULT_CHILD_CHUNK_OVERLAP",
-    "DEFAULT_CHILD_CHUNK_SIZE",
     "DEFAULT_TOP_K_INITIAL",
     "DEFAULT_TOP_K_RERANK",
+    "MULTILINGUAL_DENSE_DIM",
+    "MULTILINGUAL_DENSE_MODEL",
     "SUPPORTED_LANGUAGES",
     "BgeM3Embedder",
     "BgeReranker",
@@ -57,10 +62,12 @@ __all__ = [
     "DummySparseEmbedder",
     "IdentityReranker",
     "InMemoryVectorStore",
+    "LanguageAwareQueryExpander",
     "QdrantVectorStore",
     "RetrievalService",
     "SparseEmbedderPort",
     "chunk_text",
+    "detect_language",
     "is_supported_language",
     "tokenize",
 ]
