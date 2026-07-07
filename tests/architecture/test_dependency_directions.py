@@ -27,6 +27,7 @@ ALLOWED: dict[str, set[str]] = {
     "rie_classify": {"rie_contracts"},
     "rie_verify": {"rie_contracts"},
     "rie_coverage": {"rie_contracts", "rie_domain"},
+    "rie_output": {"rie_contracts"},
     "rie_persistence": {"rie_contracts"},
     "rie_orchestration": {
         "rie_contracts",
@@ -39,6 +40,7 @@ ALLOWED: dict[str, set[str]] = {
         "rie_classify",
         "rie_verify",
         "rie_coverage",
+        "rie_output",
         "rie_persistence",
     },
     "rie_api": {
