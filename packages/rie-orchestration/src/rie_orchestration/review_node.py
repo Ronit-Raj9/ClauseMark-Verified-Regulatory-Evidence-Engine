@@ -16,6 +16,7 @@ from __future__ import annotations
 import logging
 
 from rie_contracts import Layer1Status, VerificationStatus
+
 from rie_orchestration.state import RieState
 from rie_orchestration.wiring import AdapterBundle
 
@@ -39,7 +40,9 @@ def review_node(state: RieState, bundle: AdapterBundle) -> RieState:
     if not flagged:
         return state
     if state.get("skip_hitl", False):
-        log.info("review_node: %d FLAGGED claims, skip_hitl=True — skipping interrupt", len(flagged))
+        log.info(
+            "review_node: %d FLAGGED claims, skip_hitl=True — skipping interrupt", len(flagged)
+        )
         return state
 
     try:

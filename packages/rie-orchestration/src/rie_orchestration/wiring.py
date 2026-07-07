@@ -102,7 +102,6 @@ def _build_real_bundle(config: ConfigRepositoryPort, samples_dir: Path) -> Adapt
     from rie_coverage import CoverageReasoner, Layer2ScoringService
     from rie_extract import ExtractionService
     from rie_ingest import IngestService
-    from rie_orchestration.regime import assemble_regime_for_clause
     from rie_persistence import DocumentRepository, create_engine
     from rie_persistence.db import make_session_factory
     from rie_retrieval import (
@@ -113,6 +112,8 @@ def _build_real_bundle(config: ConfigRepositoryPort, samples_dir: Path) -> Adapt
         RetrievalService,
     )
     from rie_verify import OllamaSecondLlm, TransformersNliBackend, VerificationService
+
+    from rie_orchestration.regime import assemble_regime_for_clause
 
     engine = create_engine(os.getenv("DATABASE_URL_SYNC"))
     session_factory = make_session_factory(engine)
@@ -153,7 +154,9 @@ def _build_real_bundle(config: ConfigRepositoryPort, samples_dir: Path) -> Adapt
         for edge in edges:
             element_ids.add(edge.from_element)
             element_ids.add(edge.to_element)
-        elements_by_id = {element.element_id: element for element in repo.get_elements(list(element_ids))}
+        elements_by_id = {
+            element.element_id: element for element in repo.get_elements(list(element_ids))
+        }
         return assemble_regime_for_clause(clause, elements_by_id, edges)
 
     classifier = ClassificationService(
@@ -212,3 +215,5 @@ def _build_fake_bundle(config: ConfigRepositoryPort, samples_dir: Path) -> Adapt
         repo=repo,
         samples_dir=samples_dir,
     )
+
+

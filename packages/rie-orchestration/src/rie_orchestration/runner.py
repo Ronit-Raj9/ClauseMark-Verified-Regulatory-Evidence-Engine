@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from rie_contracts import VerificationStatus
+
 from rie_orchestration.citations import materialise_citations
 from rie_orchestration.state import RieState
 from rie_orchestration.tracing import LangfuseTracer
@@ -31,6 +32,8 @@ class RunOptions:
     run_id: str | None = field(default=None)
     enable_hitl: bool = True
     enable_postgres_checkpointer: bool | None = None  # None = auto from env
+    local_only: bool = False  # ingest only registry entries with a local_path
+    output_dir: Path | None = None  # write 13-col CSV + JSON submission here
 
 
 def run_pipeline(
@@ -44,6 +47,8 @@ def run_pipeline(
     run_id: str | None = None,
     enable_hitl: bool = True,
     enable_postgres_checkpointer: bool | None = None,
+    local_only: bool = False,
+    output_dir: Path | None = None,
 ) -> dict[str, Any]:
     options = RunOptions(
         jurisdiction=jurisdiction,
@@ -55,6 +60,8 @@ def run_pipeline(
         run_id=run_id,
         enable_hitl=enable_hitl and not dry_run,
         enable_postgres_checkpointer=enable_postgres_checkpointer,
+        local_only=local_only,
+        output_dir=output_dir,
     )
     return _execute(options)
 
@@ -133,9 +140,7 @@ def build_run_graph(
     with ``jurisdiction``, ``pillar_ids``, and optional ``run_id`` attributes.
     """
     root = repo_root or Path(__file__).resolve().parents[4]
-    force_fakes = (
-        use_fakes if use_fakes is not None else os.getenv("RIE_FORCE_FAKES") == "1"
-    )
+    force_fakes = use_fakes if use_fakes is not None else os.getenv("RIE_FORCE_FAKES") == "1"
     bundle = build_default_bundle(root, use_fakes=force_fakes)
 
     def _run(req: Any) -> dict[str, str]:
@@ -172,6 +177,7 @@ def _execute(opts: RunOptions) -> dict[str, Any]:
         "pillar_ids": opts.pillar_ids,
         "dry_run": opts.dry_run,
         "skip_hitl": not opts.enable_hitl,
+        "local_only": opts.local_only,
         "documents": [],
         "raw_bytes_by_doc": {},
         "elements_by_doc": {},
@@ -217,9 +223,7 @@ def _execute(opts: RunOptions) -> dict[str, Any]:
             snapshot = _graph_snapshot(graph, config) if config else None
         except ImportError:
             log.warning("langgraph not available — sequential fallback")
-            final = _sequential_fallback(
-                initial, bundle, with_hitl=opts.enable_hitl, tracer=tracer
-            )
+            final = _sequential_fallback(initial, bundle, with_hitl=opts.enable_hitl, tracer=tracer)
     finally:
         tracer.stop()
 
@@ -227,6 +231,27 @@ def _execute(opts: RunOptions) -> dict[str, Any]:
     package["tracing"] = tracer.summary()
     package["status"] = _run_status(final, snapshot)
     package["detail"] = _run_detail(final, snapshot)
+
+    if opts.output_dir is not None:
+        from rie_orchestration.conformance import write_submission
+
+        sub = write_submission(
+            final,
+            bundle,
+            out_dir=opts.output_dir,
+            economy=opts.jurisdiction,
+            pillar_ids=opts.pillar_ids,
+            model_version=os.getenv("OLLAMA_MODEL", "unknown"),
+            cost=package.get("tracing", {}),
+            timestamp=run_id[:12],
+        )
+        package["submission"] = sub
+        log.info(
+            "run_pipeline: wrote submission %s (%d rows, %d violations)",
+            sub["csv"],
+            sub["rows"],
+            len(sub["violations"]),
+        )
     return package
 
 
@@ -292,7 +317,7 @@ def _build_resume_command(snapshot: object, decisions: dict[str, str]) -> object
         raise RuntimeError(msg)
     if len(interrupt_ids) == 1:
         return Command(resume={interrupt_ids[0]: decisions})
-    return Command(resume={interrupt_id: decisions for interrupt_id in interrupt_ids})
+    return Command(resume=dict.fromkeys(interrupt_ids, decisions))
 
 
 def _run_status(final: RieState, snapshot: object | None) -> str:
@@ -392,8 +417,7 @@ def _build_evidence_package(
     enriched = state.get("enriched_coverage")
     if enriched:
         package["enriched_coverage"] = [
-            row.model_dump(mode="json") if hasattr(row, "model_dump") else row
-            for row in enriched
+            row.model_dump(mode="json") if hasattr(row, "model_dump") else row for row in enriched
         ]
     kg_results = state.get("kg_results")
     if kg_results:
