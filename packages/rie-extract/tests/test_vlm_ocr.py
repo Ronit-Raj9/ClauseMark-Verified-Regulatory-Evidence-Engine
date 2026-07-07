@@ -8,14 +8,12 @@ import logging
 import pymupdf  # type: ignore[import-untyped]
 import pytest
 from rie_contracts import DocumentMeta, ElementType, OcrEngine
-
 from rie_extract.adapters.vlm_ocr import (
     ScannedNotEnabledExtractor,
     VlmOcrExtractor,
     _ocr_confidence_threshold,
 )
 from rie_extract.vlm_client import FakeVlmClient
-
 
 # ---------------------------------------------------------------------------
 # Test fixtures: produce a one-page PDF on the fly so we don't depend on a

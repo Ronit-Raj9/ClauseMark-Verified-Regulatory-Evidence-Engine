@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import io
 from datetime import UTC, datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pymupdf  # type: ignore[import-untyped]
 import pytest
@@ -16,7 +16,6 @@ from rie_contracts import (
     ElementType,
     OcrEngine,
 )
-
 from rie_extract.adapters.born_digital_pdf_extractor import BornDigitalPdfExtractor
 from rie_extract.router import pick_adapter
 from rie_extract.service import ExtractionService

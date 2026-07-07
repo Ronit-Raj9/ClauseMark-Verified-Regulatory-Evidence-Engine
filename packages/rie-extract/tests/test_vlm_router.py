@@ -11,7 +11,6 @@ from rie_contracts import (
     DocumentMeta,
     DocumentType,
 )
-
 from rie_extract.adapters.born_digital_pdf_extractor import BornDigitalPdfExtractor
 from rie_extract.adapters.vlm_ocr import (
     ScannedNotEnabledExtractor,
