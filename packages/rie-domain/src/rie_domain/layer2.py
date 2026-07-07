@@ -334,7 +334,5 @@ def build_layer2_batch(
                     continue
                 if claim.indicator_id != indicator.indicator_id:
                     continue
-                recommendations.append(
-                    build_layer2_recommendation(claim, indicator, coverage)
-                )
+                recommendations.append(build_layer2_recommendation(claim, indicator, coverage))
     return recommendations
