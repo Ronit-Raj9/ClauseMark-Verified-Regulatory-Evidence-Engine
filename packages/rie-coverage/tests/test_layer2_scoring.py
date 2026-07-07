@@ -61,9 +61,12 @@ class TestRecommendBand:
         claim = make_claim_fixture()
         band, rationale, questions = recommend_band(claim, indicator_64, evidence_coverage)
 
-        assert band is ScoreBand.HALF
+        # Real RDTII 6.4 few-shots score a horizontal personal-data conditional
+        # regime as 1 (matches the Round-1 gold); restrictiveness still routes to
+        # a human (open exception question + human_confirmation_required).
+        assert band is ScoreBand.ONE
         assert "conditional_regime" in rationale
-        assert "recommended band 0.5" in rationale
+        assert "recommended band 1" in rationale
         assert any("exception" in q.lower() for q in questions)
 
     def test_human_confirmation_always_required(
@@ -131,7 +134,7 @@ class TestRecommendAll:
         )
         assert len(recs) == 1
         assert recs[0].claim_id == "c1"
-        assert recs[0].recommended_band is ScoreBand.HALF
+        assert recs[0].recommended_band is ScoreBand.ONE
 
     def test_few_shot_example_influences_band(
         self,

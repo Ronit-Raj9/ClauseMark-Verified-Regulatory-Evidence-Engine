@@ -28,7 +28,6 @@ from rie_coverage import (
     load_manifest,
 )
 
-
 # ─── load_manifest ──────────────────────────────────────────────────────────
 
 
@@ -69,8 +68,7 @@ class TestLoadManifest:
         path = tmp_path / "data" / "coverage" / "manifests" / "sample.yaml"
         path.parent.mkdir(parents=True)
         path.write_text(
-            "jurisdiction: SAMPLE\nindicators: {}\n"
-            "default_expected_source_types: [statute]\n",
+            "jurisdiction: SAMPLE\nindicators: {}\ndefault_expected_source_types: [statute]\n",
             encoding="utf-8",
         )
         manifest = load_manifest(tmp_path, "SAMPLE")
@@ -92,9 +90,7 @@ class TestLoadManifest:
     def test_rejects_mismatched_jurisdiction_in_file(self, tmp_path: Path) -> None:
         path = tmp_path / "data" / "coverage" / "manifests" / "sample.yaml"
         path.parent.mkdir(parents=True)
-        path.write_text(
-            "jurisdiction: OTHER\nindicators: {}\n", encoding="utf-8"
-        )
+        path.write_text("jurisdiction: OTHER\nindicators: {}\n", encoding="utf-8")
         with pytest.raises(ValueError, match="declares jurisdiction"):
             load_manifest(tmp_path, "SAMPLE")
 
@@ -207,9 +203,7 @@ class TestComputeCompleteness:
 
 
 def test_reason_mentions_missing_types() -> None:
-    msg = format_corpus_incomplete_reason(
-        [DocumentType.REGULATION, DocumentType.GUIDELINE]
-    )
+    msg = format_corpus_incomplete_reason([DocumentType.REGULATION, DocumentType.GUIDELINE])
     assert "corpus incomplete" in msg
     assert "regulation" in msg
     assert "guideline" in msg
