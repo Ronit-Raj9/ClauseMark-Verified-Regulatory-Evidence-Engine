@@ -146,11 +146,7 @@ def _render_review_form(st_mod, detail: ClaimDetail, client: ApiClient) -> None:
         "Provide corrected score band", value=False, key="rie-review-needs-score"
     )
     corrected: ScoreBand | None = None
-    default_band = (
-        detail.layer2.recommended_band
-        if detail.layer2 is not None
-        else ScoreBand.HALF
-    )
+    default_band = detail.layer2.recommended_band if detail.layer2 is not None else ScoreBand.HALF
     if needs_score:
         choice = st_mod.selectbox(
             "Corrected band",
