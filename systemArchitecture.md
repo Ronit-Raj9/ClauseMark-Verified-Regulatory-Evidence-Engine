@@ -329,4 +329,145 @@ Narrower than v2. Fully defensible. Demonstrable on what you can actually build.
 - **It reasons about the whole law.** Parent-document retrieval + structure graph + regime assembly — not isolated-clause guessing.
 - **Anti-hallucination is architectural, not aspirational.** ID-replacement citations make fabrication structurally impossible; deterministic gates are ~100% reliable; model gates have stated limits and route to humans.
 - **It has a legal story** for the half-legal panel, and a real data model for the durable-infrastructure pitch.
+
+---
+
+# v4 Update Plan — Agent-native, autonomous, citation-exact
+
+> v3 is the *frozen winning core*: a verified, two-layer, pillar-agnostic engine. v4 does **not** discard it — it promotes the v3 ports/adapters into **tools** wired behind an autonomous **multi-agent** control plane, and tightens the two hard promises the rubric actually pays for: **knowledge discovery that is exhaustive-by-construction**, and **citations that cannot be wrong**. Everything below is additive; the 690 existing tests remain the regression floor.
+
+This plan is written against the real submission spec we reverse-engineered from the brief: the **40 / 30 / 30** rubric (Substantive Accuracy / Technical Resilience / Architecture), the **13-column CSV + JSON** output contract that judges validate *programmatically*, the **Discovery-Tag NEW/KNOWN** differentiator, and the **real RDTII 2.1 indicator taxonomy** (Pillar 6: ban&local-processing, local-storage, infrastructure, conditional-flow; Pillar 7: lack-of-DP-framework, lack-of-cybersecurity, retention, DPIA/DPO, government-access — note the "Lack of…" inversions).
+
+## 17. Why v4 (what v3 leaves on the table)
+
+| Rubric / guideline pressure | v3 today | v4 closes it |
+|---|---|---|
+| **Discovery of NEW evidence beyond the sample kit** (the single biggest Substantive differentiator) | Source registry is hand-seeded; no autonomous breadth | Autonomous multi-strategy **Discovery swarm** + loop-until-dry + NEW/KNOWN diff against the Round-1 gold DB |
+| **Output validated programmatically** | JSON shape is ours, not the judges' | **Conformance agent** emits the exact 13-col CSV + JSON, schema-checked in CI |
+| **Framework alignment (40%)** | Pillar 6/7 YAML used invented indicator defs | Realign to the **authoritative RDTII 2.1** taxonomy + weights from the 130-page guide |
+| **Live portal crawl, HTML harder than PDF** | Crawler exists but thin; HTML extraction weak | **Portal-Navigator agent** with HTML-DOM + PDF + scanned routing; freshness/amendment resolver |
+| **"Better than Perplexity" citations** | Strong (verbatim gate) but single-pass | **Cite-then-verify two-pass + adversarial refutation panel**; nothing emitted unless it survives |
+| **Autonomy / "no manual steps"** | LangGraph linear pipeline | **Planner-supervised agent graph** that decomposes, schedules, budgets, and self-heals |
+| **Cost-efficiency (measured)** | Tracing exists | **Telemetry agent** writes a measured per-document cost report judges can verify |
+
+## 18. North-star: three guarantees v4 must make true
+
+1. **Discovery is exhaustive-by-construction.** For every `(economy × pillar × indicator)` cell, the system either returns evidence, or returns a *measured* absence state — never a silent gap. Completeness is enforced by a critic loop, not hoped for.
+2. **Every emitted citation is byte-true and claim-supporting.** The "answer" is never generated prose; it is the **statutory span itself**, re-extracted byte-identically and entailment-checked against the indicator's legal question. A wrong citation is structurally impossible, not merely unlikely.
+3. **The machine proposes, the human disposes.** Layer-1 extraction is automated and verified; Layer-2 scoring is a recommendation with `human_confirmation_required = True`. No unverified number ever enters a UN dataset.
+
+> Honesty boundary (kept from v3): "100% correct" is a guarantee about **what is emitted**, not a claim of omniscient recall. Citation fidelity is deterministically ~100% because the gate is byte-equality. Discovery recall is driven toward 100% by the critic loop and **reported with a measured gold-set recall number** — we make the absence *defensible*, we never fake the presence.
+
+## 19. Agent-native architecture (ground-up)
+
+A **supervisor/planner** agent owns a typed **blackboard** (Postgres + Qdrant + a light structure/knowledge graph) and dispatches specialist agents over a LangGraph graph. Every agent is a *tool-calling* worker with a constrained-output contract; every adapter from v3 (ingest, extract, retrieval, classify, verify, coverage, persistence) is exposed as a **tool** in a shared registry. Agents never free-write facts — they call tools and select from enums, exactly as in v3 §3.
+
+```
+                         ┌──────────────────────────────────────────────┐
+            user/cron →  │  PLANNER · supervisor                        │
+                         │  decompose (economy×pillar×indicator) →       │
+                         │  budget · schedule · self-heal · stop-rules   │
+                         └──────────────┬───────────────────────────────┘
+                                        │   (writes tasks to blackboard)
+        ┌───────────────────────────────┼───────────────────────────────┐
+        ▼                ▼               ▼                ▼               ▼
+  DISCOVERY swarm   SOURCE-VALIDATOR  EXTRACTION      RETRIEVAL       CLASSIFIER
+  (4 blind          authority tier·   profile-routed  hybrid parent- constrained
+   strategies)      freshness·dedup·  Docling/PyMuPDF doc + cross-   decode → real
+   ↓ candidates     NEW/KNOWN tag     /VLM-OCR/HTML   lingual        RDTII indicator
+        └───────────────┬───────────────┴───────────────┬───────────────┘
+                        ▼                                 ▼
+                 VERIFIER PANEL  (adversarial, N skeptics)        COVERAGE / ABSENCE
+                 4 gates + refutation vote → verified/flagged     3-state + defensible-0
+                        │                                          + COMPLETENESS CRITIC
+                        ▼                                                  │ "what's missing?"
+                 OUTPUT / CONFORMANCE agent                               └─► re-queues Planner
+                 exact 13-col CSV + JSON, schema-validated
+                        │
+                        ▼  (FLAGGED → human review interrupt; TELEMETRY agent logs cost/trace throughout)
+                 audit package + measured cost report
+```
+
+**Agent roster (each = constrained tool-caller, not a free-text oracle):**
+
+| Agent | Job | Tools it calls | Output contract |
+|---|---|---|---|
+| **Planner / Supervisor** | Decompose the run into indicator-cells; budget tokens; schedule; apply stop-rules; route FLAGGED to humans | blackboard, registry | task DAG |
+| **Discovery swarm** (×4, blind) | Find candidate official sources four independent ways (see §20) | portal-nav, search-API, seed-registry, treaty-list | candidate URLs + provenance |
+| **Source-Validator** | Authority tier; official-source gate; **freshness/amendment** resolution to the in-force version; dedup; **NEW/KNOWN** tag vs Round-1 DB | http, registry, KG | validated source records |
+| **Extraction** | Route by profile → elements + structure graph | Docling, PyMuPDF, VLM-OCR, HTML-DOM parser | `Element[]` + edges |
+| **Retrieval** | Parent-document hybrid (BGE-M3 + BM25 + RRF + rerank), cross-lingual query expansion | Qdrant, embedder, reranker | `RetrievalHit[]` |
+| **Classifier** | Constrained-decode the clause → **real** RDTII indicator + decomposition + regime assembly | LLM (guided JSON), structure graph | `Claim` (span IDs only) |
+| **Verifier panel** | 4 gates + **adversarial refutation** (§21) | NLI, 2nd-LLM, deterministic span tools | `VerificationReport` |
+| **Coverage / Critic** | 3-state absence + defensible-0; **completeness critique** re-queues discovery until dry | gold-recall, blackboard | `CoverageRecord` + missing-list |
+| **Scorer** (Zone 3, optional) | Layer-2 recommendation only | rubric config | `Layer2Recommendation` |
+| **Conformance** | Materialise the exact 13-col CSV + JSON; validate schema | citation builder, schema validator | submission files |
+| **Telemetry** | Measured per-doc cost + latency + trace (Langfuse) | tracer | cost report |
+
+## 20. 100%-correct knowledge discovery (exhaustive-by-construction)
+
+Discovery is the Substantive differentiator, so v4 treats it as a *coverage problem with a proof obligation*, not a single search.
+
+1. **Multi-modal sweep — four blind strategies.** Run concurrently, each unaware of the others (so each surfaces what the others miss):
+   - **Portal-Navigator** — crawl the official legislation portal hierarchy (e.g. `sso.agc.gov.sg`, `legislation.gov.au`, `federalgazette.agc.gov.my`), follow consolidation/amendment links, render JS where needed.
+   - **Search agent** — query search APIs scoped to official domains + known legal aggregators; promote `.gov` / official-gazette hits.
+   - **Seed-registry** — the governed `sources/` registry (KNOWN baseline).
+   - **Treaty/membership agent** — the non-regulatory set (6.5, 12.10–12.13, etc.) resolved against official instrument lists (these are *lookups*, never extracted as clauses).
+2. **Corroboration before trust.** A candidate law is admitted only when the **Source-Validator** confirms it on an official source and resolves it to the **in-force version**. The amendment chain is followed explicitly — this is exactly where ESCAP's own trial failed (Singapore Patents Act shown as the 2021 revision when Act 5 of 2025 governed; Malaysia PDPA 2010 superseded by Act A1693/2024 adding DPO/breach). v4 captures `last_amended` and flags staleness.
+3. **Dedup + NEW/KNOWN.** Every admitted provision is diffed against the Round-1 gold DB by `(law, indicator, span)`. In-kit ⇒ `KNOWN`; independently found valid provision ⇒ `NEW` (the points multiplier).
+4. **Loop-until-dry.** The **Completeness Critic** asks, per indicator cell, *"what official source type have we not yet searched, what amendment have we not followed, what sector-specific law could also carry this obligation?"* Discovery is **not done** until *K* consecutive critic rounds surface nothing new. Silent truncation is logged, never hidden.
+5. **Coverage ledger.** Every `(economy, indicator)` cell ends in exactly one explicit state — `evidence_found` / `no_evidence_in_searched_corpus` (with measured gold-set recall) / `insufficient_coverage` — so a missing answer is always an *accounted-for* state, never a gap. Defensible-zero only when recall ≥ floor **and** authoritative-source reachability ≥ floor.
+
+## 21. Citation correctness that beats Perplexity
+
+Perplexity-class tools **generate an answer, then attach citations post-hoc** — so the citation can fail to support the sentence. v4 **inverts** the pipeline so that failure mode cannot exist:
+
+- **The claim is a span, not prose.** What we emit *is* the statutory text (`verbatim_snippet`), addressed by a span ID `doc#start-end`. There is no generated sentence for a citation to mismatch.
+- **Cite-then-verify, two-pass.** Pass 1 (Classifier) emits only **span IDs + an enum indicator choice** — never a citation string, never a score (v3 §6.6). Pass 2 (Verifier) materialises and re-checks before anything is emitted:
+  1. **Span-existence** (deterministic) — offsets resolve to real stored text.
+  2. **Verbatim-match** (deterministic) — exported snippet is **byte-identical** to a fresh re-extraction at those offsets. This is the gate that makes a wrong citation *impossible*.
+  3. **Entailment** (NLI + a second, different-family LLM) — the span actually answers the indicator's legal question; any disagreement → `flagged`.
+  4. **Self-consistency** (N-sample on fixed input) — unstable label → `flagged`.
+- **Adversarial refutation panel (new in v4).** Before a claim is marked `verified`, *N* skeptic agents are each prompted to **refute** the mapping ("show why this span does NOT evidence this indicator"), with diverse lenses (wrong-indicator, confidentiality-≠-localisation, government-data-scope-exception, draft-not-in-force). Survive a majority → `verified`; otherwise `flagged` and withheld. This directly kills the misinterpretation class from Assignment 1 (Banking Act confidentiality mis-mapped as a transfer ban; MAS notice mis-read as "lack of framework").
+- **Source re-fetch at verify time** catches dead/changed URLs (a named failure mode), and `source_url` is checked to resolve.
+- **Calibrated confidence + withholding.** Below threshold → `flagged`, never shipped as `verified`. The audit row carries `raw_context_before/after` so a human closes the loop in seconds.
+
+> Net claim, defensible in front of any judge: *every Layer-1 citation we emit is mechanically re-verified to be byte-identical to its official source and to entail the indicator's legal question; anything that cannot pass is withheld and flagged, never paraphrased into a confident answer.* That is a stronger guarantee than any generate-then-cite system can make.
+
+## 22. Output-contract conformance (judge-validated)
+
+The **Conformance agent** is the only writer of submission artefacts and the contract is enforced in CI:
+
+- **CSV — exact 13 columns, exact order**: `economy, law_name, law_number_ref, last_amended, indicator_id, article, discovery_tag, location_reference, verbatim_snippet, mapping_rationale, source_url, confidence, notes`. One row per provision; one article→two indicators ⇒ two rows.
+- **JSON** mirrors CSV + technical metadata: `source_pdf_path, ocr_quality_cer, processing_time_seconds, model_version, pdf_is_scanned, retrieval_method, raw_context_before/after, provisions[]`.
+- **CLI**: `python main.py --economy Singapore --pillar 6` → `outputs/Singapore_P6_<ts>.csv` + `.json` + `logs/`. `--pdf` bypasses the crawler; `batch_run.py` covers many economies.
+- **Indicator IDs** emitted in the judges' `P{pillar}-I{n}` display form, derived from the authoritative decimal taxonomy, with the decimal retained in JSON. (The format ambiguity between template and gold DB is resolved in favour of the gold DB and surfaced in `notes`.)
+- A schema test fails the build if any column is renamed, reordered, paraphrased, or missing a required field.
+
+## 23. Evaluation & self-improvement
+
+- **Gold harness** runs the engine against the Round-1 DB (Singapore / Australia / Malaysia, Pillars 6 & 7) and reports **per-(indicator, law) precision / recall / F1**, field accuracy, and inter-annotator agreement — scored per `(indicator, law)` because one indicator legitimately maps to many provisions.
+- **Citation-fidelity rate** (verbatim-gate pass %), **hallucinated-words rate**, **reviewer-override rate**, and **false-zero rate** are tracked as first-class metrics.
+- **Self-improvement loop**: failing gold cells feed the Completeness Critic, which re-queues discovery/extraction with adjusted strategy — a measurable convergence curve to show judges, not a static number.
+
+## 24. Modern stack additions (on top of v3 §12)
+
+LangGraph multi-agent supervisor + Postgres checkpointer (durable, resumable runs, HITL interrupts) · tool registry with typed schemas · structured/guided decoding for every agent · optional KG (entity-grounding advisory gate) · Langfuse tracing · pluggable LLM (Ollama/vLLM/OpenAI/Mistral via one config) and OCR (Tesseract/PaddleOCR/VLM/Azure) — **no vendor lock-in**, the Architecture-block requirement. Apache-2.0.
+
+## 25. Migration path (additive, low-risk)
+
+1. **Wrap, don't rewrite.** Expose each v3 adapter as a registry tool; the 690 tests stay green as the regression floor.
+2. **Conformance + taxonomy first** (highest rubric ROI, lowest risk): emit the exact 13-col output and realign Pillar 6/7 YAML to the authoritative RDTII taxonomy + weights.
+3. **Discovery swarm + NEW/KNOWN**: the Substantive differentiator.
+4. **Adversarial verifier panel + source re-fetch**: hardens the citation guarantee.
+5. **Planner supervisor + Completeness Critic**: turns the linear pipeline into an autonomous, self-healing graph.
+6. **Real economies** (Singapore/Australia/Malaysia) with measured gold F1 + cost report; then scale to the 8 final-round economies.
+
+## 26. Why v4 wins (beyond v3)
+
+- **It is autonomous, not scripted** — a planner decomposes, budgets, and self-heals; "no manual steps" is literally true.
+- **Discovery is a proof, not a hope** — multi-strategy sweep + loop-until-dry + a coverage ledger that can *defend* every absence.
+- **Citations cannot be wrong** — the claim *is* the verified span; an adversarial panel must fail to refute it before it ships. Strictly stronger than generate-then-cite.
+- **It conforms to exactly what the judges grade** — the 13-column contract, the NEW/KNOWN tag, the real indicator taxonomy, the measured cost.
+- **It is still honest** — calibrated "100%": deterministic citation fidelity, *measured* discovery recall, human-confirmed scores. The credibility that wins an anti-hallucination hackathon.
 - **It is a public good ESCAP can run** — open-weights, permissive, Dockerised, local — and it survives past the hackathon as UN infrastructure, which is the reason this competition exists.

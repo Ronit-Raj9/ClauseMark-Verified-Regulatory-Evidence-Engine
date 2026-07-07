@@ -20,12 +20,25 @@ make migrate
 # 3. Run pipeline on sample laws
 make demo
 
-# 4. Audit UI
+# 4. Audit UI (Streamlit)
 make ui            # http://localhost:8501
 
 # 5. API
 make api           # http://localhost:8080
+
+# 6. React production UI (Phase 2)
+cd packages/rie-ui-web && npm install && npm run dev   # http://localhost:5173
 ```
+
+### No GPU / 4 GB VRAM
+
+```bash
+RIE_FORCE_FAKES=1 make demo     # deterministic adapters, zero LLM, ~5s
+```
+
+Real LLM on 4 GB VRAM: edit `.env` → `OLLAMA_MODEL=qwen2.5:1.5b-instruct-q4_K_M`,
+`OLLAMA_VERIFIER_MODEL=gemma2:2b-instruct-q4_K_M`, `RIE_N_SAMPLES=1`. No API key
+needed — all open-weight, self-hosted. Optional Langfuse keys for tracing only.
 
 ## Architecture
 
@@ -60,12 +73,15 @@ Orchestrated by **LangGraph** with Postgres checkpointer + interrupts for human 
 | `rie-persistence` | Postgres + Alembic. |
 | `rie-api` | FastAPI driver. |
 | `rie-ui` | Streamlit audit viewer. |
-| `rie-eval` | Gold-set runner, RAGAS metrics, ablations. |
+| `rie-ui-web` | React + Vite + TS production UI (Phase 2, JS — not a uv member). |
+| `rie-eval` | Gold-set runner, RAGAS-proxy metrics, ablations, cost/latency. |
 
 ## Pillars
 
-All 12 RDTII pillars exist as data from commit one. Pillars 6 & 7 built to depth;
-others are validated stubs (`status: stub` in `pillars/registry.yaml`).
+All 12 RDTII pillars exist as data from commit one. **Built** (deep + gold):
+6, 7 (MVP) + 8, 9, 12 (Phase 2 deepened). **Stub** (schema-valid, different doc
+profiles, no gold yet): 1–5, 10, 11. Multilingual keyword sets (en/fr/es/zh) ship
+across the digital-governance + remaining clusters.
 
 **Add a pillar:** copy `pillars/_template/pillar_NN_template.yaml`, register in
 `registry.yaml`, drop a gold set in `gold/pillar_NN/`, flip `status: built`. See
@@ -78,5 +94,15 @@ others are validated stubs (`status: stub` in `pillars/registry.yaml`).
 - **All 12 pillars as data from commit one** — depth varies.
 - **Contracts frozen before parallel work.**
 - **uv only** — never `pip`, never hand-edit `uv.lock`.
+
+## Phase 2 (delivered)
+
+- Discovery crawler (`rie-ingest/crawler.py`) — robots-aware, sitemap/BFS, offline-seed for demo.
+- KG entity-grounding gate — **advisory only**, never blocks status (§6.5).
+- Defensible absence beyond corpus — authoritative-source reachability + cross-corpus recall; bare `0` still structurally impossible.
+- Cross-lingual retrieval — language detection + query expansion.
+- VLM-OCR for scanned PDFs.
+- React production UI (`rie-ui-web`).
+- Postgres LangGraph checkpointer + `interrupt()` HITL + Langfuse tracing.
 
 See [docs/architecture_v3.md](systemArchitecture.md) for the full architecture.
