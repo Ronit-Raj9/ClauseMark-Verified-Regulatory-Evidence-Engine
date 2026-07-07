@@ -53,7 +53,7 @@ pillars:
     pillar_name: "Tariffs and trade defense"
     cluster: "traditional_trade"
     document_profile: "structured_tabular"
-    status: "built"
+    status: "stub"
     config_path: "pillars/traditional_trade/pillar_01_tariffs_trade_defense.yaml"
     gold_set_path: null
 
@@ -61,7 +61,7 @@ pillars:
     pillar_name: "Non-technical non-tariff measures"
     cluster: "traditional_trade"
     document_profile: "structured_tabular"
-    status: "built"
+    status: "stub"
     config_path: "pillars/traditional_trade/pillar_10_non_technical_ntms.yaml"
     gold_set_path: null
 
@@ -69,7 +69,7 @@ pillars:
     pillar_name: "Standards and conformity assessment"
     cluster: "traditional_trade"
     document_profile: "structured_tabular"
-    status: "built"
+    status: "stub"
     config_path: "pillars/traditional_trade/pillar_11_standards_procedures.yaml"
     gold_set_path: null
 
@@ -78,7 +78,7 @@ pillars:
     pillar_name: "Public procurement"
     cluster: "other_domestic"
     document_profile: "mixed_regulatory"
-    status: "built"
+    status: "stub"
     config_path: "pillars/other_domestic/pillar_02_public_procurement.yaml"
     gold_set_path: null
 
@@ -86,7 +86,7 @@ pillars:
     pillar_name: "Foreign direct investment"
     cluster: "other_domestic"
     document_profile: "mixed_regulatory"
-    status: "built"
+    status: "stub"
     config_path: "pillars/other_domestic/pillar_03_foreign_direct_investment.yaml"
     gold_set_path: null
 
@@ -94,7 +94,7 @@ pillars:
     pillar_name: "Intellectual property"
     cluster: "other_domestic"
     document_profile: "mixed_regulatory"
-    status: "built"
+    status: "stub"
     config_path: "pillars/other_domestic/pillar_04_intellectual_property.yaml"
     gold_set_path: null
 
@@ -102,6 +102,6 @@ pillars:
     pillar_name: "Telecom and competition"
     cluster: "other_domestic"
     document_profile: "mixed_regulatory"
-    status: "built"
+    status: "stub"
     config_path: "pillars/other_domestic/pillar_05_telecom_competition.yaml"
     gold_set_path: null
