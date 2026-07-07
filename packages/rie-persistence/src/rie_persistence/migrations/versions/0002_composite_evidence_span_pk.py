@@ -12,9 +12,7 @@ depends_on = None
 
 def upgrade() -> None:
     op.drop_constraint("evidence_spans_pkey", "evidence_spans", type_="primary")
-    op.create_primary_key(
-        "evidence_spans_pkey", "evidence_spans", ["span_id", "claim_id"]
-    )
+    op.create_primary_key("evidence_spans_pkey", "evidence_spans", ["span_id", "claim_id"])
 
 
 def downgrade() -> None:

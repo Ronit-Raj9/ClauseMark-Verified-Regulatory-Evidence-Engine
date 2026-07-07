@@ -117,7 +117,9 @@ class DocumentRepository:
                     "doc_id": e.doc_id,
                     "parent_id": e.parent_id,
                     "element_type": e.element_type.value,
-                    "text": e.text,
+                    # Postgres text columns cannot hold NUL (0x00) bytes; strip
+                    # them defensively (they only appear in mis-decoded binary).
+                    "text": e.text.replace("\x00", ""),
                     "page": e.page,
                     "bbox": e.bbox.model_dump() if e.bbox else None,
                     "char_start": e.char_start,
