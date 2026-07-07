@@ -1,0 +1,76 @@
+# RDTII 2.1 Round-1 gold — Singapore, Pillar 6 (Cross-border data policies).
+# Source of truth: details/Sample Kit/ESCAP-RDTII-2.1_ Round 1 Database.xlsx
+# (Singapore sheet). 4 scored provisions. doc_id == source_id in
+# sources/jurisdictions/singapore.yaml. span_text verbatim where the gold supplies
+# law text; otherwise the ESCAP finding statement is used. Score convention:
+# 0 = open, 1 = restrictive.
+items:
+  - gold_id: "p06_sg_6_1_pdpa"
+    pillar_id: "6"
+    indicator_id: "6.1"
+    jurisdiction: "Singapore"
+    doc_id: "sg_pdpa_2012"
+    span_text: >
+      Singapore does not implement a ban on data transfer or a local processing
+      requirement under the Personal Data Protection Act 2012.
+    expected_clause_pattern: "prohibition"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Personal Data Protection Act 2012; Personal Data Protection
+      (Amendment) Act 2020. source_url: https://sso.agc.gov.sg/Act/PDPA2012 ;
+      https://sso.agc.gov.sg/Acts-Supp/40-2020/ . coverage: Horizontal. No ban /
+      local-processing mandate — open.
+
+  - gold_id: "p06_sg_6_2_companies_act"
+    pillar_id: "6"
+    indicator_id: "6.2"
+    jurisdiction: "Singapore"
+    doc_id: "sg_companies_act_1967"
+    span_text: >
+      A company shall retain the accounting and other records for 5 years, and
+      those records shall be kept at the registered office of the company or at
+      such other place in Singapore as the directors think fit.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0.5"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Companies Act 1967, s.199. source_url:
+      https://sso.agc.gov.sg/Act/CoA1967 . coverage: Accounting records
+      (Sectoral). Sectoral local-storage requirement -> 0.5.
+
+  - gold_id: "p06_sg_6_3_pdpa"
+    pillar_id: "6"
+    indicator_id: "6.3"
+    jurisdiction: "Singapore"
+    doc_id: "sg_pdpa_2012"
+    span_text: >
+      Singapore does not implement an infrastructure requirement under the
+      Personal Data Protection Act 2012.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Personal Data Protection Act 2012; Personal Data Protection
+      (Amendment) Act 2020. source_url: https://sso.agc.gov.sg/Act/PDPA2012 ;
+      https://sso.agc.gov.sg/Acts-Supp/40-2020/ . coverage: Horizontal. No local-
+      data-centre mandate -> 0.
+
+  - gold_id: "p06_sg_6_4_pdpa"
+    pillar_id: "6"
+    indicator_id: "6.4"
+    jurisdiction: "Singapore"
+    doc_id: "sg_pdpa_2012"
+    span_text: >
+      An organisation must not transfer any personal data to a country or
+      territory outside Singapore except in accordance with requirements
+      prescribed to ensure that the transferred personal data will be accorded a
+      standard of protection that is comparable to the protection under this Act.
+    expected_clause_pattern: "conditional_regime"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Personal Data Protection Act 2012, s.26; Personal Data Protection
+      (Amendment) Act 2020. source_url: https://sso.agc.gov.sg/Act/PDPA2012 ;
+      https://sso.agc.gov.sg/Acts-Supp/40-2020/ . coverage: Horizontal. Comparable-
+      protection conditional regime over personal data -> 1.

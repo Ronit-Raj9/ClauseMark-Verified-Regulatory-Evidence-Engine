@@ -1,0 +1,75 @@
+# RDTII 2.1 Round-1 gold — Australia, Pillar 6 (Cross-border data policies).
+# Source: ESCAP-RDTII-2.1_ Round 1 Database.xlsx (Australia sheet). 4 scored
+# provisions. doc_id == source_id in sources/jurisdictions/australia.yaml.
+# NB: 6.1/6.2 use My Health Records Act 2012 (sectoral personal-health-data
+# localisation, scored 0.5 each — the government-data exception edge case).
+items:
+  - gold_id: "p06_au_6_1_my_health_records"
+    pillar_id: "6"
+    indicator_id: "6.1"
+    jurisdiction: "Australia"
+    doc_id: "au_my_health_records_act_2012"
+    span_text: >
+      A record, or information, that is comprised in the My Health Record system
+      must not be held or processed outside Australia, except where the record or
+      information does not include personal information or identifying
+      information.
+    expected_clause_pattern: "prohibition"
+    expected_score_band: "0.5"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: My Health Records Act 2012, s.77. source_url:
+      https://www.legislation.gov.au/C2012A00063 . coverage: Personal Health Data
+      (Sectoral). Sectoral local-processing of health records -> 0.5 (govt-data
+      exception edge case).
+
+  - gold_id: "p06_au_6_2_my_health_records"
+    pillar_id: "6"
+    indicator_id: "6.2"
+    jurisdiction: "Australia"
+    doc_id: "au_my_health_records_act_2012"
+    span_text: >
+      Records comprised in the My Health Record system must be stored and
+      processed within Australia.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0.5"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: My Health Records Act 2012, s.77. source_url:
+      https://www.legislation.gov.au/C2012A00063 . coverage: Personal Health Data
+      (Sectoral). Sectoral local-storage of health records -> 0.5.
+
+  - gold_id: "p06_au_6_3_privacy_act"
+    pillar_id: "6"
+    indicator_id: "6.3"
+    jurisdiction: "Australia"
+    doc_id: "au_privacy_act_1988"
+    span_text: >
+      No infrastructure requirement is found; the Privacy Act 1988 does not
+      require establishment of a local data centre as a condition to provide
+      services using data.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Privacy Act 1988. source_url:
+      https://www.legislation.gov.au/C2004A03712 . coverage: Horizontal. No
+      infrastructure requirement -> 0.
+
+  - gold_id: "p06_au_6_4_privacy_act"
+    pillar_id: "6"
+    indicator_id: "6.4"
+    jurisdiction: "Australia"
+    doc_id: "au_privacy_act_1988"
+    span_text: >
+      Before an APP entity discloses personal information about an individual to
+      an overseas recipient, the entity must take reasonable steps to ensure that
+      the recipient does not breach the Australian Privacy Principles, unless the
+      individual consents or the disclosure is required or authorised by law.
+    expected_clause_pattern: "conditional_regime"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Privacy Act 1988, Australian Privacy Principle 8 (cross-border
+      disclosure). source_url: https://www.legislation.gov.au/C2004A03712 .
+      coverage: Horizontal. Conditional flow regime over personal data -> 1.
