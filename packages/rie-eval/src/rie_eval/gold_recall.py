@@ -61,11 +61,7 @@ def filter_gold_for_indicator(
     jurisdiction: str,
 ) -> list[GoldItem]:
     """Gold items scoped to one ``(jurisdiction, indicator_id)`` pair."""
-    return [
-        g
-        for g in gold
-        if g.indicator_id == indicator_id and g.jurisdiction == jurisdiction
-    ]
+    return [g for g in gold if g.indicator_id == indicator_id and g.jurisdiction == jurisdiction]
 
 
 def compute_indicator_gold_recall(
@@ -84,9 +80,7 @@ def compute_indicator_gold_recall(
 
     Otherwise returns ``hits / len(ind_gold)`` in ``[0.0, 1.0]``.
     """
-    ind_gold = filter_gold_for_indicator(
-        gold, indicator_id=indicator_id, jurisdiction=jurisdiction
-    )
+    ind_gold = filter_gold_for_indicator(gold, indicator_id=indicator_id, jurisdiction=jurisdiction)
     if not ind_gold or not retrieved:
         return None
     hits = sum(1 for item in ind_gold if gold_hit_in_retrieved(item, retrieved))
@@ -106,10 +100,7 @@ def compute_gold_set_recall(
     if not gold:
         return 0.0
     if len(retrieved_per_query) != len(gold):
-        msg = (
-            f"retrieved_per_query length {len(retrieved_per_query)} "
-            f"!= gold length {len(gold)}"
-        )
+        msg = f"retrieved_per_query length {len(retrieved_per_query)} != gold length {len(gold)}"
         raise ValueError(msg)
     hits = sum(
         1

@@ -33,6 +33,7 @@ from rie_contracts import (
     ReviewDecision,
     ReviewRecord,
 )
+from rie_verify.confidence import screen_confidence_on_gold
 
 from rie_eval.gold_recall import (
     compute_gold_set_recall,
@@ -45,7 +46,6 @@ from rie_eval.ragas_metrics import (
     compute_context_recall,
     compute_faithfulness,
 )
-from rie_verify.confidence import screen_confidence_on_gold
 
 # ─── Lightweight repository protocol (subset of DocumentRepositoryPort) ──────
 # The Evaluator only needs three read-side operations. Defining a narrow local

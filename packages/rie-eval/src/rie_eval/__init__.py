@@ -10,6 +10,14 @@ from rie_eval.ablations import (
     run_all_ablations,
 )
 from rie_eval.cost import CostTracker, RunCostReport, summarise_run_cost
+from rie_eval.gold_harness import (
+    DISCOVERY_KNOWN,
+    DISCOVERY_NEW,
+    GoldMatch,
+    MatchSet,
+    match_provisions,
+    score_against_gold,
+)
 from rie_eval.gold_recall import (
     compute_gold_set_recall,
     compute_indicator_gold_recall,
@@ -31,11 +39,15 @@ __all__ = [
     "ABLATION_WITHOUT_PARENT_DOC",
     "ABLATION_WITHOUT_RERANKER",
     "CANONICAL_ABLATIONS",
+    "DISCOVERY_KNOWN",
+    "DISCOVERY_NEW",
     "NO_CLAIM_LABEL",
     "RAGAS_AVAILABLE",
     "AblationResult",
     "CostTracker",
     "Evaluator",
+    "GoldMatch",
+    "MatchSet",
     "RunCostReport",
     "aggregate_recall",
     "compute_context_recall",
@@ -47,8 +59,10 @@ __all__ = [
     "filter_gold_for_indicator",
     "gold_hit_in_retrieved",
     "macro_avg",
+    "match_provisions",
     "prf",
     "run_ablation",
     "run_all_ablations",
+    "score_against_gold",
     "summarise_run_cost",
 ]

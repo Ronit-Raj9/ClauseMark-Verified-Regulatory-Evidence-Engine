@@ -31,6 +31,7 @@ from collections.abc import Iterable, Sequence
 
 from rie_contracts import Claim, Decomposition
 
+
 def _ragas_available() -> bool:
     try:  # pragma: no cover - optional dependency
         import ragas  # type: ignore[import-not-found]  # noqa: F401
