@@ -6,7 +6,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from rie_orchestration.wiring import (
     _DEFAULT_EMBEDDING_MODEL,
     _DEFAULT_RERANKER_MODEL,
@@ -35,12 +34,14 @@ def test_production_env_failure_does_not_fall_back_to_fakes(
     monkeypatch.setenv("QDRANT_HOST", "localhost")
     monkeypatch.delenv("RIE_FORCE_FAKES", raising=False)
 
-    with patch(
-        "rie_orchestration.wiring._build_real_bundle",
-        side_effect=RuntimeError("db down"),
+    with (
+        patch(
+            "rie_orchestration.wiring._build_real_bundle",
+            side_effect=RuntimeError("db down"),
+        ),
+        pytest.raises(RuntimeError, match="db down"),
     ):
-        with pytest.raises(RuntimeError, match="db down"):
-            build_default_bundle()
+        build_default_bundle()
 
 
 def test_non_production_env_falls_back_to_fakes(monkeypatch: pytest.MonkeyPatch) -> None:

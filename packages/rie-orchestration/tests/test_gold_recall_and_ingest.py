@@ -6,7 +6,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import pytest
 from rie_config import ConfigRepository
 from rie_contracts import (
     Claim,

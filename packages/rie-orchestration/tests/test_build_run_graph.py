@@ -85,17 +85,16 @@ def test_resume_pipeline_accepts_flagged_claims() -> None:
     from dataclasses import dataclass
     from datetime import UTC, datetime
 
-    from rie_contracts import GateName, GateResult, VerificationReport, VerificationStatus
+    from rie_contracts import GateName, GateResult, VerificationReport
     from rie_orchestration.graph import build_memory_checkpointer
 
     build_memory_checkpointer(reset=True)
+
     @dataclass
     class FlaggingVerifier:
         def verify(self, claim, get_element_text):
             del get_element_text
-            gates = [
-                GateResult(gate=g, passed=True, ran_at=datetime.now(UTC)) for g in GateName
-            ]
+            gates = [GateResult(gate=g, passed=True, ran_at=datetime.now(UTC)) for g in GateName]
             return VerificationReport(
                 claim_id=claim.claim_id,
                 gates=gates,
@@ -129,7 +128,7 @@ def test_resume_pipeline_accepts_flagged_claims() -> None:
         for cid, rep in package["verifications"].items()
         if rep["status"] == VerificationStatus.FLAGGED.value
     ]
-    decisions = {cid: "accept" for cid in flagged_ids}
+    decisions = dict.fromkeys(flagged_ids, "accept")
     resumed = resume_pipeline(
         run_id,
         decisions,
