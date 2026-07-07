@@ -1,0 +1,181 @@
+# RDTII 2.1 Round-1 gold — Singapore, Pillar 7 (Domestic data protection &
+# privacy). Source: ESCAP-RDTII-2.1_ Round 1 Database.xlsx (Singapore sheet).
+# 10 provisions (9 with explicit Indicator_ID + R39 blank-indicator = 7.1 by
+# context, Banking Act 1970). doc_id == source_id in
+# sources/jurisdictions/singapore.yaml. 7.1/7.2 are INVERTED ("Lack of ...") so a
+# framework existing scores 0.
+items:
+  - gold_id: "p07_sg_7_1_pdpa"
+    pillar_id: "7"
+    indicator_id: "7.1"
+    jurisdiction: "Singapore"
+    doc_id: "sg_pdpa_2012"
+    span_text: >
+      The Personal Data Protection Act 2012 is the baseline data-protection
+      framework applying across sectors and complementing sectoral laws, enforced
+      by the Personal Data Protection Commission.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Personal Data Protection Act 2012; Personal Data Protection
+      (Amendment) Act 2020. source_url: https://sso.agc.gov.sg/Act/PDPA2012 ;
+      https://sso.agc.gov.sg/Acts-Supp/40-2020/ . coverage: Horizontal. INVERTED:
+      comprehensive framework exists -> 0.
+
+  - gold_id: "p07_sg_7_1_banking_act"
+    pillar_id: "7"
+    indicator_id: "7.1"
+    jurisdiction: "Singapore"
+    doc_id: "sg_banking_act_1970"
+    span_text: >
+      Banks and their officers must safeguard the confidentiality of customer
+      information and shall not disclose it except as provided in the Third
+      Schedule, for example with the written consent of the customer.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Banking Act 1970, s.47 (Round-1 row R39, blank Indicator_ID =
+      7.1 by context). source_url: https://sso.agc.gov.sg/Act/BA1970 . coverage:
+      Financial sector (Sectoral). Banking confidentiality is a sectoral DP
+      provision (NOT a 6.1 transfer ban). Score 0.
+
+  - gold_id: "p07_sg_7_2_cybersecurity_act"
+    pillar_id: "7"
+    indicator_id: "7.2"
+    jurisdiction: "Singapore"
+    doc_id: "sg_cybersecurity_act_2018"
+    span_text: >
+      The Cybersecurity Act 2018 establishes a framework for national
+      cybersecurity, including protection of critical information infrastructure,
+      response powers, information-sharing and licensing of cybersecurity service
+      providers.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Cybersecurity Act 2018. source_url:
+      https://sso.agc.gov.sg/Acts-Supp/9-2018/ . coverage: Horizontal. INVERTED:
+      dedicated horizontal cyber framework exists -> 0.
+
+  - gold_id: "p07_sg_7_3_pdpa"
+    pillar_id: "7"
+    indicator_id: "7.3"
+    jurisdiction: "Singapore"
+    doc_id: "sg_pdpa_2012"
+    span_text: >
+      An organisation shall cease to retain its documents containing personal
+      data as soon as it is reasonable to assume that the purpose for which the
+      personal data was collected is no longer being served by retention.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Personal Data Protection Act 2012, s.25 (Retention Limitation
+      Obligation); Personal Data Protection (Amendment) Act 2020. source_url:
+      https://sso.agc.gov.sg/Act/PDPA2012 ; https://sso.agc.gov.sg/Acts-Supp/40-2020/ .
+      coverage: Horizontal. No fixed minimum period -> 0.
+
+  - gold_id: "p07_sg_7_3_telecom_act"
+    pillar_id: "7"
+    indicator_id: "7.3"
+    jurisdiction: "Singapore"
+    doc_id: "sg_telecommunications_act_1999"
+    span_text: >
+      A telecommunication licensee must keep specified data records for 12
+      calendar months for inspection by Singapore government agencies, including
+      source IP address, timestamps and user identification.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Telecommunications Act 1999; Facilities-Based Operations licence
+      under s.5 (IMDA); IP Telephony Services terms. source_url:
+      https://sso.agc.gov.sg/Act/TA1999 . coverage: Horizontal/telecom. Minimum
+      12-month retention -> 1.
+
+  - gold_id: "p07_sg_7_3_companies_act"
+    pillar_id: "7"
+    indicator_id: "7.3"
+    jurisdiction: "Singapore"
+    doc_id: "sg_companies_act_1967"
+    span_text: >
+      A company shall retain the accounting and other records that are required
+      to be kept under this section for a period of not less than 5 years.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Companies Act 1967, s.199. source_url:
+      https://sso.agc.gov.sg/Act/CoA1967 . coverage: Accounting records
+      (Sectoral). Minimum 5-year retention -> 1.
+
+  - gold_id: "p07_sg_7_3_income_tax_act"
+    pillar_id: "7"
+    indicator_id: "7.3"
+    jurisdiction: "Singapore"
+    doc_id: "sg_income_tax_act_1947"
+    span_text: >
+      Every person carrying on a trade, business or profession shall keep and
+      retain records for a period of 5 years from the relevant Year of
+      Assessment.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Income Tax Act 1947, s.67. source_url:
+      https://sso.agc.gov.sg/Act/ITA1947 . coverage: Income records (Sectoral).
+      Minimum 5-year retention -> 1.
+
+  - gold_id: "p07_sg_7_3_employment_act"
+    pillar_id: "7"
+    indicator_id: "7.3"
+    jurisdiction: "Singapore"
+    doc_id: "sg_employment_act_1968"
+    span_text: >
+      An employer shall keep employee records for current employees for 2 years
+      and for former employees for one year after the employee ceases employment.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Employment Act 1968, s.95. source_url:
+      https://sso.agc.gov.sg/Act/EmA1968 . coverage: Employment records
+      (Sectoral). Minimum retention period -> 1.
+
+  - gold_id: "p07_sg_7_4_pdpa"
+    pillar_id: "7"
+    indicator_id: "7.4"
+    jurisdiction: "Singapore"
+    doc_id: "sg_pdpa_2012"
+    span_text: >
+      An organisation shall designate at least one individual, a data protection
+      officer, to be responsible for ensuring that the organisation complies with
+      this Act.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Personal Data Protection Act 2012, s.11(3); Guide to Data
+      Protection Impact Assessments; Advisory Guidelines on the PDPA for
+      Children's Personal Data. source_url: https://sso.agc.gov.sg/Act/PDPA2012 .
+      coverage: Horizontal. Mandatory DPO across all sectors -> 1.
+
+  - gold_id: "p07_sg_7_5_cpc"
+    pillar_id: "7"
+    indicator_id: "7.5"
+    jurisdiction: "Singapore"
+    doc_id: "sg_criminal_procedure_code_2010"
+    span_text: >
+      A police officer may access any computer and any data, and may require any
+      person to provide the password or means of decryption necessary to enable
+      comprehension of the data, and may order the production of any document for
+      the purposes of an investigation.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Criminal Procedure Code 2010, ss.39/40 and s.20. source_url:
+      https://sso.agc.gov.sg/Act/CPC2010 . coverage: Horizontal. Government access
+      without independent judicial warrant -> 1.

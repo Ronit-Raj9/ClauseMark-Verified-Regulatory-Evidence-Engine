@@ -1,0 +1,137 @@
+# RDTII 2.1 Round-1 gold — Australia, Pillar 7 (Domestic data protection &
+# privacy). Source: ESCAP-RDTII-2.1_ Round 1 Database.xlsx (Australia sheet).
+# 7 scored provisions (7.1, 7.2, 7.3, 7.4, and three 7.5 rows). doc_id ==
+# source_id in sources/jurisdictions/australia.yaml. 7.1/7.2 INVERTED.
+items:
+  - gold_id: "p07_au_7_1_privacy_act"
+    pillar_id: "7"
+    indicator_id: "7.1"
+    jurisdiction: "Australia"
+    doc_id: "au_privacy_act_1988"
+    span_text: >
+      The Privacy Act 1988 is the primary federal data-protection law of general
+      application, giving effect to 13 Australian Privacy Principles and, since
+      2018, a mandatory Notifiable Data Breaches scheme.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Privacy Act 1988 (2018 NDB amendment; 2023 penalty amendment).
+      source_url: https://www.legislation.gov.au/C2004A03712 ;
+      https://www.oaic.gov.au/privacy/notifiable-data-breaches . coverage:
+      Horizontal. INVERTED: comprehensive framework exists -> 0.
+
+  - gold_id: "p07_au_7_2_soci_dispersed"
+    pillar_id: "7"
+    indicator_id: "7.2"
+    jurisdiction: "Australia"
+    doc_id: "au_soci_act_2018"
+    span_text: >
+      Australia has no single coherent horizontal cybersecurity law; cybersecurity
+      obligations are dispersed across the Security of Critical Infrastructure Act
+      2018, the Privacy Act 1988, the Criminal Code Act 1995 and the 2023-2030
+      Australian Cyber Security Strategy.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0.5"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Security of Critical Infrastructure Act 2018; Privacy Act 1988;
+      Criminal Code Act 1995; 2023-2030 Australian Cyber Security Strategy.
+      source_url: https://www.legislation.gov.au/C2018A00029/latest/versions .
+      coverage: Horizontal. INVERTED: dispersed / non-dedicated -> 0.5.
+
+  - gold_id: "p07_au_7_3_tia_act"
+    pillar_id: "7"
+    indicator_id: "7.3"
+    jurisdiction: "Australia"
+    doc_id: "au_tia_act_1979"
+    span_text: >
+      A service provider must keep the information or documents of the kind
+      specified in section 187AA for the period of 2 years after the information
+      came into existence.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Telecommunications (Interception and Access) Act 1979, s.187C
+      (data-set per s.187AA; inserted by the 2015 Data Retention Amendment Act).
+      source_url: https://www.legislation.gov.au/C2004A02124/latest/text .
+      coverage: Internet and mobile service providers (Sectoral). Minimum 2-year
+      retention -> 1.
+
+  - gold_id: "p07_au_7_4_pia"
+    pillar_id: "7"
+    indicator_id: "7.4"
+    jurisdiction: "Australia"
+    doc_id: "au_privacy_act_1988"
+    span_text: >
+      A Privacy Impact Assessment is contemplated but, apart from government
+      agencies, is not mandated; it is recommended under Australian Privacy
+      Principle 1.2, and the OAIC may direct an agency to undertake one.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "0"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Privacy Act 1988, s.33D(1); OAIC Privacy Management Framework /
+      Privacy Impact Assessment guidance 2020. source_url:
+      https://www.oaic.gov.au/privacy/guidance-and-advice/ . coverage: Horizontal.
+      DPO/DPIA not mandated for the private sector -> 0.
+
+  - gold_id: "p07_au_7_5_tia_aa"
+    pillar_id: "7"
+    indicator_id: "7.5"
+    jurisdiction: "Australia"
+    doc_id: "au_tia_act_1979"
+    span_text: >
+      The Telecommunications (Interception and Access) Act 1979 permits
+      interception without a warrant in emergencies, and the assistance and access
+      industry powers require providers to give specified assistance to access
+      data.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Telecommunications (Interception and Access) Act 1979 (ss.10, 110);
+      Telecommunications and Other Legislation Amendment (Assistance and Access)
+      Act 2018 (s.317ZH); Telecommunications Legislation Amendment (International
+      Production Orders) Act 2021; Telecommunications Act 1997. source_url:
+      https://www.legislation.gov.au/C2004A02124/ . coverage: Telecommunications
+      services (Sectoral). Government access without warrant in emergencies -> 1.
+
+  - gold_id: "p07_au_7_5_asio_slaid_dat"
+    pillar_id: "7"
+    indicator_id: "7.5"
+    jurisdiction: "Australia"
+    doc_id: "au_asio_act_1979"
+    span_text: >
+      The Australian Security Intelligence Organisation Act 1979 authorises
+      computer-access warrants, and the Surveillance Legislation Amendment
+      (Identify and Disrupt) Act 2021 permits disruption of data, account takeover
+      and network activity monitoring.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Australian Security Intelligence Organisation Act 1979, s.25A;
+      Surveillance Legislation Amendment (Identify and Disrupt) Act 2021;
+      Data Availability and Transparency Act 2022. source_url:
+      https://www.legislation.gov.au/C2004A02123 . coverage: Horizontal.
+      Government access without independent judicial oversight -> 1.
+
+  - gold_id: "p07_au_7_5_dat_act"
+    pillar_id: "7"
+    indicator_id: "7.5"
+    jurisdiction: "Australia"
+    doc_id: "au_dat_act_2022"
+    span_text: >
+      The Data Availability and Transparency Act 2022 establishes controlled
+      access to public-sector data by accredited users, and the National Data
+      Commissioner may compel the provision of information and documents.
+    expected_clause_pattern: "obligation"
+    expected_score_band: "1"
+    expected_authority_tier: "tier_1_statute"
+    notes: >
+      law_name: Data Availability and Transparency Act 2022, Art.104 (commenced
+      1 Apr 2022). source_url: https://www.legislation.gov.au/C2022A00011/latest/text ;
+      https://www.datacommissioner.gov.au/law/dat-act . coverage: Horizontal.
+      Compelled provision of data without judicial warrant -> 1.
