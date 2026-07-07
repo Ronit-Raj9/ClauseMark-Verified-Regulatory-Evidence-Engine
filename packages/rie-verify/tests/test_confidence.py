@@ -84,10 +84,7 @@ def _gold(indicator: str = "6.4", doc_id: str = "doc1") -> GoldItem:
 
 def _verified_report(claim_id: str = "c-1") -> VerificationReport:
     now = datetime.now(tz=UTC)
-    gates = [
-        GateResult(gate=gate, passed=True, detail="ok", ran_at=now)
-        for gate in GateName
-    ]
+    gates = [GateResult(gate=gate, passed=True, detail="ok", ran_at=now) for gate in GateName]
     return VerificationReport(
         claim_id=claim_id,
         gates=gates,
