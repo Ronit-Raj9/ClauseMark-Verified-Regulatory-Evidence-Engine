@@ -25,9 +25,7 @@ VALID_TIERS = {
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Seed authority_overrides table.")
-    p.add_argument(
-        "--seed", default=str(ROOT / "data" / "seeds" / "authority_overrides.yaml")
-    )
+    p.add_argument("--seed", default=str(ROOT / "data" / "seeds" / "authority_overrides.yaml"))
     p.add_argument("--dry-run", action="store_true")
     return p.parse_args()
 
@@ -65,11 +63,10 @@ def main() -> int:
     if args.dry_run:
         return 0
 
-    from sqlalchemy import select
-    from sqlalchemy.orm import sessionmaker
-
     from rie_persistence.db import create_engine
     from rie_persistence.models import AuthorityOverrideRow
+    from sqlalchemy import select
+    from sqlalchemy.orm import sessionmaker
 
     engine = create_engine()
     Session = sessionmaker(engine, future=True, expire_on_commit=False)

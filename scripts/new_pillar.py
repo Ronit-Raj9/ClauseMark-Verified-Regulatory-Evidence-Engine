@@ -14,7 +14,6 @@ Three files touched: pillar YAML, registry.yaml, gold/<dir>/.
 from __future__ import annotations
 
 import argparse
-import shutil
 from pathlib import Path
 
 import yaml
