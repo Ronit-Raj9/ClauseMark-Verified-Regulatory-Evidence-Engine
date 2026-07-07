@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -15,36 +15,14 @@ import type {
   ScoreBand,
 } from "@/types";
 
-// Audit viewer route /review/:claimId.
-//
-// Two-pane layout per systemArchitecture §7:
-//   left  — source document with the exact evidence span(s) highlighted yellow.
-//   right — claim decomposition (subject / condition / constraint / context),
-//           indicator + clause pattern badges, per-gate verification rows, and
-//           the overall layer1 status.
-//
-// Bottom: Accept / Correct / Reject -> POST /v1/reviews via reviews.submit.
-//
-// No pillar id or indicator id is hard-coded — every label is rendered from
-// the API payload. Layer-2 recommendation is shown above the decision bar;
-// the Correct score select is pre-filled from the recommended band.
-
 const LAYER1_TONES: Record<string, string> = {
-  verified: "bg-gate-pass text-white",
-  flagged: "bg-coverage-absent text-white",
-  rejected: "bg-gate-fail text-white",
-  draft: "bg-slate-300 text-slate-800",
+  verified: "bg-gate-pass-bg text-gate-pass-text",
+  flagged: "bg-gate-flag-bg text-gate-flag-text",
+  rejected: "bg-gate-fail-bg text-gate-fail-text",
+  draft: "bg-canvas text-muted border border-line",
 };
 
-// Decomposition is open-ended — these are the canonical field names rie-extract
-// commits to in rie_contracts.Decomposition. We render them in this order if
-// present, then any extra keys after, so nothing is hidden from the auditor.
-const PRIMARY_FIELDS: readonly string[] = [
-  "subject",
-  "condition",
-  "constraint",
-  "context",
-];
+const PRIMARY_FIELDS: readonly string[] = ["subject", "condition", "constraint", "context"];
 
 function renderValue(value: unknown): string {
   if (value == null) return "—";
@@ -70,6 +48,28 @@ function decompositionEntries(d: Decomposition): Array<[string, unknown]> {
     if (!seen.has(k)) out.push([k, v]);
   }
   return out;
+}
+
+function Panel({
+  title,
+  children,
+  action,
+}: {
+  title: string;
+  children: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="rie-panel overflow-hidden">
+      <header className="flex items-center justify-between border-b border-line bg-canvas/60 px-4 py-3">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+          {title}
+        </span>
+        {action}
+      </header>
+      {children}
+    </div>
+  );
 }
 
 export default function Review() {
@@ -120,16 +120,16 @@ export default function Review() {
   });
 
   if (!claimId) {
-    return <div className="text-sm text-red-600">Missing claim id in URL.</div>;
+    return <div className="text-sm text-gate-fail-text">Missing claim id in URL.</div>;
   }
 
   if (detailQuery.isLoading) {
-    return <div className="text-sm text-slate-500">Loading claim {claimId}…</div>;
+    return <div className="rie-panel px-6 py-12 text-center text-sm text-muted">Loading claim…</div>;
   }
 
   if (detailQuery.isError) {
     return (
-      <div className="text-sm text-red-600 font-mono">
+      <div className="rounded-xl border border-gate-fail-border bg-gate-fail-bg px-4 py-3 font-mono text-sm text-gate-fail-text">
         {(detailQuery.error as Error).message}
       </div>
     );
@@ -137,287 +137,209 @@ export default function Review() {
 
   const detail = detailQuery.data;
   if (!detail) {
-    return <div className="text-sm text-slate-500">No claim returned.</div>;
+    return <div className="text-sm text-muted">No claim returned.</div>;
   }
 
   const { claim, verification, citations, layer2 } = detail;
-  const layer1Tone = LAYER1_TONES[claim.layer1_status] ?? "bg-slate-300 text-slate-800";
+  const layer1Tone = LAYER1_TONES[claim.layer1_status] ?? "bg-canvas text-muted border border-line";
   const decompEntries = decompositionEntries(claim.decomposition);
 
   return (
-    <section className="space-y-4">
-      {/* Header strip */}
-      <header className="flex flex-wrap items-start justify-between gap-3">
+    <section className="space-y-6 animate-fade-up">
+      <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <div className="text-xs text-slate-500 font-mono mb-1">
-            <Link to="/queue" className="hover:underline">
-              ← back to queue
-            </Link>
-          </div>
-          <h1 className="text-xl font-semibold text-slate-900 break-all">
-            {claim.claim_id}
-          </h1>
-          <p className="text-xs text-slate-500 font-mono mt-0.5">
-            jurisdiction {claim.jurisdiction} · pillar {claim.pillar_id} ·
-            clause {claim.clause_id} · regime {claim.regime}
+          <Link
+            to="/queue"
+            className="text-xs font-medium text-muted transition-colors hover:text-ink"
+          >
+            ← Back to queue
+          </Link>
+          <h1 className="mt-2 break-all font-mono text-lg font-semibold text-ink">{claim.claim_id}</h1>
+          <p className="mt-1 font-mono text-xs text-muted">
+            {claim.jurisdiction} · pillar {claim.pillar_id} · {claim.clause_id} · {claim.regime}
           </p>
         </div>
-        <span
-          className={[
-            "px-2.5 py-1 rounded-md text-xs font-mono font-semibold",
-            layer1Tone,
-          ].join(" ")}
-          title={`layer1_status = ${claim.layer1_status}`}
-        >
-          layer1 {claim.layer1_status}
-        </span>
+        <span className={["rie-badge", layer1Tone].join(" ")}>layer1 · {claim.layer1_status}</span>
       </header>
 
-      {/* Two-pane grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* LEFT: source spans */}
-        <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
-            Source spans
-          </h2>
-          <p className="text-xs text-slate-500">
-            Highlighted in yellow at the exact evidence offsets. Text materialised
-            deterministically by rie-api — never authored by the LLM.
-          </p>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="space-y-4">
+          <div>
+            <h2 className="font-serif text-xl text-ink">Source spans</h2>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
+              Evidence highlighted at exact offsets. Text materialised deterministically — never authored by the model.
+            </p>
+          </div>
           <SpanViewer
             citations={citations}
             activeSpanId={activeSpanId}
             onSelect={(c: CitationDTO) => setActiveSpanId(c.span_id)}
           />
-
           {claim.evidence_spans.length > 0 && (
-            <div className="text-[11px] font-mono text-slate-500 border border-slate-200 rounded-md p-2 bg-slate-50">
-              <div className="font-semibold mb-1 text-slate-700">
-                evidence_spans ({claim.evidence_spans.length})
-              </div>
-              <ul className="space-y-0.5">
+            <Panel title={`Evidence spans (${claim.evidence_spans.length})`}>
+              <ul className="divide-y divide-line">
                 {claim.evidence_spans.map((s) => (
                   <li key={s.span_id}>
                     <button
                       type="button"
                       onClick={() => setActiveSpanId(s.span_id)}
                       className={[
-                        "text-left hover:underline",
-                        s.span_id === activeSpanId ? "text-slate-900 font-semibold" : "",
+                        "block w-full px-4 py-2.5 text-left font-mono text-[11px] transition-colors hover:bg-canvas",
+                        s.span_id === activeSpanId ? "bg-coverage-absent-bg text-ink" : "text-muted",
                       ].join(" ")}
                     >
-                      {s.span_id} · {s.role} · doc {s.doc_id} · {s.char_start}–{s.char_end}
+                      {s.span_id} · {s.role} · {s.char_start}–{s.char_end}
                     </button>
                   </li>
                 ))}
               </ul>
-            </div>
+            </Panel>
           )}
         </div>
 
-        {/* RIGHT: decomposition + gates */}
         <div className="space-y-4">
-          {/* Indicator / pattern badges */}
           <div className="flex flex-wrap gap-2">
-            <span
-              className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-900 text-white text-xs font-mono"
-              title="indicator_id"
-            >
-              <span className="opacity-70">indicator</span>
-              <span className="font-semibold">{claim.indicator_id}</span>
-            </span>
-            <span
-              className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-700 text-white text-xs font-mono"
-              title="clause_pattern"
-            >
-              <span className="opacity-70">pattern</span>
-              <span className="font-semibold">{claim.clause_pattern}</span>
+            <span className="rie-badge bg-ink text-white">ind {claim.indicator_id}</span>
+            <span className="rie-badge border border-line bg-canvas text-muted">
+              {claim.clause_pattern}
             </span>
             {claim.model_confidence != null && (
-              <span
-                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-200 text-slate-800 text-xs font-mono"
-                title="model_confidence (Layer-1 selector confidence, not a score)"
-              >
-                <span className="opacity-70">conf</span>
-                <span className="font-semibold">
-                  {claim.model_confidence.toFixed(2)}
-                </span>
+              <span className="rie-badge border border-line bg-canvas font-mono text-muted">
+                conf {claim.model_confidence.toFixed(2)}
               </span>
             )}
           </div>
 
-          {/* Decomposition */}
-          <div className="bg-white border border-slate-200 rounded-md">
-            <header className="px-3 py-2 border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
-              Decomposition
-            </header>
-            <dl className="divide-y divide-slate-100">
+          <Panel title="Decomposition">
+            <dl className="divide-y divide-line">
               {decompEntries.length === 0 && (
-                <div className="px-3 py-3 text-xs text-slate-500">
-                  (empty decomposition)
-                </div>
+                <div className="px-4 py-4 text-xs text-muted">Empty decomposition</div>
               )}
               {decompEntries.map(([k, v]) => (
-                <div key={k} className="px-3 py-2 grid grid-cols-[8rem_1fr] gap-3">
-                  <dt className="text-xs font-mono uppercase text-slate-500 pt-0.5">
-                    {k}
-                  </dt>
-                  <dd className="text-sm text-slate-900 whitespace-pre-wrap break-words">
+                <div key={k} className="grid grid-cols-[7rem_1fr] gap-3 px-4 py-3">
+                  <dt className="font-mono text-[10px] uppercase tracking-wide text-muted">{k}</dt>
+                  <dd className="text-sm leading-relaxed text-ink whitespace-pre-wrap break-words">
                     {renderValue(v)}
                   </dd>
                 </div>
               ))}
             </dl>
-          </div>
+          </Panel>
 
-          {/* Layer-2 recommendation (human confirmation required) */}
           {layer2 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-md">
-              <header className="px-3 py-2 border-b border-amber-200 bg-amber-100/60 text-xs font-semibold uppercase tracking-wide text-amber-900 flex items-center justify-between gap-2">
-                <span>Layer-2 recommendation</span>
+            <div className="overflow-hidden rounded-xl border border-coverage-absent-border bg-coverage-absent-bg">
+              <header className="flex items-center justify-between gap-2 border-b border-coverage-absent-border px-4 py-3">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-coverage-absent-text">
+                  Layer-2 recommendation
+                </span>
                 {layer2.human_confirmation_required && (
-                  <span className="font-mono normal-case text-[10px] px-1.5 py-0.5 rounded bg-amber-200 shrink-0">
-                    human confirmation required
+                  <span className="rie-badge bg-coverage-absent-solid text-white">
+                    Human confirmation required
                   </span>
                 )}
               </header>
-              <div className="px-3 py-3 space-y-2 text-sm">
-                <div className="flex flex-wrap gap-2 items-center">
-                  <span className="text-xs font-mono text-amber-800">indicator</span>
-                  <span className="px-2 py-0.5 rounded-md bg-amber-800/90 text-white font-mono font-semibold text-xs">
-                    {layer2.indicator_id}
-                  </span>
-                  <span className="text-xs font-mono text-amber-800">recommended band</span>
-                  <span className="px-2 py-0.5 rounded-md bg-amber-900 text-white font-mono font-semibold text-xs">
-                    {layer2.recommended_band}
+              <div className="space-y-3 px-4 py-4 text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rie-badge bg-ink text-white">{layer2.recommended_band}</span>
+                  <span className="font-mono text-xs text-coverage-absent-text">
+                    indicator {layer2.indicator_id}
                   </span>
                 </div>
-                <p className="text-slate-800 whitespace-pre-wrap">{layer2.rationale}</p>
+                <p className="leading-relaxed text-ink whitespace-pre-wrap">{layer2.rationale}</p>
                 {layer2.open_questions.length > 0 && (
-                  <div>
-                    <div className="text-xs font-semibold uppercase text-amber-900 mb-1">
-                      Open questions
-                    </div>
-                    <ul className="list-disc list-inside text-slate-700 space-y-0.5">
-                      {layer2.open_questions.map((q) => (
-                        <li key={q}>{q}</li>
-                      ))}
-                    </ul>
-                  </div>
+                  <ul className="list-inside list-disc space-y-1 text-sm text-muted">
+                    {layer2.open_questions.map((q) => (
+                      <li key={q}>{q}</li>
+                    ))}
+                  </ul>
                 )}
               </div>
             </div>
           )}
 
-          {/* Verification gates */}
-          <div className="bg-white border border-slate-200 rounded-md">
-            <header className="px-3 py-2 border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600 flex items-center justify-between">
-              <span>Verification gates</span>
-              {verification && (
+          <Panel
+            title="Verification gates"
+            action={
+              verification ? (
                 <span
                   className={[
-                    "px-2 py-0.5 rounded text-[11px] font-mono font-semibold",
+                    "rie-badge",
                     verification.status === "verified"
-                      ? "bg-gate-pass text-white"
+                      ? "bg-gate-pass-bg text-gate-pass-text"
                       : verification.status === "flagged"
-                        ? "bg-coverage-absent text-white"
-                        : "bg-gate-fail text-white",
+                        ? "bg-gate-flag-bg text-gate-flag-text"
+                        : "bg-gate-fail-bg text-gate-fail-text",
                   ].join(" ")}
                 >
                   {verification.status}
                 </span>
-              )}
-            </header>
+              ) : undefined
+            }
+          >
             {!verification && (
-              <div className="px-3 py-3 text-xs text-slate-500">
-                No verification report attached yet.
-              </div>
+              <div className="px-4 py-4 text-xs text-muted">No verification report attached yet.</div>
             )}
             {verification && (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-line">
                 {verification.gates.map((g, idx) => (
-                  <li
-                    key={`${g.gate}-${idx}`}
-                    className="px-3 py-2 flex items-start gap-3"
-                  >
-                    <div className="shrink-0">
-                      <GateBadge gate={g} />
-                    </div>
-                    <div className="text-xs text-slate-600 flex-1 min-w-0">
-                      <div className="font-mono break-words">
-                        {g.detail || (g.passed ? "passed" : "failed")}
-                      </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
-                        ran_at {g.ran_at}
-                      </div>
+                  <li key={`${g.gate}-${idx}`} className="flex items-start gap-3 px-4 py-3">
+                    <GateBadge gate={g} />
+                    <div className="min-w-0 flex-1 text-xs text-muted">
+                      <div className="break-words font-mono">{g.detail || (g.passed ? "passed" : "failed")}</div>
+                      <div className="mt-0.5 text-[10px] opacity-70">{g.ran_at}</div>
                     </div>
                   </li>
                 ))}
                 {verification.failure_reasons.length > 0 && (
-                  <li className="px-3 py-2 text-xs text-red-700 bg-red-50">
-                    <span className="font-semibold">failure_reasons:</span>{" "}
+                  <li className="bg-gate-fail-bg px-4 py-3 text-xs text-gate-fail-text">
                     {verification.failure_reasons.join("; ")}
                   </li>
                 )}
               </ul>
             )}
-          </div>
+          </Panel>
 
-          {/* Prior reviews (audit trail) */}
           {reviewsQuery.data && reviewsQuery.data.items.length > 0 && (
-            <div className="bg-white border border-slate-200 rounded-md">
-              <header className="px-3 py-2 border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                Prior reviews ({reviewsQuery.data.total})
-              </header>
-              <ul className="divide-y divide-slate-100">
+            <Panel title={`Prior reviews (${reviewsQuery.data.total})`}>
+              <ul className="divide-y divide-line">
                 {reviewsQuery.data.items.map((r, idx) => (
-                  <li
-                    key={`${r.reviewer}-${r.decided_at}-${idx}`}
-                    className="px-3 py-2 text-xs"
-                  >
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-mono font-semibold">{r.reviewer}</span>
+                  <li key={`${r.reviewer}-${r.decided_at}-${idx}`} className="px-4 py-3 text-xs">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono font-semibold text-ink">{r.reviewer}</span>
                       <span
                         className={[
-                          "px-1.5 py-0.5 rounded font-mono",
+                          "rie-badge",
                           r.decision === "accept"
-                            ? "bg-gate-pass text-white"
+                            ? "bg-gate-pass-bg text-gate-pass-text"
                             : r.decision === "correct"
-                              ? "bg-coverage-absent text-white"
-                              : "bg-gate-fail text-white",
+                              ? "bg-gate-flag-bg text-gate-flag-text"
+                              : "bg-gate-fail-bg text-gate-fail-text",
                         ].join(" ")}
                       >
                         {r.decision}
                       </span>
                       {r.corrected_score && (
-                        <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-800 font-mono">
+                        <span className="rie-badge border border-line bg-canvas font-mono text-muted">
                           score {r.corrected_score}
                         </span>
                       )}
-                      <span className="text-slate-400 font-mono ml-auto">
-                        {r.decided_at}
-                      </span>
+                      <span className="ml-auto font-mono text-muted">{r.decided_at}</span>
                     </div>
-                    {r.note && (
-                      <div className="mt-1 text-slate-600 whitespace-pre-wrap">
-                        {r.note}
-                      </div>
-                    )}
+                    {r.note && <p className="mt-2 whitespace-pre-wrap text-muted">{r.note}</p>}
                   </li>
                 ))}
               </ul>
-            </div>
+            </Panel>
           )}
 
           {lastReview && (
-            <div className="border border-gate-pass/50 bg-green-50 text-xs text-green-800 rounded-md px-3 py-2 font-mono">
-              recorded {lastReview.decision} by {lastReview.reviewer} at {lastReview.decided_at}
+            <div className="rounded-xl border border-gate-pass-bg bg-gate-pass-bg px-4 py-3 font-mono text-xs text-gate-pass-text">
+              Recorded {lastReview.decision} by {lastReview.reviewer}
             </div>
           )}
         </div>
       </div>
 
-      {/* Decision bar — Accept / Correct / Reject */}
       <DecisionBar
         reviewer={reviewer}
         onReviewerChange={setReviewer}
