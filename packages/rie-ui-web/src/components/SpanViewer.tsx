@@ -2,12 +2,6 @@ import { useMemo } from "react";
 
 import type { CitationDTO } from "@/types";
 
-// Renders the source text for a claim with the verified span highlighted.
-//
-// Backend invariant: rie-api materialises the citation text deterministically
-// (rie_api.routes.claims._materialise_citations). The UI NEVER fabricates
-// surrounding context — we render exactly what was returned.
-
 interface Props {
   citations: CitationDTO[];
   activeSpanId?: string | null;
@@ -28,7 +22,7 @@ export default function SpanViewer({ citations, activeSpanId, onSelect }: Props)
 
   if (citations.length === 0) {
     return (
-      <div className="border border-dashed border-slate-300 rounded-md p-6 text-sm text-slate-500">
+      <div className="rie-panel border-dashed px-6 py-12 text-center text-sm text-muted">
         No citations attached to this claim.
       </div>
     );
@@ -40,15 +34,15 @@ export default function SpanViewer({ citations, activeSpanId, onSelect }: Props)
         const first = items[0];
         if (!first) return null;
         return (
-          <article key={key} className="bg-white border border-slate-200 rounded-md">
-            <header className="px-4 py-2 border-b border-slate-200 bg-slate-50 text-xs font-mono text-slate-600 flex items-center justify-between">
+          <article key={key} className="rie-panel overflow-hidden">
+            <header className="flex items-center justify-between border-b border-line bg-canvas/60 px-4 py-3 font-mono text-xs text-muted">
               <span>
-                doc <span className="text-slate-900">{first.doc_id}</span> ·
-                element <span className="text-slate-900">{first.element_id}</span>
+                doc <span className="text-ink">{first.doc_id}</span> · element{" "}
+                <span className="text-ink">{first.element_id}</span>
               </span>
-              <span className="text-slate-400">{items.length} span(s)</span>
+              <span>{items.length} span{items.length === 1 ? "" : "s"}</span>
             </header>
-            <div className="px-4 py-3 space-y-3">
+            <div className="space-y-3 p-4">
               {items.map((c) => {
                 const active = c.span_id === activeSpanId;
                 return (
@@ -57,22 +51,20 @@ export default function SpanViewer({ citations, activeSpanId, onSelect }: Props)
                     type="button"
                     onClick={() => onSelect?.(c)}
                     className={[
-                      "block w-full text-left rounded-md border p-3 transition-colors",
+                      "block w-full rounded-lg border p-4 text-left transition-all duration-200",
                       active
-                        ? "border-yellow-500 bg-yellow-50"
-                        : "border-slate-200 hover:border-slate-400",
+                        ? "border-coverage-absent-border bg-coverage-absent-bg shadow-float"
+                        : "border-line bg-surface hover:border-ink/15 hover:shadow-float",
                     ].join(" ")}
                   >
-                    <div className="text-[11px] font-mono text-slate-500 mb-1 flex items-center gap-2">
-                      <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">
-                        {c.role}
-                      </span>
-                      <span>span {c.span_id}</span>
+                    <div className="mb-2 flex flex-wrap items-center gap-2 font-mono text-[11px] text-muted">
+                      <span className="rie-badge bg-canvas text-muted">{c.role}</span>
+                      <span>{c.span_id}</span>
                       <span>
-                        offsets {c.char_start}–{c.char_end}
+                        {c.char_start}–{c.char_end}
                       </span>
                     </div>
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    <p className="text-sm leading-relaxed text-ink whitespace-pre-wrap">
                       <span className="rie-span-highlight">{c.text || "(empty span)"}</span>
                     </p>
                   </button>

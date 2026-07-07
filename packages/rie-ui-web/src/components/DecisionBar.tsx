@@ -2,13 +2,6 @@ import { useEffect, useState } from "react";
 
 import type { ReviewDecision, ScoreBand } from "@/types";
 
-// HITL decision bar — emits Accept / Correct (with corrected_score) / Reject.
-// All persistence is the parent's responsibility (calls reviews.submit).
-//
-// The corrected-score select uses the ScoreBand enum string values exactly
-// (mirrors rie_contracts.ScoreBand). We DO NOT invent any score — Layer-2 is
-// reviewer-authored at decision time per the two-layer rule.
-
 interface Props {
   reviewer: string;
   onReviewerChange: (v: string) => void;
@@ -19,7 +12,6 @@ interface Props {
   }) => Promise<void> | void;
   disabled?: boolean;
   lastError?: string | null;
-  /** Layer-2 recommended band — pre-fills the Correct score select only. */
   suggestedBand?: ScoreBand | string | null;
 }
 
@@ -67,29 +59,33 @@ export default function DecisionBar({
   const isDisabled = disabled || busy || !reviewer.trim();
 
   return (
-    <div className="sticky bottom-0 border-t border-slate-200 bg-white p-4 rounded-md shadow-sm">
-      <div className="flex flex-wrap gap-3 items-end">
-        <label className="flex flex-col text-xs text-slate-600">
-          Reviewer
+    <div className="sticky bottom-4 z-40 rie-panel border-ink/10 p-5 shadow-float backdrop-blur-sm">
+      <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+        Reviewer decision
+      </p>
+
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="flex min-w-[140px] flex-col gap-1.5 text-xs font-medium text-muted">
+          Reviewer handle
           <input
             value={reviewer}
             onChange={(e) => onReviewerChange(e.target.value)}
             placeholder="your.handle"
-            className="mt-1 border border-slate-300 rounded px-2 py-1 text-sm w-40"
+            className="rie-input"
           />
         </label>
 
-        <label className="flex flex-col text-xs text-slate-600">
-          Corrected score (for Correct)
+        <label className="flex min-w-[160px] flex-col gap-1.5 text-xs font-medium text-muted">
+          Corrected score
           {suggestedBand && (
-            <span className="text-[10px] text-amber-700 font-mono mt-0.5">
+            <span className="font-mono text-[10px] font-normal text-coverage-absent-text">
               Layer-2 recommends {suggestedBand}
             </span>
           )}
           <select
             value={correctedScore}
             onChange={(e) => setCorrectedScore(e.target.value as ScoreBand)}
-            className="mt-1 border border-slate-300 rounded px-2 py-1 text-sm font-mono"
+            className="rie-input font-mono"
           >
             {SCORE_BANDS.map((b) => (
               <option key={b} value={b}>
@@ -99,23 +95,23 @@ export default function DecisionBar({
           </select>
         </label>
 
-        <label className="flex-1 min-w-[200px] flex flex-col text-xs text-slate-600">
+        <label className="flex min-w-[220px] flex-1 flex-col gap-1.5 text-xs font-medium text-muted">
           Note (optional)
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="reason / rationale"
-            className="mt-1 border border-slate-300 rounded px-2 py-1 text-sm"
+            placeholder="Reason or rationale"
+            className="rie-input"
           />
         </label>
       </div>
 
-      <div className="flex flex-wrap gap-2 mt-3">
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => fire("accept")}
           disabled={isDisabled}
-          className="px-3 py-1.5 rounded-md bg-gate-pass text-white text-sm font-medium disabled:opacity-50"
+          className="rie-btn bg-gate-pass-solid text-white hover:opacity-90"
         >
           Accept
         </button>
@@ -123,7 +119,7 @@ export default function DecisionBar({
           type="button"
           onClick={() => fire("correct")}
           disabled={isDisabled}
-          className="px-3 py-1.5 rounded-md bg-coverage-absent text-white text-sm font-medium disabled:opacity-50"
+          className="rie-btn bg-coverage-absent-solid text-white hover:opacity-90"
         >
           Correct
         </button>
@@ -131,19 +127,19 @@ export default function DecisionBar({
           type="button"
           onClick={() => fire("reject")}
           disabled={isDisabled}
-          className="px-3 py-1.5 rounded-md bg-gate-fail text-white text-sm font-medium disabled:opacity-50"
+          className="rie-btn bg-gate-fail-solid text-white hover:opacity-90"
         >
           Reject
         </button>
         {!reviewer.trim() && (
-          <span className="text-xs text-slate-500 self-center">
-            enter reviewer handle to enable actions
-          </span>
+          <span className="text-xs text-muted">Enter a reviewer handle to enable actions</span>
         )}
       </div>
 
       {lastError && (
-        <div className="mt-2 text-xs text-red-600 font-mono">{lastError}</div>
+        <div className="mt-3 rounded-lg border border-gate-fail-border bg-gate-fail-bg px-3 py-2 font-mono text-xs text-gate-fail-text">
+          {lastError}
+        </div>
       )}
     </div>
   );
