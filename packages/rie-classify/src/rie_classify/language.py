@@ -153,9 +153,7 @@ def _get_lingua_detector() -> object | None:
     try:
         from lingua import Language, LanguageDetectorBuilder  # type: ignore[import-not-found]
     except ImportError:
-        logger.info(
-            "lingua-language-detector not importable; falling back to stopword detector."
-        )
+        logger.info("lingua-language-detector not importable; falling back to stopword detector.")
         _LINGUA_DETECTOR = None
         return None
 

@@ -90,8 +90,7 @@ def _format_indicator(ic: IndicatorConfig, detected_language: str) -> str:
         if kws:
             match_str = "true" if match else "false"
             lines.append(
-                f"  positive_keywords[{used_lang}] (language_match: {match_str}): "
-                f"{', '.join(kws)}"
+                f"  positive_keywords[{used_lang}] (language_match: {match_str}): {', '.join(kws)}"
             )
     if ic.negative_cues:
         used_lang, kws, match = _select_keywords(
