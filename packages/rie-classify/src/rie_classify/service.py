@@ -71,6 +71,7 @@ class InternalClassification(BaseModel):
     language: str = Field(min_length=2, max_length=8)
     language_pillar_match: bool
 
+
 logger = logging.getLogger(__name__)
 
 # Sampling plan for self-consistency. Index 0 is deterministic; the rest add
@@ -122,9 +123,7 @@ class ClassificationService(ClassifierPort):
             raise ValueError("indicator_choices must be non-empty")
 
         detected_language = self._detect_clause_language(clause_element.text)
-        _pillar_supports_language(
-            indicator_choices=indicator_choices, language=detected_language
-        )
+        _pillar_supports_language(indicator_choices=indicator_choices, language=detected_language)
         prompt = build_classification_prompt(
             clause_element=clause_element,
             neighbourhood=neighbourhood,
@@ -270,13 +269,18 @@ class ClassificationService(ClassifierPort):
             role = (
                 SpanRole.PRIMARY if el.element_id == primary_element_id else SpanRole.REGIME_MEMBER
             )
+            # Offsets are ELEMENT-RELATIVE (0..len) so the verifier's
+            # `element_text[char_start:char_end]` reproduces the cited span
+            # byte-for-byte. Document-absolute position for display is derived
+            # downstream from the element's own char_start + page.
+            rel_end = len(el.text)
             spans.append(
                 EvidenceSpan(
-                    span_id=f"{el.doc_id}#{el.char_start}-{el.char_end}",
+                    span_id=f"{el.doc_id}#0-{rel_end}",
                     element_id=el.element_id,
                     doc_id=el.doc_id,
-                    char_start=el.char_start,
-                    char_end=el.char_end,
+                    char_start=0,
+                    char_end=rel_end,
                     role=role,
                 )
             )
