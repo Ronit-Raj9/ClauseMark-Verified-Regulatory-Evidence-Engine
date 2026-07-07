@@ -44,9 +44,7 @@ def build_graph(
     try:
         from langgraph.graph import END, START, StateGraph
     except ImportError as e:
-        raise ImportError(
-            "langgraph required. uv add --package rie-orchestration langgraph"
-        ) from e
+        raise ImportError("langgraph required. uv add --package rie-orchestration langgraph") from e
 
     graph = StateGraph(RieState)
 

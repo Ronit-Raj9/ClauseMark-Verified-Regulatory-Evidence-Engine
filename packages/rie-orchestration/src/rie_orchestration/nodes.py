@@ -41,7 +41,9 @@ def _apply_confidence_screening(
     screened: dict[str, object] = {}
     for pillar_id in state.get("pillar_ids", []):
         result = screen_pillar_confidence(
-            pillar_id, state.get("claims", []), bundle.config  # type: ignore[arg-type]
+            pillar_id,
+            state.get("claims", []),
+            bundle.config,  # type: ignore[arg-type]
         )
         screened[pillar_id] = result
     state["confidence_screen"] = screened
@@ -74,9 +76,7 @@ def _apply_confidence_screening(
         updated[claim_id] = flagged
         downgraded += 1
     if downgraded:
-        log.info(
-            "verify: confidence screening downgraded %d VERIFIED → FLAGGED", downgraded
-        )
+        log.info("verify: confidence screening downgraded %d VERIFIED → FLAGGED", downgraded)
     return updated
 
 
@@ -115,7 +115,11 @@ def ingest_node(state: RieState, bundle: AdapterBundle) -> RieState:
         state["raw_bytes_by_doc"] = raw_by_doc
         return state
 
+    local_only = state.get("local_only", False)
     for entry in entries:
+        if local_only and not getattr(entry, "local_path", None):
+            log.info("ingest: skip %s (local_only, no local_path)", entry.source_id)
+            continue
         try:
             meta, raw = bundle.ingest.load_document_bytes(entry)
         except IngestError as exc:
@@ -296,9 +300,7 @@ def coverage_node(state: RieState, bundle: AdapterBundle) -> RieState:
                 jurisdiction=state["jurisdiction"],
                 indicator_id=ind.indicator_id,
                 verified_claims=verified,
-                gold_recall=lookup_gold_recall(
-                    bundle, pillar_id, ind.indicator_id, state=state
-                ),
+                gold_recall=lookup_gold_recall(bundle, pillar_id, ind.indicator_id, state=state),
             )
             if corpus_completeness_enabled and manifest is not None:
                 enriched = enrich_with_completeness(

@@ -27,6 +27,7 @@ class RieState(TypedDict, total=False):
     pillar_ids: list[str]
     dry_run: bool
     skip_hitl: bool
+    local_only: bool
 
     # Ingest output
     documents: list[DocumentMeta]
