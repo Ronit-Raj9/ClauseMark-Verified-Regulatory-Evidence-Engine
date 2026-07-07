@@ -50,6 +50,7 @@ from rie_retrieval.embedder import (
     DenseEmbedderPort,
     SparseEmbedderPort,
 )
+from rie_retrieval.multilingual import LanguageAwareQueryExpander, detect_language
 
 __all__ = [
     "DEFAULT_CHILD_CHUNK_OVERLAP",
@@ -126,6 +127,7 @@ class RetrievalService(RetrievalPort):
         child_chunk_size: int = DEFAULT_CHILD_CHUNK_SIZE,
         child_chunk_overlap: int = DEFAULT_CHILD_CHUNK_OVERLAP,
         dense_dim: int = BGE_M3_DENSE_DIM,
+        query_expander: LanguageAwareQueryExpander | None = None,
     ) -> None:
         if top_k_rerank > top_k_initial:
             msg = f"top_k_rerank ({top_k_rerank}) must be <= top_k_initial ({top_k_initial})"
@@ -140,6 +142,7 @@ class RetrievalService(RetrievalPort):
         self._chunk_size = child_chunk_size
         self._chunk_overlap = child_chunk_overlap
         self._dense_dim = dense_dim
+        self._query_expander = query_expander
         self._docs: dict[str, _IndexedDocument] = {}
         # element_id -> the rendered text we hand to the reranker as the
         # candidate document, plus its char offsets for snippet reconstruction.
@@ -166,7 +169,15 @@ class RetrievalService(RetrievalPort):
         child_texts: list[str] = []
         child_payloads: list[dict[str, str | int | float | bool | None]] = []
 
-        doc_language = doc_meta.language or "en"
+        # Prefer the declared language; otherwise detect it best-effort from the
+        # leaf text so a multilingual collection still tags each child with the
+        # right script/lang (used for sparse tokenization + cross-lingual
+        # telemetry). Detection never raises and defaults to "en".
+        doc_language = doc_meta.language
+        if not doc_language:
+            sample = " ".join(e.text for e in leaves[:8])
+            detected = detect_language(sample)
+            doc_language = detected if detected != "unknown" else "en"
 
         for el in leaves:
             parent_element_id = parent_of.get(el.element_id, el.element_id)
@@ -236,13 +247,22 @@ class RetrievalService(RetrievalPort):
         top_k: int = 8,
         *,
         lang: str | None = None,
+        keywords_by_lang: dict[str, list[str]] | None = None,
     ) -> list[RetrievalHit]:
         if not query.strip():
             return []
 
-        q = _RetrievalQuery(
-            text=query, jurisdiction=jurisdiction, lang=lang, top_k=top_k
-        )
+        # Cross-lingual query expansion (Phase 2): when an expander is wired AND
+        # the caller supplies a pillar indicator's multilingual keyword variants,
+        # append the other-language surface forms so a query in language A can
+        # surface clauses indexed in language B. Default behaviour (no expander
+        # OR no keywords) is byte-for-byte unchanged — the original `query` is
+        # embedded as-is. Reranking always uses the ORIGINAL `query` text.
+        search_text = query
+        if self._query_expander is not None and keywords_by_lang:
+            search_text = self._query_expander.expand(query, keywords_by_lang)
+
+        q = _RetrievalQuery(text=search_text, jurisdiction=jurisdiction, lang=lang, top_k=top_k)
 
         dense_q = self._dense.embed_dense([q.text], lang=q.lang)[0]
         sparse_q = self._sparse.embed_sparse([q.text], lang=q.lang)[0]

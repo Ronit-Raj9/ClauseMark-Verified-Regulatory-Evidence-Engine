@@ -57,9 +57,7 @@ class DummyDenseEmbedder:
 
     dim: int = _DENSE_DIM
 
-    def embed_dense(
-        self, texts: Sequence[str], lang: str | None = None
-    ) -> list[list[float]]:
+    def embed_dense(self, texts: Sequence[str], lang: str | None = None) -> list[list[float]]:
         out: list[list[float]] = []
         for text in texts:
             vec = [0.0] * self.dim
@@ -86,9 +84,7 @@ class DummySparseEmbedder:
     across languages so a multilingual collection can share one BM25 index.
     """
 
-    def embed_sparse(
-        self, texts: Sequence[str], lang: str | None = None
-    ) -> list[dict[int, float]]:
+    def embed_sparse(self, texts: Sequence[str], lang: str | None = None) -> list[dict[int, float]]:
         out: list[dict[int, float]] = []
         for text in texts:
             freq: dict[int, float] = defaultdict(float)
