@@ -9,6 +9,7 @@ dependencies = [
     "qdrant-client>=1.12",
     "fastembed>=0.4",
     "numpy>=1.26",
+    "langdetect>=1.0.9",
 ]
 
 [build-system]
