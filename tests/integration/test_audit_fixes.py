@@ -229,7 +229,13 @@ def test_api_resume_endpoint_contract() -> None:
 )
 def test_hitl_resume_accepts_flagged_claims() -> None:
     """HITL interrupt → ``resume_pipeline`` completes flagged claims (§4)."""
-    from rie_contracts import GateName, GateResult, Layer1Status, VerificationReport, VerificationStatus
+    from rie_contracts import (
+        GateName,
+        GateResult,
+        Layer1Status,
+        VerificationReport,
+        VerificationStatus,
+    )
     from rie_orchestration import resume_pipeline, run_pipeline
     from rie_orchestration.fakes import (
         FakeClassifier,
@@ -248,9 +254,7 @@ def test_hitl_resume_accepts_flagged_claims() -> None:
     class _FlaggingVerifier:
         def verify(self, claim, get_element_text):
             del get_element_text
-            gates = [
-                GateResult(gate=g, passed=True, ran_at=datetime.now(UTC)) for g in GateName
-            ]
+            gates = [GateResult(gate=g, passed=True, ran_at=datetime.now(UTC)) for g in GateName]
             return VerificationReport(
                 claim_id=claim.claim_id,
                 gates=gates,
@@ -289,7 +293,7 @@ def test_hitl_resume_accepts_flagged_claims() -> None:
 
     resumed = resume_pipeline(
         run_id,
-        {cid: "accept" for cid in flagged_ids},
+        dict.fromkeys(flagged_ids, "accept"),
         bundle=bundle,
         enable_postgres_checkpointer=False,
     )

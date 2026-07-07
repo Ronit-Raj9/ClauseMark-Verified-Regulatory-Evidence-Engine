@@ -58,8 +58,13 @@ def test_structured_tabular_post_extract_attaches_rows_and_cells() -> None:
     table = _table("HS\tDescription\tRate\n0101\tHorses\t5%\n0102\tCattle\t0%")
     elements, edges = strat.post_extract(_meta(), [table], [])
 
-    rows = [e for e in elements if e.legal_numbering and e.legal_numbering.startswith("row:")
-            and "col:" not in e.legal_numbering]
+    rows = [
+        e
+        for e in elements
+        if e.legal_numbering
+        and e.legal_numbering.startswith("row:")
+        and "col:" not in e.legal_numbering
+    ]
     cells = [e for e in elements if e.element_type is ElementType.TABLE_CELL]
 
     # 3 lines → 3 rows; 3 cells each → 9 cells.
