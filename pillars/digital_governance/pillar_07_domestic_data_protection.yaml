@@ -1,87 +1,343 @@
+# RDTII 2.1 — Pillar 7: Domestic data protection and privacy.
+# Indicators + names + scoring criteria realigned to the AUTHORITATIVE ESCAP
+# RDTII 2.1 taxonomy (ESCAP-RDTII-2.1-guide.pdf, Oct 2025; Round-1 Database).
+# Scoring convention = RESTRICTIVENESS: 0 = open / low compliance cost; 1 =
+# restrictive / lacking / high compliance cost. 0.5 = partial.
+#
+# WITHIN-PILLAR INDICATOR WEIGHTS (DTRI/ECIPE expert study):
+# 7.1=31, 7.2=31, 7.3=16, 7.4=6, 7.5=16.
+# NB: `weight` cannot be expressed as a structured field — the frozen
+# `IndicatorConfig` contract (rie-contracts, extra="forbid") has no `weight`
+# property. Weights are recorded in each indicator's definition text and
+# ESCALATED to the lead (see report). DO NOT hard-code these in engine code.
+#
+# *** INVERSION (7.1 and 7.2) ***
+# 7.1 and 7.2 are framed as "LACK of ...". A comprehensive / dedicated framework
+# EXISTING scores toward 0 (open); the ABSENCE of a framework scores 1
+# (restrictive/lacking). This is the opposite polarity to a plain "framework
+# present" indicator. Worked traps:
+#   - Singapore 7.2: citing the MAS Cyber Hygiene Notice 2019 to claim a "lack"
+#     of cybersecurity framework is self-contradictory — the cited measure PROVES
+#     a framework exists, so 7.2 is 0, not 1.
+#   - A confidentiality duty (e.g. Banking Act 1970 s.47) is NOT a 6.1 transfer
+#     ban; the Banking-Act-as-6.1 label is a deliberately-wrong teaching example.
+#
+# SCOPE EXCEPTION: government data is NOT scored (commercial focus). 7.5 turns
+# restrictive when government access bypasses INDEPENDENT JUDICIAL oversight.
+
 pillar_id: "7"
-pillar_name: "Domestic data protection"
+pillar_name: "Domestic data protection and privacy"
 cluster: "digital_governance"
 document_profile: "statutory_legal_text"
 status: "built"
 description: >
-  Domestic data protection rules — consent, lawful basis, data-subject rights,
-  breach notification, independent supervisory authority.
+  Domestic data protection and privacy (RDTII 2.1 Pillar 7). Restrictiveness /
+  adequacy of the domestic regime across four policy parameters: data-protection
+  framework, dedicated cybersecurity framework, minimum data-retention periods,
+  DPIA/DPO obligations, and government access to personal data without
+  independent judicial oversight. 0 = open/adequate, 1 = restrictive/lacking.
+  Indicators 7.1 and 7.2 are INVERTED ("Lack of ..."): a framework existing
+  scores toward 0. Government-data measures are out of scope. Indicator weights
+  within the pillar: 7.1=31, 7.2=31, 7.3=16, 7.4=6, 7.5=16.
 
 indicators:
+  # ── 7.1 — weight 31 (INVERTED: lack of framework) ───────────────────────────
   - indicator_id: "7.1"
-    name: "Comprehensive data protection law in force"
+    name: "Lack of comprehensive legal framework for data protection"
     definition: >
-      Whether a horizontal data protection statute applicable across sectors
-      is in force.
+      [WEIGHT 31 — INVERTED] Core legal question: has the economy adopted a
+      COMPREHENSIVE data-protection framework applying to personal data ACROSS
+      sectors? "Comprehensive" = broad, cross-sectoral (horizontal) applicability
+      with a detailed scope of data-subject rights and obligations (access,
+      rectification, erasure, portability; covering collection, processing,
+      cross-border transfer). A framework EXISTING scores toward 0; its ABSENCE
+      scores 1. Government data out of scope (commercial transactions only).
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No general data protection law."
-      "0.5": "Sectoral data protection law(s) only."
-      "1": "Comprehensive horizontal data protection law in force."
+      "0": >
+        A comprehensive (horizontal) data-protection legal framework is in force
+        (e.g. Singapore PDPA 2012; Malaysia PDPA Act 709; Australia Privacy Act
+        1988 with the Australian Privacy Principles).
+      "0.5": >
+        A data-protection framework applies ONLY to specific sectors (a sectoral
+        law — e.g. a financial-sector or communications-sector personal-data code
+        of practice in the absence of, or in addition to, a horizontal law).
+      "1": >
+        The economy lacks a comprehensive data-protection framework.
     positive_keywords:
-      en: ["Personal Data Protection Act", "Data Protection Act", "this Act applies to"]
-    authority_hints: ["tier_1_statute"]
-
-  - indicator_id: "7.2"
-    name: "Lawful basis / consent for processing"
-    definition: >
-      Whether the law requires a lawful basis (consent or otherwise) for
-      processing personal data.
-    evaluation_method: "clause_extraction"
-    clause_pattern: "obligation"
-    scoring_criteria:
-      "0": "No general lawful-basis requirement."
-      "0.5": "Lawful basis required for specific data categories only."
-      "1": "General lawful-basis requirement (consent or enumerated alternatives)."
-    positive_keywords:
-      en: ["consent", "lawful basis", "shall only process", "with the consent of"]
-    authority_hints: ["tier_1_statute"]
-
-  - indicator_id: "7.3"
-    name: "Data-subject rights (access, rectification, erasure)"
-    definition: >
-      Whether data subjects have enforceable access, rectification, and erasure
-      rights against controllers.
-    evaluation_method: "clause_extraction"
-    clause_pattern: "obligation"
-    scoring_criteria:
-      "0": "No rights enumerated."
-      "0.5": "Partial rights (e.g. access only)."
-      "1": "Full triad: access + rectification + erasure (or equivalent)."
-    positive_keywords:
-      en: ["right to access", "right of access", "right to rectification",
-           "right to erasure", "right to be forgotten", "right to correction"]
-    authority_hints: ["tier_1_statute"]
-
-  - indicator_id: "7.4"
-    name: "Mandatory breach notification"
-    definition: >
-      Whether the law requires controllers to notify the supervisory authority
-      and/or data subjects of personal data breaches.
-    evaluation_method: "clause_extraction"
-    clause_pattern: "obligation"
-    scoring_criteria:
-      "0": "No breach notification."
-      "0.5": "Notification to authority only OR data subjects only."
-      "1": "Notification to authority AND data subjects."
-    positive_keywords:
-      en: ["notify the Commissioner", "without undue delay", "data breach notification",
-           "shall notify", "within 72 hours"]
+      en: ["Personal Data Protection Act", "Privacy Act", "Data Protection Act",
+           "Personal Data Protection Principles", "this Act applies to", "data subject",
+           "across all sectors", "horizontal"]
+      fr: ["loi sur la protection des données personnelles", "loi sur la vie privée",
+           "loi sur la protection des données", "principes de protection des données",
+           "la présente loi s'applique à", "personne concernée", "tous les secteurs"]
+      es: ["ley de protección de datos personales", "ley de privacidad",
+           "ley de protección de datos", "principios de protección de datos",
+           "la presente ley se aplica a", "interesado", "todos los sectores"]
+      zh: ["个人数据保护法", "隐私法", "数据保护法",
+           "个人数据保护原则", "本法适用于", "数据主体", "所有部门", "横向"]
+    negative_cues:
+      en: ["no data protection law", "absence of", "only applies to", "sector-specific",
+           "limited to the financial sector", "no general law"]
+      fr: ["aucune loi sur la protection des données", "absence de", "s'applique uniquement à",
+           "sectoriel", "limité au secteur financier", "aucune loi générale"]
+      es: ["ninguna ley de protección de datos", "ausencia de", "solo se aplica a",
+           "sectorial", "limitado al sector financiero", "ninguna ley general"]
+      zh: ["没有数据保护法", "缺乏", "仅适用于", "特定部门", "仅限金融部门", "没有一般性法律"]
+    few_shot_examples:
+      - text: >
+          The processing of personal data by a data user shall be in compliance
+          with the following Personal Data Protection Principles, namely the
+          General Principle, the Notice and Choice Principle, the Disclosure
+          Principle, the Security Principle, the Retention Principle, the Data
+          Integrity Principle and the Access Principle.
+        decomposition:
+          subject: "data user"
+          condition: "processing personal data"
+          constraint: "comprehensive horizontal principles-based framework exists"
+        label: "7.1"
+        score: 0
+        rationale: >
+          Malaysia PDPA Act 709 s.5 establishes a comprehensive horizontal data-
+          protection framework (seven principles, data-subject rights, a
+          Commissioner), so the "lack" claim is FALSE — 7.1=0. Band requires human
+          confirmation.
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
-  - indicator_id: "7.5"
-    name: "Independent supervisory authority"
+  # ── 7.2 — weight 31 (INVERTED: lack of cybersecurity framework) ─────────────
+  - indicator_id: "7.2"
+    name: "Lack of dedicated legal framework for cybersecurity"
     definition: >
-      Whether the law establishes an independent data protection / privacy
-      supervisory authority.
+      [WEIGHT 31 — INVERTED] Core legal question: has the economy adopted a
+      DEDICATED cybersecurity legal framework? "Dedicated" = a broadly-applicable
+      cybersecurity-specific law (horizontal) OR a cybersecurity-focused law for
+      specific sectors (sectoral). "Non-dedicated" = reliance on other laws (e.g.
+      computer-crime statutes) to address cyber threats. A dedicated horizontal
+      framework scores 0; absence scores 1. A cited cybersecurity instrument
+      PROVES a framework exists — do not claim "lack" while citing one.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No supervisory authority."
-      "0.5": "Authority exists but lacks independence indicia (e.g. ministerial control)."
-      "1": "Independent authority with enforcement powers."
+      "0": >
+        A dedicated cybersecurity legal framework applies to ALL sectors
+        (horizontal) — e.g. Singapore Cybersecurity Act 2018; Malaysia Cyber
+        Security Act 2024 (Act 854).
+      "0.5": >
+        A non-dedicated cybersecurity framework AND/OR a dedicated cybersecurity
+        framework applying only to SPECIFIC sectors (e.g. Australia — dispersed
+        across the Security of Critical Infrastructure Act 2018, Criminal Code Act
+        1995 and the national Cyber Security Strategy, with no single horizontal
+        cybersecurity law).
+      "1": >
+        The economy lacks any cybersecurity legal framework.
     positive_keywords:
-      en: ["the Commission shall be independent", "Commissioner", "supervisory authority",
-           "Data Protection Commission", "Data Protection Authority"]
-    authority_hints: ["tier_1_statute"]
+      en: ["Cybersecurity Act", "Cyber Security Act", "critical information infrastructure",
+           "national cyber security", "cybersecurity framework", "CSP licensing",
+           "Computer Crimes Act"]
+      fr: ["loi sur la cybersécurité", "infrastructure d'information critique",
+           "cybersécurité nationale", "cadre de cybersécurité", "loi sur les crimes informatiques"]
+      es: ["ley de ciberseguridad", "infraestructura crítica de información",
+           "ciberseguridad nacional", "marco de ciberseguridad", "ley de delitos informáticos"]
+      zh: ["网络安全法", "关键信息基础设施", "国家网络安全", "网络安全框架", "计算机犯罪法"]
+    negative_cues:
+      en: ["no cybersecurity law", "absence of a dedicated", "dispersed across",
+           "relies on other laws", "no single framework", "non-dedicated"]
+      fr: ["aucune loi sur la cybersécurité", "absence d'un cadre dédié", "dispersé entre",
+           "s'appuie sur d'autres lois", "aucun cadre unique", "non dédié"]
+      es: ["ninguna ley de ciberseguridad", "ausencia de un marco dedicado", "disperso entre",
+           "se basa en otras leyes", "ningún marco único", "no dedicado"]
+      zh: ["没有网络安全法", "缺乏专门的", "分散于", "依赖其他法律", "没有单一框架", "非专门"]
+    few_shot_examples:
+      - text: >
+          The Cybersecurity Act 2018 establishes a framework for the oversight and
+          maintenance of national cybersecurity in Singapore, including the
+          protection of critical information infrastructure, the powers of the
+          Commissioner of Cybersecurity, and the licensing of cybersecurity
+          service providers.
+        decomposition:
+          subject: "cybersecurity service providers and CII owners"
+          condition: "national cybersecurity oversight"
+          constraint: "dedicated horizontal cybersecurity framework exists"
+        label: "7.2"
+        score: 0
+        rationale: >
+          Singapore Cybersecurity Act 2018 is a dedicated horizontal framework, so
+          the "lack" claim is FALSE — 7.2=0. Citing a cybersecurity instrument to
+          argue "lack" is self-contradictory (the MAS-notice trap). Band requires
+          human confirmation.
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  # ── 7.3 — weight 16 ─────────────────────────────────────────────────────────
+  - indicator_id: "7.3"
+    name: "Minimum period of data retention requirements"
+    definition: >
+      [WEIGHT 16] Core legal question: does the law impose a MINIMUM retention
+      period (firms must keep data for at least a specified period — days/months/
+      years — available on the authorities' request)? Distinct from local storage
+      (6.2 = LOCATION) — retention is about DURATION, and the retained data may be
+      held anywhere, including abroad. A "retain no longer than necessary" /
+      "as long as necessary" ceiling is the OPPOSITE and is NOT scored (it is a
+      maximum-period type, no longer scored in 2.1). Binary indicator (0/1).
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": >
+        No retention requirement, OR a requirement that does not specify a minimum
+        period (e.g. Singapore PDPA 2012 s.25 Retention Limitation Obligation —
+        cease retention when the purpose is served; Malaysia PDPA Act 709 s.10
+        Retention Principle — not kept longer than necessary).
+      "1": >
+        A minimum-period retention requirement exists (e.g. Singapore Companies
+        Act 1967 s.199 — 5 years; Income Tax Act 1947 s.67 — 5 years; Telecom
+        licence — 12 months; Malaysia Income Tax Act 1967 s.82 / Service Tax Act
+        2018 s.24 — 7 years; Australia Telecommunications (Interception and
+        Access) Act 1979 s.187C — 2 years).
+    positive_keywords:
+      en: ["shall retain for", "keep for a period of", "retained for at least",
+           "for a period of not less than", "preserve for", "5 years", "7 years",
+           "two years", "12 months"]
+      fr: ["doit conserver pendant", "conserver pour une durée de", "conservé pendant au moins",
+           "pour une durée d'au moins", "préserver pendant", "cinq ans", "deux ans"]
+      es: ["deberá conservar durante", "conservar por un período de", "conservado por al menos",
+           "por un período no inferior a", "preservar durante", "cinco años", "dos años"]
+      zh: ["应保留", "保存期限为", "至少保留", "不少于的期限", "保存至少", "五年", "两年", "十二个月"]
+    negative_cues:
+      en: ["no longer than necessary", "as long as necessary", "cease to retain",
+           "shall destroy", "shall not be kept longer than", "delete when no longer required"]
+      fr: ["pas plus longtemps que nécessaire", "aussi longtemps que nécessaire", "cesser de conserver",
+           "doit détruire", "ne doit pas être conservé plus longtemps que"]
+      es: ["no más de lo necesario", "el tiempo que sea necesario", "cesar la conservación",
+           "deberá destruir", "no se conservará más tiempo que"]
+      zh: ["不超过必要期限", "在必要期间内", "停止保留", "应予销毁", "不得超过必要期限保存"]
+    few_shot_examples:
+      - text: >
+          A company shall retain the accounting and other records that are required
+          to be kept under this section for a period of not less than 5 years after
+          the completion of the transactions or operations to which they relate.
+        decomposition:
+          subject: "company"
+          condition: "keeping accounting records"
+          constraint: "minimum retention period of 5 years"
+        label: "7.3"
+        score: 1
+        rationale: >
+          Companies Act 1967 s.199 fixes a minimum retention period of 5 years, so
+          7.3=1 (binary). A "no longer than necessary" rule would instead be 0.
+          Band requires human confirmation.
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  # ── 7.4 — weight 6 (LOWEST in Pillar 7) ─────────────────────────────────────
+  - indicator_id: "7.4"
+    name: "Data Protection Impact Assessment (DPIA) or Data Protection Officer (DPO) requirements"
+    definition: >
+      [WEIGHT 6] Core legal question: does the law require appointment of a Data
+      Protection Officer (DPO) or performance of a Data Protection Impact
+      Assessment (DPIA)? The metric focuses on the presence of a DPO requirement
+      (DPIA usually follows DPO appointment). Government data out of scope.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": >
+        No requirement to appoint a DPO or perform a DPIA.
+      "0.5": >
+        A requirement for a DPO, or for both DPO and DPIA, applying ONLY to a
+        specific sector.
+      "1": >
+        A requirement to appoint a DPO, OR the application of BOTH DPO and DPIA,
+        HORIZONTALLY across all sectors (e.g. Singapore PDPA 2012 s.11(3) — appoint
+        at least one DPO; Malaysia PDPA Act 709 as amended 2024 s.12A — mandatory
+        DPO + DPIA for high-risk processing).
+    positive_keywords:
+      en: ["data protection officer", "appoint a DPO", "designate an individual responsible",
+           "data protection impact assessment", "DPIA", "at least one individual responsible"]
+      fr: ["délégué à la protection des données", "désigner un DPO",
+           "analyse d'impact relative à la protection des données", "AIPD"]
+      es: ["delegado de protección de datos", "designar un DPO",
+           "evaluación de impacto relativa a la protección de datos", "EIPD"]
+      zh: ["数据保护官", "指定数据保护官", "指定负责人", "数据保护影响评估", "影响评估"]
+    negative_cues:
+      en: ["no requirement to appoint", "recommended", "advised", "not mandated",
+           "voluntary", "may appoint"]
+      fr: ["aucune obligation de désigner", "recommandé", "conseillé", "non obligatoire",
+           "facultatif", "peut désigner"]
+      es: ["ninguna obligación de designar", "recomendado", "aconsejado", "no obligatorio",
+           "voluntario", "podrá designar"]
+      zh: ["无需指定", "建议", "鼓励", "非强制", "自愿", "可指定"]
+    few_shot_examples:
+      - text: >
+          An organisation shall designate at least one individual (a data
+          protection officer) to be responsible for ensuring that the organisation
+          complies with this Act, and shall make available to the public the
+          business contact information of that individual.
+        decomposition:
+          subject: "organisation"
+          condition: "ensuring compliance with the Act"
+          constraint: "must designate at least one DPO (horizontal)"
+        label: "7.4"
+        score: 1
+        rationale: >
+          Singapore PDPA 2012 s.11(3) mandates a DPO horizontally across all
+          sectors, so 7.4=1. Band requires human confirmation.
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  # ── 7.5 — weight 16 ─────────────────────────────────────────────────────────
+  - indicator_id: "7.5"
+    name: "Requirements to allow government access to personal data"
+    definition: >
+      [WEIGHT 16] Core legal question: can the government access personal data
+      WITHOUT the explicit authorisation of an INDEPENDENT JUDICIAL body (a court
+      decision / judicial warrant / equivalent with due-process safeguards)? A
+      provision enabling government/law-enforcement access without independent
+      judicial oversight scores 1; the absence of such a requirement scores 0.
+      Binary indicator (0/1). Government data out of scope.
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": >
+        No requirement allowing government access to personal data without
+        independent judicial oversight (e.g. Malaysia PDPA Act 709 — access only
+        via warrant or narrow investigatory exemptions; the PDPA row itself scored
+        0 in Round-1).
+      "1": >
+        A requirement applies that allows government access to personal data
+        without independent judicial authorisation (e.g. Singapore Criminal
+        Procedure Code 2010 ss.39/40 — police access to computers and decrypted
+        info; Australia Telecommunications (Interception and Access) Act 1979 —
+        interception without warrant in emergencies; Malaysia Cyber Security Act
+        2024 s.40 — search and seizure without warrant where delay is harmful).
+    positive_keywords:
+      en: ["without a warrant", "without prior authorisation", "without the order of a court",
+           "shall provide to the authority", "intercept", "access to computerised data",
+           "shall hand over", "production of any document", "subscriber information"]
+      fr: ["sans mandat", "sans autorisation préalable", "sans décision de justice",
+           "doit fournir à l'autorité", "intercepter", "accès aux données informatisées"]
+      es: ["sin orden judicial", "sin autorización previa", "sin orden de un tribunal",
+           "deberá facilitar a la autoridad", "interceptar", "acceso a datos informatizados"]
+      zh: ["无需搜查令", "无需事先授权", "无需法院命令",
+           "应向当局提供", "拦截", "访问计算机化数据", "应交出", "用户信息"]
+    negative_cues:
+      en: ["upon a court order", "with a judicial warrant", "with the authorisation of the public prosecutor",
+           "subject to judicial oversight", "only with the order of a court"]
+      fr: ["sur décision de justice", "avec un mandat judiciaire", "avec l'autorisation du procureur",
+           "sous contrôle judiciaire", "uniquement sur décision d'un tribunal"]
+      es: ["mediante orden judicial", "con una orden judicial", "con la autorización del fiscal",
+           "bajo control judicial", "únicamente por orden de un tribunal"]
+      zh: ["须经法院命令", "凭司法令状", "经检察官授权", "受司法监督", "仅凭法院命令"]
+    few_shot_examples:
+      - text: >
+          A police officer may access any computer and any data stored in the
+          computer, and may require any person to provide the necessary password,
+          encryption code or decryption code, or other means required to enable
+          comprehension of the data, in the course of an investigation.
+        decomposition:
+          subject: "police officer"
+          condition: "in the course of an investigation"
+          constraint: "may compel access to data and decryption without a judicial warrant"
+        label: "7.5"
+        score: 1
+        rationale: >
+          Singapore Criminal Procedure Code 2010 ss.39/40 permit police access to
+          computers and decrypted information in investigations without independent
+          judicial authorisation, so 7.5=1. Band requires human confirmation.
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]

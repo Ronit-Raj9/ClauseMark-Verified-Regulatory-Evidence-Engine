@@ -1,111 +1,347 @@
+# RDTII 2.1 — Pillar 6: Cross-border data policies.
+# Indicators + names + scoring criteria realigned to the AUTHORITATIVE ESCAP
+# RDTII 2.1 taxonomy (ESCAP-RDTII-2.1-guide.pdf, Oct 2025; Round-1 Database).
+# Scoring convention = RESTRICTIVENESS: 0 = open / no restriction (low compliance
+# cost); 1 = restrictive / extensive (high compliance cost). 0.5 = partial.
+#
+# WITHIN-PILLAR INDICATOR WEIGHTS (DTRI/ECIPE expert study; used to aggregate
+# indicator scores into the Pillar score): 6.1=38, 6.2=12, 6.3=31, 6.4=12, 6.5=8.
+# NB: `weight` cannot be expressed as a structured field — the frozen
+# `IndicatorConfig` contract (rie-contracts, extra="forbid") has no `weight`
+# property. Weights are therefore recorded in each indicator's definition text
+# and ESCALATED to the lead (see report). DO NOT hard-code these in engine code.
+#
+# SCOPE EXCEPTION (6.1-6.4): measures applied to GOVERNMENT data are NOT scored —
+# the DB captures COMMERCIAL transactions only. EDGE CASE: ESCAP nonetheless
+# scored Australia's My Health Records Act 2012 (health-record localisation) at
+# 6.1=0.5 and 6.2=0.5, treating health-data localisation as in-scope; do not
+# hard-exclude every government-data measure.
+#
+# COMMON SCORING FEATURES (apply to 6.1, 6.2, 6.4): (a) type-of-data — measures
+# on PERSONAL data score higher than non-personal; (b) scope — HORIZONTAL
+# (cross-sector) scores higher than sector-specific (financial/telecom) or
+# specific data types; (c) number-of-economies — a requirement covering MORE
+# economies scores higher than one economy (6.1/6.4 only; 6.2 has no
+# economies feature).
+
 pillar_id: "6"
-pillar_name: "Cross-border data transfers"
+pillar_name: "Cross-border data policies"
 cluster: "digital_governance"
 document_profile: "statutory_legal_text"
 status: "built"
 description: >
-  Restrictions, conditions and adequacy regimes governing the export of personal
-  data and other regulated data categories across national borders.
+  Cross-border data policies (RDTII 2.1 Pillar 6). Restrictiveness of the
+  regulatory environment governing the movement of data across national borders:
+  outright transfer bans and local-processing mandates, local-storage (copy-on-
+  shore) requirements, local-data-centre/infrastructure mandates, conditional
+  flow regimes (adequacy / safeguards / consent), and treaty commitments on data
+  transfer. 0 = open, 1 = restrictive. Government-data measures are out of scope
+  for 6.1-6.4 (commercial transactions only), with the noted health-data edge
+  case. Indicator weights within the pillar: 6.1=38, 6.2=12, 6.3=31, 6.4=12,
+  6.5=8.
 
 indicators:
+  # ── 6.1 — weight 38 (HIGHEST in Pillar 6) ──────────────────────────────────
   - indicator_id: "6.1"
-    name: "Free cross-border data flow"
+    name: "Ban and local processing requirements"
     definition: >
-      Whether the law permits cross-border transfer of personal data without
-      conditions on the receiving jurisdiction.
-    evaluation_method: "clause_extraction"
-    clause_pattern: "obligation"
-    scoring_criteria:
-      "0": "Outbound transfer prohibited or conditioned on regulator approval."
-      "0.5": "Outbound transfer permitted subject to comparable-protection or adequacy requirement."
-      "1": "Outbound transfer expressly permitted without conditions on receiving jurisdiction."
-    positive_keywords:
-      en: ["may transfer", "shall be permitted to transfer", "no restriction"]
-    negative_cues:
-      en: ["only if", "subject to", "prior authorisation", "prohibited"]
-    authority_hints: ["tier_1_statute", "tier_2_regulation"]
-
-  - indicator_id: "6.2"
-    name: "Prohibition on cross-border transfer"
-    definition: >
-      Whether the law prohibits or severely restricts the transfer of certain
-      data categories across borders.
+      [WEIGHT 38] Core legal question: does the law BAN cross-border transfer of
+      data per se, and/or MANDATE local processing (require collection,
+      organisation, structuring, storage, adaptation, use, disclosure or
+      dissemination of data to occur domestically)? A conditional "shall not
+      transfer ... unless" rule is NOT an outright ban (that is 6.4). Government
+      data is out of scope (commercial transactions only); the Australia My
+      Health Records Act 2012 health-data edge case is in scope at 0.5.
     evaluation_method: "clause_extraction"
     clause_pattern: "prohibition"
     scoring_criteria:
-      "0": "No prohibition."
-      "0.5": "Prohibition applies to narrow data categories only."
-      "1": "General prohibition on outbound transfer (or for broad personal-data categories)."
+      "0": >
+        Data is permitted to transfer freely without any ban or local-processing
+        requirement (e.g. Singapore — PDPA imposes no transfer ban or local-
+        processing mandate).
+      "0.5": >
+        A ban and/or local-processing requirement applies only to NON-personal
+        data, OR to a SPECIFIC data set, OR to ONE economy (e.g. Australia My
+        Health Records Act 2012 — sectoral personal-health-data localisation).
+      "1": >
+        A ban and/or local-processing requirement covers PERSONAL data OR applies
+        HORIZONTALLY across sectors; OR there are two or more such requirements on
+        non-personal / specific data sets, or it applies to more than one economy.
     positive_keywords:
-      en: ["shall not transfer", "prohibited from transferring", "is not permitted"]
-    authority_hints: ["tier_1_statute"]
+      en: ["shall not transfer", "prohibited from transferring", "ban on transfer",
+           "must be processed within", "shall be processed in", "local processing",
+           "processed locally", "carried out within the territory"]
+      fr: ["ne doit pas transférer", "interdiction de transfert", "interdit de transférer",
+           "doit être traité sur le territoire", "traitement local", "traité localement"]
+      es: ["no podrá transferir", "prohibición de transferencia", "prohibido transferir",
+           "deberá tratarse en el territorio", "procesamiento local", "tratado localmente"]
+      zh: ["不得传输", "禁止传输", "传输禁令",
+           "必须在境内处理", "本地处理", "在境内进行处理"]
+    negative_cues:
+      en: ["unless", "subject to", "with consent", "where the recipient",
+           "freely", "no restriction", "permitted to transfer"]
+      fr: ["sauf si", "sous réserve de", "avec le consentement", "lorsque le destinataire",
+           "librement", "aucune restriction", "autorisé à transférer"]
+      es: ["a menos que", "sujeto a", "con consentimiento", "cuando el destinatario",
+           "libremente", "sin restricción", "autorizado a transferir"]
+      zh: ["除非", "须遵守", "经同意", "在接收方", "自由地", "无限制", "允许传输"]
+    few_shot_examples:
+      - text: >
+          Singapore does not implement a ban on data transfer or a local
+          processing requirement. Under the Personal Data Protection Act 2012 an
+          organisation may transfer personal data outside Singapore provided the
+          recipient is bound by a comparable standard of protection.
+        decomposition:
+          subject: "organisation"
+          condition: "transfer of personal data outside Singapore"
+          constraint: "no outright ban and no local-processing mandate exists"
+        label: "6.1"
+        score: 0
+        rationale: >
+          The PDPA 2012 conditions outbound transfer (a 6.4 conditional regime)
+          but imposes no transfer ban and no local-processing mandate, so 6.1=0.
+          Do NOT mischaracterise a confidentiality or conditional-transfer rule as
+          a localisation ban (the assignment-1 failure mode). Restrictiveness band
+          is a recommendation requiring human confirmation.
+      - text: >
+          A registered healthcare recipient must not hold or take a record, or
+          process information, comprised in the National Repositories outside
+          Australia, except where the record or information does not include
+          personal information or identifying information.
+        decomposition:
+          subject: "registered healthcare recipient"
+          condition: "holding or processing My Health Record information"
+          constraint: "must occur within Australia (personal health data)"
+        label: "6.1"
+        score: 0.5
+        rationale: >
+          My Health Records Act 2012 s.77 mandates local holding/processing of
+          personal health records — a sectoral (personal-health-data) local-
+          processing requirement, hence 0.5 not 1. Edge case to the government-
+          data exception. Band requires human confirmation.
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
-  - indicator_id: "6.3"
-    name: "Data localisation requirement"
+  # ── 6.2 — weight 12 ─────────────────────────────────────────────────────────
+  - indicator_id: "6.2"
+    name: "Local storage requirements"
     definition: >
-      Whether the law requires personal or other regulated data to be stored or
-      processed locally.
+      [WEIGHT 12] Core legal question: does the law require a COPY of certain data
+      to be STORED within the economy (a copy-on-shore rule — cross-border
+      transfer is permitted so long as a copy is retained locally)? Two features
+      only: type-of-data and scope (no number-of-economies feature). Distinct from
+      6.3 (which mandates BUILDING/OWNING local infrastructure) and from 7.3
+      (which fixes a retention DURATION regardless of location). Local processing
+      (6.1) is more demanding than local storage. Government data out of scope.
     evaluation_method: "clause_extraction"
     clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No localisation."
-      "0.5": "Conditional localisation (sector-specific or copy-on-shore)."
-      "1": "Mandatory exclusive local storage / processing."
+      "0": >
+        Data may be transferred freely with no local-storage requirement (e.g.
+        Malaysia — PDPA Act 709 imposes no data-localisation/local-storage rule).
+      "0.5": >
+        A local-storage requirement applies to NON-personal data OR to a SPECIFIC
+        data set (e.g. Singapore Companies Act 1967 s.199 — accounting records
+        kept in Singapore; Malaysia Income Tax Act 1967 s.82 / Service Tax Act
+        2018 s.24 — tax records retained in Malaysia).
+      "1": >
+        A local-storage requirement covers PERSONAL data OR applies HORIZONTALLY
+        across sectors; OR there are two or more local-storage requirements on
+        non-personal / specific data sets.
     positive_keywords:
-      en: ["shall be stored within", "must be processed in", "local storage required",
-           "stored on a server located in"]
+      en: ["shall be kept in", "shall be retained in", "stored within",
+           "kept at a place in", "copy ... within the territory", "maintained in",
+           "held in"]
+      fr: ["doit être conservé sur le territoire", "doit être conservé dans",
+           "stocké sur le territoire", "copie conservée sur le territoire", "détenu sur le territoire"]
+      es: ["deberá conservarse en", "deberá mantenerse en", "almacenado en el territorio",
+           "copia conservada en el territorio", "mantenido en el territorio"]
+      zh: ["应保存在境内", "应留存于境内", "存储在境内",
+           "在境内保留副本", "保存于境内"]
+    negative_cues:
+      en: ["may be kept anywhere", "regardless of location", "outside the country",
+           "as long as necessary", "no longer than necessary"]
+      fr: ["peut être conservé n'importe où", "indépendamment du lieu", "à l'étranger",
+           "aussi longtemps que nécessaire", "pas plus longtemps que nécessaire"]
+      es: ["puede conservarse en cualquier lugar", "independientemente del lugar", "en el extranjero",
+           "el tiempo que sea necesario", "no más de lo necesario"]
+      zh: ["可保存于任何地点", "无论存储地点", "在境外", "在必要期间内", "不超过必要期限"]
+    few_shot_examples:
+      - text: >
+          A company shall cause accounting and other records to be kept that will
+          sufficiently explain the transactions and financial position of the
+          company, and shall retain those records for 5 years; the records shall
+          be kept at the registered office of the company or at such other place
+          in Singapore as the directors think fit.
+        decomposition:
+          subject: "company"
+          condition: "keeping accounting records"
+          constraint: "records kept at a place in Singapore (sectoral data set)"
+        label: "6.2"
+        score: 0.5
+        rationale: >
+          Companies Act 1967 s.199 requires accounting records to be kept in
+          Singapore — a sectoral (specific-data-set) local-storage requirement,
+          hence 0.5. Band requires human confirmation.
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
-  - indicator_id: "6.4"
-    name: "Conditional cross-border transfer regime (adequacy / safeguards)"
+  # ── 6.3 — weight 31 ─────────────────────────────────────────────────────────
+  - indicator_id: "6.3"
+    name: "Infrastructure requirements"
     definition: >
-      Whether the law permits outbound transfer subject to one or more
-      conditions — e.g. adequacy decision, standard contractual clauses,
-      binding corporate rules, consent, or comparable-protection finding.
+      [WEIGHT 31] Core legal question: does the law mandate establishment of a
+      LOCAL DATA CENTRE (or dedicated local physical infrastructure) as a
+      condition to provide a service using data? Distinct from 6.2 (storing data
+      within the economy may use rented facilities) — 6.3 requires BUILDING/OWNING
+      dedicated local infrastructure as a primary barrier to data movement.
+      Operational/technical requirements that merely apply to data centres are NOT
+      scored here. Government data out of scope. Binary indicator (0/1).
+    evaluation_method: "clause_extraction"
+    clause_pattern: "obligation"
+    scoring_criteria:
+      "0": >
+        No infrastructure requirement (e.g. Singapore and Malaysia — no explicit
+        local-data-centre mandate as a condition to provide services).
+      "1": >
+        At least one infrastructure requirement: an explicit mandate to establish
+        a local data centre / dedicated local data-storage infrastructure as a
+        condition for providing a service (e.g. Viet Nam — at least one local
+        server for websites/social/online-games; Mongolia — servers for
+        biometric/genetic data physically local).
+    positive_keywords:
+      en: ["local data centre", "establish a data center", "server located in",
+           "at least one server within", "build a data centre", "dedicated local infrastructure",
+           "host on servers in the territory"]
+      fr: ["centre de données local", "établir un centre de données", "serveur situé dans",
+           "au moins un serveur sur le territoire", "infrastructure locale dédiée", "héberger sur des serveurs"]
+      es: ["centro de datos local", "establecer un centro de datos", "servidor ubicado en",
+           "al menos un servidor en el territorio", "infraestructura local dedicada", "alojar en servidores"]
+      zh: ["本地数据中心", "设立数据中心", "服务器位于境内",
+           "境内至少一台服务器", "专用本地基础设施", "托管于境内服务器"]
+    negative_cues:
+      en: ["may use any provider", "cloud service", "operational requirement",
+           "technical standard for data centres"]
+      fr: ["peut utiliser n'importe quel fournisseur", "service en nuage", "exigence opérationnelle",
+           "norme technique pour les centres de données"]
+      es: ["puede usar cualquier proveedor", "servicio en la nube", "requisito operativo",
+           "norma técnica para centros de datos"]
+      zh: ["可使用任何提供商", "云服务", "运营要求", "数据中心技术标准"]
+    few_shot_examples:
+      - text: >
+          Singapore does not implement an infrastructure requirement. The Personal
+          Data Protection Act 2012 does not require organisations to establish a
+          local data centre as a condition to provide services using data.
+        decomposition:
+          subject: "organisation"
+          condition: "providing services using data"
+          constraint: "no local-data-centre / infrastructure mandate exists"
+        label: "6.3"
+        score: 0
+        rationale: >
+          No statutory mandate to establish dedicated local infrastructure, so
+          6.3=0 (binary). Band requires human confirmation.
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
+
+  # ── 6.4 — weight 12 ─────────────────────────────────────────────────────────
+  - indicator_id: "6.4"
+    name: "Conditional flow regimes"
+    definition: >
+      [WEIGHT 12] Core legal question: does the law impose CONDITIONS on cross-
+      border transfer (beyond storage/processing/infrastructure) that prevent
+      transfer to economies where data protection is not adequate/equivalent —
+      e.g. adequacy/whitelist finding, comparable-protection obligation on the
+      recipient, individual consent, contractual safeguards, or prior government
+      approval? Scoring is NOT based on who decides (individual / business /
+      government) but on type-of-data and scope. Government data out of scope.
     evaluation_method: "clause_extraction"
     clause_pattern: "conditional_regime"
     scoring_criteria:
-      "0": "No conditional regime — either fully free or fully prohibited."
-      "0.5": "Conditions exist but are narrow or sectoral."
-      "1": "A general conditional regime is the operating rule for outbound transfers."
+      "0": >
+        No condition on outbound transfer (data flows freely, or is wholly
+        prohibited with no conditional escape).
+      "0.5": >
+        The conditional-flow regime applies to NON-personal data and/or a SPECIFIC
+        data set (financial / telecom / cloud).
+      "1": >
+        The regime covers PERSONAL data (whether horizontal OR sector-specific);
+        OR the conditional-flow regime applies HORIZONTALLY across all sectors
+        even if only on non-personal / specific data (e.g. Malaysia PDPA Act 709
+        s.129; Singapore PDPA 2012 s.26).
     positive_keywords:
-      en: [
-        "comparable level of protection", "adequacy", "appropriate safeguards",
-        "standard contractual clauses", "binding corporate rules", "explicit consent",
-        "subject to", "provided that", "may transfer if", "where"
-      ]
+      en: ["shall not transfer", "unless", "comparable", "adequate level of protection",
+           "appropriate safeguards", "standard contractual clauses", "binding corporate rules",
+           "with the consent", "substantially similar", "specified by the Minister", "provided that"]
+      fr: ["ne doit pas transférer", "sauf si", "comparable", "niveau de protection adéquat",
+           "garanties appropriées", "clauses contractuelles types", "règles d'entreprise contraignantes",
+           "avec le consentement", "substantiellement similaire", "à condition que"]
+      es: ["no podrá transferir", "a menos que", "comparable", "nivel adecuado de protección",
+           "garantías adecuadas", "cláusulas contractuales tipo", "normas corporativas vinculantes",
+           "con el consentimiento", "sustancialmente similar", "siempre que"]
+      zh: ["不得传输", "除非", "同等的", "充分的保护水平",
+           "适当保障措施", "标准合同条款", "有约束力的公司规则",
+           "经同意", "实质上相似", "前提是"]
     negative_cues:
-      en: ["unconditional", "freely"]
+      en: ["unconditional", "freely", "without any condition", "no restriction"]
+      fr: ["sans condition", "librement", "sans aucune condition", "aucune restriction"]
+      es: ["incondicional", "libremente", "sin ninguna condición", "sin restricción"]
+      zh: ["无条件", "自由地", "没有任何条件", "无限制"]
     few_shot_examples:
-      - text: |
-          An organisation shall not transfer any personal data outside the country
-          unless it has taken appropriate steps to ensure that the recipient is
-          bound by legally enforceable obligations to provide to the transferred
-          personal data a standard of protection that is comparable to the
-          protection under this Act.
+      - text: >
+          A data user shall not transfer any personal data of a data subject to a
+          place outside Malaysia unless to such place as specified by the Minister
+          by notification in the Gazette; or where the data subject has given his
+          consent to the transfer, or the transfer is necessary for the
+          performance of a contract, or the data user has taken all reasonable
+          precautions to ensure the data will not be processed in contravention of
+          this Act.
+        decomposition:
+          subject: "data user"
+          condition: "transfer of personal data outside Malaysia"
+          constraint: "permitted only to a gazetted place or under listed conditions (consent / contract / safeguards)"
+        label: "6.4"
+        score: 1
+        rationale: >
+          PDPA Act 709 s.129 is a horizontal conditional-flow regime over PERSONAL
+          data (default-deny + adequacy whitelist + consent/contract/safeguards
+          derogations), hence 6.4=1. Do NOT relabel s.129 as a 6.1 localisation
+          ban (assignment-1 trap). Band requires human confirmation.
+      - text: >
+          An organisation must not transfer any personal data to a country or
+          territory outside Singapore except in accordance with requirements
+          prescribed to ensure that the transferred personal data will be accorded
+          a standard of protection that is comparable to the protection under this
+          Act.
         decomposition:
           subject: "organisation"
-          condition: "transfer of personal data outside the country"
-          constraint: "recipient bound by comparable-protection obligations"
+          condition: "transfer of personal data outside Singapore"
+          constraint: "recipient bound by comparable-protection standard"
         label: "6.4"
-        score: 0.5
+        score: 1
         rationale: >
-          A general rule (prohibition on outbound transfer) coupled with a
-          comparable-protection exception — the canonical conditional regime
-          structure (general_rule + conditional_exception). Restrictiveness
-          (0.5 vs 1) is a regime-level judgment and must be confirmed by a
-          reviewer.
+          PDPA 2012 s.26 is a horizontal conditional-flow regime over personal
+          data (comparable-protection requirement), hence 6.4=1. Band requires
+          human confirmation.
     authority_hints: ["tier_1_statute", "tier_2_regulation"]
 
+  # ── 6.5 — weight 8 (NON-REGULATORY; treaty lookup) ──────────────────────────
   - indicator_id: "6.5"
-    name: "Cross-border treaty / mutual recognition membership"
+    name: "Not in an agreement with binding commitments on data transfer"
     definition: >
-      Whether the jurisdiction is party to a cross-border data treaty or mutual
-      recognition arrangement (e.g. APEC CBPR, Council of Europe Convention 108+,
-      OECD privacy framework).
+      [WEIGHT 8 — NON-REGULATORY / treaty lookup, not desk-research extracted]
+      Core legal question: is the economy committed to at least one agreement
+      (preferential trade agreement, treaty, regional / bilateral / plurilateral /
+      multilateral) containing an ENFORCEABLE (binding) commitment on cross-border
+      data transfer (a 'Cross-Border Transfer of Information by Electronic Means'
+      / 'Free Flow of Data' provision)? Sourced from the TAPED dataset (2.2.1
+      data_free-flow_prov), a secondary pointer to primary treaty text. If the
+      data-flow provision mixes binding and non-binding obligations (mixed
+      legalisation), the score is 1.
     evaluation_method: "treaty_lookup"
+    clause_pattern: "obligation"
     scoring_criteria:
-      "0": "No party to any qualifying instrument."
-      "0.5": "Party to one qualifying instrument."
-      "1": "Party to two or more qualifying instruments."
-    authority_hints: ["tier_1_statute"]
+      "0": >
+        The economy signs at least one agreement with a binding commitment on
+        cross-border data flows (e.g. CPTPP / DEPA electronic-commerce chapters).
+      "1": >
+        The economy does not commit to any agreement with a binding commitment on
+        cross-border data transfer (or only mixed-legalisation provisions exist).
+    authority_hints: ["tier_1_statute", "tier_2_regulation"]
