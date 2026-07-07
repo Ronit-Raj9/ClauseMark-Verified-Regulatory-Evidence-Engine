@@ -20,6 +20,8 @@ __all__ = [
     "BGE_M3_DENSE_DIM",
     "DEFAULT_DENSE_MODEL",
     "DEFAULT_SPARSE_MODEL",
+    "MULTILINGUAL_DENSE_DIM",
+    "MULTILINGUAL_DENSE_MODEL",
     "BgeM3Embedder",
     "DenseEmbedderPort",
     "SparseEmbedderPort",
@@ -33,6 +35,17 @@ BGE_M3_DENSE_DIM: int = 1024
 DEFAULT_DENSE_MODEL: str = "BAAI/bge-m3"
 DEFAULT_SPARSE_MODEL: str = "Qdrant/bm25"
 
+# Phase 2 (cross-lingual): the architecture names BGE-M3 as the multilingual
+# dense model, BUT the fastembed catalogue does NOT currently ship
+# ``BAAI/bge-m3`` (verified via ``TextEmbedding.list_supported_models()``).
+# The catalogue-valid multilingual dense model is ``intfloat/multilingual-e5-
+# large`` — same 1024-dim output, so it is a drop-in for the dense leg and the
+# Qdrant collection dimension. If a future fastembed adds bge-m3, swap the
+# constant; nothing else changes. (If neither is available, callers can fall
+# back to ``DEFAULT_DENSE_MODEL`` for an English-only run.)
+MULTILINGUAL_DENSE_MODEL: str = "intfloat/multilingual-e5-large"
+MULTILINGUAL_DENSE_DIM: int = 1024
+
 
 @runtime_checkable
 class DenseEmbedderPort(Protocol):
@@ -43,9 +56,7 @@ class DenseEmbedderPort(Protocol):
     — BGE-M3 is multilingual and a missing `lang` is never an error.
     """
 
-    def embed_dense(
-        self, texts: Sequence[str], lang: str | None = None
-    ) -> list[list[float]]: ...
+    def embed_dense(self, texts: Sequence[str], lang: str | None = None) -> list[list[float]]: ...
 
 
 @runtime_checkable
@@ -103,9 +114,7 @@ class BgeM3Embedder:
 
     # ── public API ────────────────────────────────────────────────────────
 
-    def embed_dense(
-        self, texts: Sequence[str], lang: str | None = None
-    ) -> list[list[float]]:
+    def embed_dense(self, texts: Sequence[str], lang: str | None = None) -> list[list[float]]:
         # `lang` is accepted for API parity but unused: BGE-M3 is multilingual
         # and does not take a language hint at inference time.
         del lang
@@ -119,9 +128,7 @@ class BgeM3Embedder:
             out.append([float(x) for x in vec])
         return out
 
-    def embed_sparse(
-        self, texts: Sequence[str], lang: str | None = None
-    ) -> list[dict[int, float]]:
+    def embed_sparse(self, texts: Sequence[str], lang: str | None = None) -> list[dict[int, float]]:
         # `lang` is accepted for API parity. The Qdrant/bm25 sparse model used
         # here does its own tokenization, so this hint is recorded for caller
         # observability but not forwarded — when we swap to a per-language

@@ -160,11 +160,11 @@ def _split_unicode_words(text: str) -> list[str]:
 def _is_cjk_char(ch: str) -> bool:
     code = ord(ch)
     return (
-        0x4E00 <= code <= 0x9FFF      # CJK Unified Ideographs
-        or 0x3400 <= code <= 0x4DBF   # CJK Unified Ideographs Extension A
-        or 0x3040 <= code <= 0x309F   # Hiragana
-        or 0x30A0 <= code <= 0x30FF   # Katakana
-        or 0xAC00 <= code <= 0xD7AF   # Hangul Syllables
+        0x4E00 <= code <= 0x9FFF  # CJK Unified Ideographs
+        or 0x3400 <= code <= 0x4DBF  # CJK Unified Ideographs Extension A
+        or 0x3040 <= code <= 0x309F  # Hiragana
+        or 0x30A0 <= code <= 0x30FF  # Katakana
+        or 0xAC00 <= code <= 0xD7AF  # Hangul Syllables
     )
 
 
